@@ -4,6 +4,8 @@ import java.util.Set;
 
 import org.magenta.random.RandomBuilder;
 
+import com.google.common.eventbus.EventBus;
+
 /**
  * A <code>DataDomain</code> groups together different type of related {@link DataSet} and
  * {@link Generator} so they can be retrieved in a convenient way.
@@ -135,5 +137,7 @@ public interface DataDomain<S extends DataSpecification> {
    * @return an iterable of dataset.
    */
   public Iterable<GenerationStrategy<?, ? extends DataSpecification>> strategies();
+
+  public EventBus getEventBus();
 
 }

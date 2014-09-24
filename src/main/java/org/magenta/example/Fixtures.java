@@ -34,10 +34,10 @@ public class Fixtures {
 
   public static DataDomainManager<ExampleDataSpecification> automotives() {
     DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(),RandomBuilder.PROVIDER.singleton());
-    domain.newDataSet(Color.class).generatedBy(new ColorGenerator());
-    domain.newDataSet(Car.class).generatedBy(new CarGenerator());
+    domain.newDataSet(Color.class).generatedBy(new ColorGenerator(),10);
+    domain.newDataSet(Car.class).generatedBy(new CarGenerator(),20);
     domain.newDataSet(Car.Maker.class).composedOf(Car.Maker.values());
-    domain.newDataSet(Owner.class).generatedBy(new OwnerGenerator());
+    domain.newDataSet(Owner.class).generatedBy(new OwnerGenerator(),3);
 
     return domain;
   }

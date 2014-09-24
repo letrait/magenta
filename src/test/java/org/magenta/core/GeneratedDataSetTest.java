@@ -10,9 +10,12 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.magenta.DataDomain;
 import org.magenta.DataDomainManager;
+import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.mockito.Mockito;
+
+import com.google.common.eventbus.EventBus;
 
 public class GeneratedDataSetTest {
 
@@ -27,7 +30,7 @@ public class GeneratedDataSetTest {
 		DataDomainManager<DataSpecification> domain=mock(DataDomainManager.class);
 		GenerationStrategy<Integer, DataSpecification> strategy=mock(GenerationStrategy.class);
 
-		GeneratedDataSet<Integer> sut=new GeneratedDataSet<>(domain, strategy, Integer.class);
+		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
 
 		//exercise sut
 
@@ -49,7 +52,7 @@ public class GeneratedDataSetTest {
 
 		when(strategy.generate(Mockito.any(DataDomain.class))).thenReturn(Arrays.asList(expected));
 
-		GeneratedDataSet<Integer> sut=new GeneratedDataSet<>(domain, strategy, Integer.class);
+		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
 
 		//exercise sut
 		Iterable<Integer> actual=sut.get();

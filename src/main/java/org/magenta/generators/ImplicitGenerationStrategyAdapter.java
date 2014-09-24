@@ -48,8 +48,9 @@ public class ImplicitGenerationStrategyAdapter<D, S extends DataSpecification> i
   }
 
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
+  public Iterable<DataKey<?>> getModifiedDataSet() {
     return affectedDataSet;
   }
+
 
 }

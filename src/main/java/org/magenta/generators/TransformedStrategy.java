@@ -48,8 +48,8 @@ public class TransformedStrategy<D, O, S extends DataSpecification> implements G
   }
 
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
-    return strategy.getTriggeredGeneratedDataKeys();
+  public Iterable<DataKey<?>> getModifiedDataSet() {
+    return strategy.getModifiedDataSet();
   }
 
 }

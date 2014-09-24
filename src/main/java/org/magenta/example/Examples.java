@@ -12,14 +12,12 @@ import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.Generator;
 import org.magenta.SimpleDataSpecification;
-import org.magenta.annotations.TriggeredGeneration;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.example.domain.Car;
 import org.magenta.example.domain.Owner;
 import org.magenta.example.domain.Trip;
 import org.magenta.example.generators.CarGenerator;
 import org.magenta.example.generators.ColorGenerator;
-import org.magenta.example.generators.OwnerGenerator;
 import org.magenta.example.generators.TripGenerator;
 import org.magenta.random.RandomBuilder;
 
@@ -222,10 +220,10 @@ public class Examples {
   @Test
   public void generating_objects_having_bidirectional_associations(){
 
+    title("generating_objects_having_bidirectional_associations");
     DataDomain<ExampleDataSpecification> automotives = Fixtures.automotives();
     out("Here are an owner with its generated cars: %s",automotives.dataset(Owner.class).any());
     out("The car is associated to its owner in the  %s strategy", CarGenerator.class.getName());
-    out("Take a look at the  %s strategy and its annotation: %s", OwnerGenerator.class.getName(),TriggeredGeneration.class);
     out("The annotation means 'generate also cars when you need to generate owners'");
   }
 

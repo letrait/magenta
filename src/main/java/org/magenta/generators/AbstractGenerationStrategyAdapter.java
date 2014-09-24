@@ -67,8 +67,9 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
   }
 
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
+  public Iterable<DataKey<?>> getModifiedDataSet() {
     return affectedDataSet;
   }
+
 
 }

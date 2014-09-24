@@ -32,11 +32,10 @@ public interface GenerationStrategy<D, S extends DataSpecification> {
   public Iterable<D> generate(DataDomain<? extends S> datasetMap);
 
   /**
-   * Return the list of {@link DataKey}s of the data sets that need to be generated after this
-   * the data of this generation strategy has been generated.  This allow bidirectional relation
-   * between objects to be correctly generated.
-   * @return the affected data keys.
+   * Return the list of {@link DataKey}s of the data sets that will be modified when this generation strategy is used.
+   * This  bidirectional relations between objects to be correctly generated.
+   * @return the modified data set keys.
    */
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys();
+  public Iterable<DataKey<?>> getModifiedDataSet();
 
 }

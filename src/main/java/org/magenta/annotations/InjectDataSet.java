@@ -16,6 +16,6 @@ public @interface InjectDataSet {
    * @return
    */
   String value() default DataKey.DEFAULT_QUALIFIER;
-
+  boolean modified() default false;
 
 }

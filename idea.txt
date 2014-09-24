@@ -64,9 +64,6 @@ Faire un random iterator pour le DataSetAggregationStrategy
 
 //TODO : add a generatedBy from a list of generation strategy
 
-These two methods should not be public
-  public void pushOnGenerationCallStack(DataKey<?> key) {
-   }
-  
-  public void popFromGenerationCallStack() {
-    }
+//dont expose EventBus in the DataDomain
+
+//les DataSet devraient presenter leur datakey

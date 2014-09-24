@@ -15,6 +15,7 @@ import org.magenta.random.RandomBuilder;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
+import com.google.common.eventbus.EventBus;
 
 /**
  * Aggregator that links an existing data domain with another.
@@ -40,6 +41,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   public DataDomainAggregator(DataDomain<? super S> delegate, DataDomain<S> parent) {
     this.parent = parent;
     this.delegate = delegate;
+    this.delegate.getEventBus().register(parent);
   }
 
   @Override
@@ -144,6 +146,11 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   @Override
   public Integer numberOfElementsFor(DataKey<?> key) {
     return delegate.numberOfElementsFor(key);
+  }
+
+  @Override
+  public EventBus getEventBus() {
+    return this.parent.getEventBus();
   }
 
 }

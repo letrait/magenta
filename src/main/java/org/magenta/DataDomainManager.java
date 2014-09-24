@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Set;
 
 import org.magenta.core.DataDomainAggregator;
+import org.magenta.core.DataSetRelationLoader;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.core.GeneratedDataSet;
 import org.magenta.core.GeneratorImpl;
@@ -22,11 +23,11 @@ import org.magenta.core.injection.HiearchicalFieldsFinder;
 import org.magenta.core.injection.Injector;
 import org.magenta.core.injection.RandomBuilderFieldHandler;
 import org.magenta.core.injection.ThreadLocalDataDomainSupplier;
+import org.magenta.generators.ContextualGenerationStrategyDecorator;
 import org.magenta.generators.DataSetAggregationStrategy;
 import org.magenta.generators.GeneratorAnnotationHelper;
 import org.magenta.generators.ImplicitGenerationStrategyAdapter;
 import org.magenta.generators.IterableSupplierGenerationStrategyAdapter;
-import org.magenta.generators.NonReentrantDecorator;
 import org.magenta.generators.SimpleGenerationStrategyAdapter;
 import org.magenta.generators.SupplierBasedSimpleGenerationStrategyAdapter;
 import org.magenta.generators.TransformedStrategy;
@@ -44,6 +45,8 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 /**
  * This class allow the management of {@link DataSet}. Use this class to add,
@@ -75,6 +78,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   private ThreadLocalDataDomainSupplier<S> currentFixtureSupplier;
 
+  private EventBus eventBus;
+
 
 
   private final String name;
@@ -102,6 +107,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
     this.currentFixtureSupplier = fixtureSupplier;
+    this.eventBus = new EventBus(name);
+
 
     //this.generationCallStack = getCallstack;
 
@@ -141,7 +148,11 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return a new {@link DataDomainManager}
    */
   public static <S extends DataSpecification> DataDomainManager<S> newRoot(String name, S specification, RandomBuilder randomizer) {
-    return new DataDomainManager<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
+    DataDomainManager<S> fixtureBuilder = new DataDomainManager<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
+
+    fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
+
+    return fixtureBuilder;
   }
 
   /**
@@ -154,7 +165,11 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return a new {@link DataDomainManager} child of this one.
    */
   public DataDomainManager<S> newNode(String name) {
-    return new DataDomainManager<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+    DataDomainManager<S> child = new DataDomainManager<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+
+    child.getEventBus().register(this);
+
+    return child;
   }
 
   /**
@@ -174,8 +189,12 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   public <X extends S> DataDomainManager<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    return new DataDomainManager<X>(name, (DataDomainManager<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    DataDomainManager<X> child = new DataDomainManager<X>(name, (DataDomainManager<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
        this.generationCallStack*/);
+
+child.getEventBus().register(this);
+
+    return child;
   }
 
   /**
@@ -190,8 +209,12 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    */
   public DataDomainManager<S> newNode(DataDomain<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    return new DataDomainManager<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    DataDomainManager<S> child = new DataDomainManager<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
          this.generationCallStack*/);
+
+    child.getEventBus().register(this);
+
+    return child;
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -655,7 +678,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", DataDomainManager.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
-      ds = new GeneratedDataSet<D>(DataDomainManager.this, s, key.getType());
+      ds = new GeneratedDataSet<D,S>(DataDomainManager.this, s, key, eventBus);
       put(key, ds);
     }
     return ds;
@@ -789,6 +812,17 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   public <D> DataSet<D> remove(Class<D> type) {
 
     return remove(DataKey.makeDefault(type));
+  }
+
+  @Override
+  public EventBus getEventBus() {
+    return this.eventBus;
+  }
+
+
+  @Subscribe
+  public void captureChildrenNodeEvent(Object event){
+    this.eventBus.post(event);
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1008,9 +1042,9 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return a new generated data set
      */
     public final DataSet<D> generatedBy(GenerationStrategy<? extends T, ? super S> strategy) {
-      GenerationStrategy<D, S> derivedStrategy = new NonReentrantDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey,currentFixtureSupplier);
+      GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey,currentFixtureSupplier);
 
-      GeneratedDataSet<D> dataset = new GeneratedDataSet<D>(DataDomainManager.this, derivedStrategy, originalKey.getType());
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(DataDomainManager.this, derivedStrategy, originalKey, eventBus);
       DataDomainManager.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1059,7 +1093,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      */
     public final DataSet<D> materalizedFrom(final Iterable<DataKey<? extends T>> keys) {
       GenerationStrategy<D, S> derivedStrategy = new TransformedStrategy<D, T, S>(new DataSetAggregationStrategy<T, S>(keys), filter, converter);
-      GeneratedDataSet<D> dataset = new GeneratedDataSet<D>(DataDomainManager.this, derivedStrategy, originalKey.getType());
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(DataDomainManager.this, derivedStrategy, originalKey, eventBus);
       DataDomainManager.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1208,5 +1242,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
       DataDomainManager.this.put(originalKey, dataset);
     }
   }
+
+
 
 }

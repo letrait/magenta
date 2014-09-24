@@ -1,10 +1,13 @@
 package org.magenta.generators;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.magenta.DataKey;
-import org.magenta.annotations.TriggeredGeneration;
-import org.magenta.annotations.Key;
+import org.magenta.annotations.InjectDataSet;
+import org.magenta.core.injection.HiearchicalFieldsFinder;
 
 import com.google.common.collect.Lists;
 
@@ -29,26 +32,48 @@ public class GeneratorAnnotationHelper {
 
     List<DataKey<?>> affecteds = Lists.newArrayList();
 
-    if (clazz.isAnnotationPresent(TriggeredGeneration.class)) {
-      TriggeredGeneration annotation = clazz.getAnnotation(TriggeredGeneration.class);
+    List<Field> fields = HiearchicalFieldsFinder.SINGLETON.apply(clazz);
 
-      if (annotation.value().length > 0) {
-        for (Key key : annotation.value()) {
-          DataKey<?> dsKey = DataKey.makeQualified(key.qualifier(), key.value());
-          affecteds.add(dsKey);
+    for(Field f:fields){
+      if(f.isAnnotationPresent(InjectDataSet.class)){
+        InjectDataSet annotation = f.getAnnotation(InjectDataSet.class);
+        if(annotation.modified()){
+          DataKey k = findKey(f, annotation);
+          affecteds.add(k);
         }
-      } else {
-        // impossible, @AffectedDataSet cannot be empty by definition
-        throw new IllegalStateException("AffectedDataSet annotation cannot be empty");
-      }
-    }else{
-      Class parent = clazz.getSuperclass();
-      if(parent != null){
-        return getAffectedDataSet(parent);
       }
     }
 
     return affecteds;
+
+  }
+
+  private static DataKey<?> findKey(Field f, InjectDataSet annotation) {
+
+    String qualifier = annotation.value();
+
+    Type gt = f.getGenericType();
+    if (gt instanceof ParameterizedType) {
+      ParameterizedType pt = (ParameterizedType) gt;
+      Type t = pt.getActualTypeArguments()[0];
+      if (t instanceof Class) {
+        Class keyType = ((Class) t);
+
+        return DataKey.makeQualified(qualifier, keyType);
+      } else {
+        throw new IllegalStateException("Dataset cannot be injected into field [" + f.getName() + "] of [" + f.getDeclaringClass()
+            .getName() + "] because the specified DataSet is a generic type [" + t
+            + "].  A specific type should be declared such as DataSet<Integer>  instead of DataSet<D>.");
+      }
+    } else {
+      throw new IllegalStateException(
+          "Dataset cannot be injected into field ["
+              + f.getName()
+              + "] of ["
+              + f.getDeclaringClass()
+                  .getName()
+              + "] because the key cannot be derived from the DataSet since it is a rawtype.  A specific type should be declared such as DataSet<Integer> instead of just DataSet.");
+    }
 
   }
 }

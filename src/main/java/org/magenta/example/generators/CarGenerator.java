@@ -20,7 +20,7 @@ public class CarGenerator implements Supplier<Car> {
   @InjectDataSet
   private DataSet<Car.Maker> makers;
 
-  @InjectDataSet
+  @InjectDataSet(modified = true)
   private DataSet<Owner> owners;
 
   @InjectRandomBuilder

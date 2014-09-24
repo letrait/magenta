@@ -89,7 +89,7 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
 
   @SuppressWarnings("unchecked")
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
+  public Iterable<DataKey<?>> getModifiedDataSet() {
     return Collections.EMPTY_LIST;
   }
 

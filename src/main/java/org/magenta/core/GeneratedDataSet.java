@@ -1,17 +1,18 @@
 package org.magenta.core;
 
-import org.magenta.CycleDetectedInGenerationException;
 import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
+import org.magenta.events.DataSetGenerated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
+import com.google.common.eventbus.EventBus;
 
 /**
  * A {@linkplain DataSet} implementation that relies on a
@@ -22,14 +23,17 @@ import com.google.common.base.Suppliers;
  * @param <D>
  *          the type of data
  */
-public class GeneratedDataSet<D> extends AbstractDataSet<D> {
+public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDataSet<D> {
 
   private static final  Logger LOG = LoggerFactory.getLogger(GeneratedDataSet.class);
 
   private Supplier<Iterable<D>> supplier;
-  private DataDomain<?> domain;
-  private GenerationStrategy<D, ?> strategy;
-  private boolean relationProcessed;
+  private DataDomain<S> domain;
+  private GenerationStrategy<D, S> strategy;
+  private DataKey<D> key;
+  private EventBus eventBus;
+  private boolean postProcessing;
+
 
   /**
    * Default constructor.
@@ -43,10 +47,12 @@ public class GeneratedDataSet<D> extends AbstractDataSet<D> {
    * @param <S>
    *          the data specification type
    */
-  public <S extends DataSpecification> GeneratedDataSet(final DataDomain<S> domain, final GenerationStrategy<D, ? super S> strategy, final Class<D> type) {
-    super(type, domain.getRandomizer());
-    this.strategy = strategy;
+  public  GeneratedDataSet(final DataDomain<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, EventBus eventBus) {
+    super(key.getType(), domain.getRandomizer());
+    this.strategy = (GenerationStrategy)strategy;
     this.domain = domain;
+    this.key = key;
+    this.eventBus = eventBus;
     this.supplier = Suppliers.memoize(new Supplier<Iterable<D>>() {
       @Override
       public Iterable<D> get() {
@@ -64,20 +70,13 @@ public class GeneratedDataSet<D> extends AbstractDataSet<D> {
     //This has to be called after the supplier is initialized, since the loading of the triggered data key may
     //indirectly call this dataset again, in which case the initialized data will be returned and the relationProcessed
     //flag will be true
-    if (!relationProcessed) {
-      relationProcessed = true;
-      if (this.strategy.getTriggeredGeneratedDataKeys() != null) {
-        for (DataKey<?> k : this.strategy.getTriggeredGeneratedDataKeys()) {
-          try{
-          this.domain.dataset(k)
-              .get();
-          }catch(CycleDetectedInGenerationException cdge){
-            //ignore
-            //the key is already being loaded elsewhere
-          }
-        }
-      }
+
+    //I don't think postprocessing is needed at each get
+    if (!postProcessing) {
+      postProcessing = true;
+      this.eventBus.post(new DataSetGenerated(this.key,this.domain));
     }
+
     return data;
   }
 

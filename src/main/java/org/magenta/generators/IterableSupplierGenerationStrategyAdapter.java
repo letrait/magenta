@@ -49,8 +49,9 @@ public class IterableSupplierGenerationStrategyAdapter<D, S extends DataSpecific
   }
 
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
+  public Iterable<DataKey<?>> getModifiedDataSet() {
     return affectedDataSet;
   }
+
 
 }

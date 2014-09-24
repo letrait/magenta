@@ -20,14 +20,16 @@ import org.magenta.core.injection.FixtureContext;
  * @param <D> the type of data
  * @param <S> the type of data specification
  */
-public class NonReentrantDecorator<D, S extends DataSpecification> implements GenerationStrategy<D, S> {
+public class ContextualGenerationStrategyDecorator<D, S extends DataSpecification> implements GenerationStrategy<D, S> {
 
   private GenerationStrategy<D, S> delegate;
   private FixtureContext<S> context;
+  private DataKey<D> key;
 
 
-  public NonReentrantDecorator(GenerationStrategy<D, S> delegate, DataKey<D> key, FixtureContext<S> context) {
+  public ContextualGenerationStrategyDecorator(GenerationStrategy<D, S> delegate, DataKey<D> key, FixtureContext<S> context) {
     this.delegate = delegate;
+    this.key = key;
     this.context = new LoopCycleDetector<S>(context, key);
   }
 
@@ -58,9 +60,11 @@ public class NonReentrantDecorator<D, S extends DataSpecification> implements Ge
   }
 
   @Override
-  public Iterable<DataKey<?>> getTriggeredGeneratedDataKeys() {
-    return delegate.getTriggeredGeneratedDataKeys();
+  public Iterable<DataKey<?>> getModifiedDataSet() {
+    return delegate.getModifiedDataSet();
   }
+
+
 
 }
 
