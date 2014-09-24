@@ -88,22 +88,5 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
 
   }
 
-  @Test
-  public void testGeneratedBySimpleGenerationStrategy_preferred_number(){
 
-    //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
-    SimpleGenerationStrategy<String,DataSpecification> colorStrategy = mock(SimpleGenerationStrategy.class);
-
-    when(colorStrategy.generateItem(Mockito.any(DataDomain.class))).thenReturn("red", "blue", "green","black");
-    when(colorStrategy.getPreferredNumberOfItems(Mockito.any(DataSpecification.class))).thenReturn(3);
-
-    //exercise sut
-    DataSet<String> colors = sut.newDataSet(String.class).generatedBy(colorStrategy);
-
-    //verify outcome
-    assertThat(sut).theDataSet(String.class).isNotNull().isEqualTo(colors).containsExactly("red","blue","green");
-
-
-  }
 }

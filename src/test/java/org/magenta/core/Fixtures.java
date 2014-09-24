@@ -1,19 +1,17 @@
 package org.magenta.core;
 
 import java.util.Arrays;
-import java.util.Random;
 
-import org.magenta.core.GenericDataSet;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Suppliers;
 
 public class Fixtures {
-	
-	public static Randoms randomizer(){
-		return Randoms.singleton();
+
+	public static RandomBuilder randomizer(){
+		return RandomBuilder.PROVIDER.singleton();
 	}
-	
+
   public static GenericDataSet<String> createAnonymousDataSet(int size) {
     String[] elements = new String[size];
     for (int i = 0; i < size; i++) {

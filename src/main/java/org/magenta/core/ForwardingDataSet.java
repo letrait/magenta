@@ -9,6 +9,7 @@ import org.magenta.DataSet;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Predicate;
+import com.google.common.base.Supplier;
 
 /**
  * Implementation of a forwarding data set that can be used to implement the
@@ -21,13 +22,13 @@ import com.google.common.base.Predicate;
 
 public class ForwardingDataSet<D> implements DataSet<D> {
 
-  private final DataSet<D> delegate;
+  private final Supplier<DataSet<D>> delegate;
 
 
   /**
    * @param delegate the delegate
    */
-  public ForwardingDataSet(DataSet<D> delegate) {
+  public ForwardingDataSet(Supplier<DataSet<D>> delegate) {
     this.delegate = delegate;
   }
   /*
@@ -60,7 +61,7 @@ public class ForwardingDataSet<D> implements DataSet<D> {
       return false;
     }
     DataSet<?> other = (DataSet<?>) obj;
-    if (!delegate.equals(other)) {
+    if (!delegate.get().equals(other)) {
       return false;
     }
     return true;
@@ -68,117 +69,117 @@ public class ForwardingDataSet<D> implements DataSet<D> {
 
   @Override
   public Class<D> getType() {
-    return delegate.getType();
+    return delegate.get().getType();
   }
 
   @Override
   public D[] array() {
-    return delegate.array();
+    return delegate.get().array();
   }
 
   @Override
   public D[] array(int size) {
-    return delegate.array(size);
+    return delegate.get().array(size);
   }
 
   @Override
   public D[] randomArray() {
-    return delegate.randomArray();
+    return delegate.get().randomArray();
   }
 
   @Override
   public D[] randomArray(int size) {
-    return delegate.randomArray(size);
+    return delegate.get().randomArray(size);
   }
 
   @Override
   public Iterable<D> get() {
-    return delegate.get();
+    return delegate.get().get();
   }
 
   @Override
   public List<D> list() {
-    return delegate.list();
+    return delegate.get().list();
   }
 
   @Override
   public List<D> list(int size) {
-    return delegate.list(size);
+    return delegate.get().list(size);
   }
 
   @Override
   public List<D> randomList() {
-    return delegate.randomList();
+    return delegate.get().randomList();
   }
 
   @Override
   public List<D> randomList(int size) {
-    return delegate.randomList(size);
+    return delegate.get().randomList(size);
   }
 
   @Override
   public Set<D> set() {
-    return delegate.set();
+    return delegate.get().set();
   }
 
   @Override
   public Set<D> set(int size) {
-    return delegate.set(size);
+    return delegate.get().set(size);
   }
 
   @Override
   public DataSet<D> subset(int size) {
-    return delegate.subset(size);
+    return delegate.get().subset(size);
   }
 
   @Override
   public DataSet<D> filter(Predicate<? super D> filter) {
-    return delegate.filter(filter);
+    return delegate.get().filter(filter);
   }
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> transformedType) {
-    return delegate.transform(function, transformedType);
+    return delegate.get().transform(function, transformedType);
   }
   @Override
   public <S> DataSet<S> cast(Class<S> type) {
-    return delegate.cast(type);
+    return delegate.get().cast(type);
   }
 
   @Override
   public D any() {
-    return delegate.any();
+    return delegate.get().any();
   }
 
   @Override
   public D link(Object o) {
-    return delegate.link(o);
+    return delegate.get().link(o);
   }
 
   @Override
   public <L> Iterable<L> reverseLink(Class<L> type, D referred) {
-    return delegate.reverseLink(type, referred);
+    return delegate.get().reverseLink(type, referred);
   }
 
   @Override
   @SafeVarargs
   public final DataSet<D> without(D... items) {
-    return delegate.without(items);
+    return delegate.get().without(items);
   }
 
   @Override
   public boolean isGenerated() {
-    return delegate.isGenerated();
+    return delegate.get().isGenerated();
   }
 
   @Override
   public DataSet<D> without(Collection<D> items) {
-    return delegate.without(items);
+    return delegate.get().without(items);
   }
 
   @Override
   public boolean isEmpty() {
-    return delegate.isEmpty();
+    return delegate.get().isEmpty();
   }
 
   /*
@@ -188,7 +189,7 @@ public class ForwardingDataSet<D> implements DataSet<D> {
 
   @Override
   public D any(Predicate<? super D> filter) {
-    return delegate.any(filter);
+    return delegate.get().any(filter);
   }
 
   @Override

@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
  */
 public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecification> implements GenerationStrategy<D, S> {
 
-  private final Integer numberOfElements;
+  private final DataKey<?> key;
   private List<DataKey<?>> affectedDataSet;
 
   /**
@@ -28,18 +28,10 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
    * @param numberOfElements the number of elements to generate or null if we should use this class <code>getPreferredNumberOfItems</code>.
    * @param affectedDataSet The dataset that are affected by this generation strategy (other than the generated object).
    */
-  public AbstractGenerationStrategyAdapter(Integer numberOfElements, List<DataKey<?>> affectedDataSet) {
-    this.numberOfElements = numberOfElements;
+  public AbstractGenerationStrategyAdapter(DataKey<?> key, List<DataKey<?>> affectedDataSet) {
+    this.key = key;
     this.affectedDataSet = affectedDataSet;
   }
-
-  /**
-   * Return the preferred number of items to generate when none are specified through the constructor.
-   *
-   * @param specification the data domain specification
-   * @return the preferred number of items
-   */
-  protected abstract int getPreferredNumberOfItems(S specification);
 
   /**
    * Generate an item at the given <code>index</code> and from the <code>dataDomain</code>.
@@ -51,15 +43,16 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
   protected abstract D doGenerate(int index, DataDomain<? extends S> dataDomain);
 
   @Override
-  public Iterable<D> generate(DataDomain<? extends S> dataDomain) {
+  public Iterable<D> generate(DataDomain<? extends S> fixture) {
 
     List<D> result = Lists.newArrayList();
 
-    int s = numberOfElements == null ? getPreferredNumberOfItems(dataDomain.getSpecification()) : numberOfElements;
+    int s = fixture.numberOfElementsFor(key);
 
     for (int i = 0; i < s; i++) {
-      result.add(doGenerate(i, dataDomain));
+      result.add(doGenerate(i, fixture));
     }
+
     return result;
   }
 

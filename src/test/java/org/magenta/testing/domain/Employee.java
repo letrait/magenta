@@ -24,6 +24,12 @@ public class Employee {
   public void setOccupation(String occupation) {
     this.occupation = occupation;
   }
+  @Override
+  public String toString() {
+    return "Employee [employeeId=" + employeeId + ", name=" + name + ", occupation=" + occupation + "]";
+  }
+
+
 
 
 }

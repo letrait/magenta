@@ -6,7 +6,7 @@ import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 public class DataDomainAssert<DATA_SPEC extends DataSpecification> extends AbstractAssert<DataDomainAssert<DATA_SPEC>, DataDomain<DATA_SPEC>> {
 
@@ -31,7 +31,7 @@ public class DataDomainAssert<DATA_SPEC extends DataSpecification> extends Abstr
     return myself;
   }
 
-  public DataDomainAssert<DATA_SPEC> hasRandomizer(Randoms randomizer) {
+  public DataDomainAssert<DATA_SPEC> hasRandomizer(RandomBuilder randomizer) {
     Assertions.assertThat(actual.getRandomizer())
         .overridingErrorMessage("Expected data domain randomizer to be <%s> but was <%s>", randomizer, actual.getSpecification())
         .isEqualTo(randomizer);

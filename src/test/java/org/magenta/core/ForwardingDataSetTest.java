@@ -5,8 +5,9 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.magenta.DataSet;
-import org.magenta.core.ForwardingDataSet;
 import org.mockito.Mockito;
+
+import com.google.common.base.Suppliers;
 
 public class ForwardingDataSetTest {
 
@@ -16,7 +17,7 @@ public class ForwardingDataSetTest {
     // setup fixtures
     DataSet<String> delegate = Mockito.mock(DataSet.class);
 
-    ForwardingDataSet<String> sut = new ForwardingDataSet<String>(delegate);
+    ForwardingDataSet<String> sut = new ForwardingDataSet<String>(Suppliers.ofInstance(delegate));
 
     // exercise sut
     sut.any();
@@ -56,8 +57,8 @@ public class ForwardingDataSetTest {
   public void testEquals() {
     // setup fixtures
     DataSet<String> delegate = Fixtures.createAnonymousDataSet(10);
-    DataSet<String> sut = new ForwardingDataSet<String>(delegate);
-    DataSet<String> same = new ForwardingDataSet<String>(delegate);
+    DataSet<String> sut = new ForwardingDataSet<String>(Suppliers.ofInstance(delegate));
+    DataSet<String> same = new ForwardingDataSet<String>(Suppliers.ofInstance(delegate));
 
     // exercise and verify outcome
     assertThat(delegate).isEqualTo(sut)

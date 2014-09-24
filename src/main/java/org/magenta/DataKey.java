@@ -7,9 +7,10 @@ import java.util.Arrays;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.core.ForwardingDataSet;
 import org.magenta.core.GenericDataSet;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 /**
@@ -113,8 +114,34 @@ public class DataKey<D> {
    */
 
   @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> asDataSet(Randoms randomizer, D... data) {
+  public QualifiedDataSet<D> asDataSet(RandomBuilder randomizer, D... data) {
     return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
+  }
+
+  /**
+   * Return a {@link Qualified} dataset.
+   *
+   * @param dataset
+   *          the dataset to qualify.
+   * @return a new QualifiedDataSet
+   */
+
+  @SuppressWarnings("unchecked")
+  public QualifiedDataSet<D> qualify(DataSet<D> dataset) {
+    return new QualifiedDataSetImpl<D>(this, dataset);
+  }
+
+  /**
+   * Return a {@link Qualified} dataset.
+   *
+   * @param dataset
+   *          the dataset to qualify.
+   * @return a new QualifiedDataSet
+   */
+
+  @SuppressWarnings("unchecked")
+  public QualifiedDataSet<D> qualify(Supplier<DataSet<D>> dataset) {
+    return new QualifiedDataSetImpl<D>(this, dataset);
   }
 
   /**
@@ -184,9 +211,18 @@ public class DataKey<D> {
     private final DataKey<D2> key;
 
     private QualifiedDataSetImpl(DataKey<D2> qualifier, DataSet<D2> delegate) {
-      super(delegate);
+      super(Suppliers.ofInstance(delegate));
       this.key = qualifier;
     }
+
+
+
+    public QualifiedDataSetImpl(DataKey<D2> key, Supplier<DataSet<D2>> delegate) {
+      super(delegate);
+      this.key = key;
+    }
+
+
 
     @Override
     public DataKey<D2> getKey() {

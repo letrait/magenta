@@ -18,7 +18,7 @@ import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.magenta.core.GeneratorImpl;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilderImpl;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;

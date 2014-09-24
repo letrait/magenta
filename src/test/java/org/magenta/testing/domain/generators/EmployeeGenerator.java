@@ -3,7 +3,7 @@ package org.magenta.testing.domain.generators;
 import org.magenta.DataDomain;
 import org.magenta.DataSpecification;
 import org.magenta.SimpleGenerationStrategy;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 import org.magenta.testing.domain.Employee;
 
 public class EmployeeGenerator implements SimpleGenerationStrategy<Employee, DataSpecification>{
@@ -11,7 +11,7 @@ public class EmployeeGenerator implements SimpleGenerationStrategy<Employee, Dat
 	@Override
 	public Employee generateItem(DataDomain<? extends DataSpecification> datasets) {
 
-		Randoms r=datasets.getRandomizer();
+		RandomBuilder r=datasets.getRandomizer();
 
 		Employee e=new Employee();
 		e.setEmployeeId(r.longs().any());
@@ -21,9 +21,5 @@ public class EmployeeGenerator implements SimpleGenerationStrategy<Employee, Dat
 		return e;
 	}
 
-	@Override
-	public int getPreferredNumberOfItems(DataSpecification specification) {
-		return specification.getDefaultNumberOfItems();
-	}
 
 }

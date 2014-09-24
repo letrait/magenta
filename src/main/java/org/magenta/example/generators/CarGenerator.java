@@ -2,27 +2,40 @@ package org.magenta.example.generators;
 
 import java.awt.Color;
 
-import org.magenta.DataDomain;
 import org.magenta.DataSet;
-import org.magenta.SimpleGenerationStrategy;
+import org.magenta.annotations.InjectDataSet;
+import org.magenta.annotations.InjectDataSpecification;
+import org.magenta.annotations.InjectRandomBuilder;
 import org.magenta.example.domain.Car;
 import org.magenta.example.domain.Owner;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
-public class CarGenerator implements SimpleGenerationStrategy<Car, CarSpecification> {
+import com.google.common.base.Supplier;
+
+public class CarGenerator implements Supplier<Car> {
+
+  @InjectDataSet
+  private DataSet<Color> colors;
+
+  @InjectDataSet
+  private DataSet<Car.Maker> makers;
+
+  @InjectDataSet
+  private DataSet<Owner> owners;
+
+  @InjectRandomBuilder
+  private RandomBuilder rnd;
+
+  @InjectDataSpecification
+  private Supplier<CarSpecification> spec;
 
   @Override
-  public Car generateItem(DataDomain<? extends CarSpecification> dataDomain) {
-
-    Randoms rnd=dataDomain.getRandomizer();
-    CarSpecification spec = dataDomain.getSpecification();
+  public Car get() {
 
     Car car = new Car();
-    car.setColor(dataDomain.dataset(Color.class).any());
-    car.setMaker(dataDomain.dataset(Car.Maker.class).any());
-    car.setYear(rnd.integers().any(spec.getYearRange()));
-
-    DataSet<Owner> owners = dataDomain.dataset(Owner.class);
+    car.setColor(colors.any());
+    car.setMaker(makers.any());
+    car.setYear(rnd.integers().any(spec.get().getYearRange()));
 
     if(!owners.isEmpty()) {
       car.setOwner(owners.any());
@@ -34,9 +47,7 @@ public class CarGenerator implements SimpleGenerationStrategy<Car, CarSpecificat
     return car;
   }
 
-  @Override
-  public int getPreferredNumberOfItems(CarSpecification specification) {
-    return specification.getDefaultNumberOfItems();
-  }
+
+
 
 }

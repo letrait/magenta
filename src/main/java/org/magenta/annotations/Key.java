@@ -14,13 +14,13 @@ import org.magenta.DataKey;
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.ANNOTATION_TYPE })
+@Target({ ElementType.ANNOTATION_TYPE})
 public @interface Key {
   /**
    * The data type associated to this key.
    *
    */
-  Class<?> value();
+  Class<?> value() default Key.class;
 
   /**
    * The qualified of this {@link DataKey} or the

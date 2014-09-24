@@ -13,6 +13,7 @@ import org.magenta.DataSet;
 import org.magenta.Generator;
 import org.magenta.SimpleDataSpecification;
 import org.magenta.annotations.TriggeredGeneration;
+import org.magenta.core.EmptyDataSet;
 import org.magenta.example.domain.Car;
 import org.magenta.example.domain.Owner;
 import org.magenta.example.domain.Trip;
@@ -20,7 +21,7 @@ import org.magenta.example.generators.CarGenerator;
 import org.magenta.example.generators.ColorGenerator;
 import org.magenta.example.generators.OwnerGenerator;
 import org.magenta.example.generators.TripGenerator;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -31,7 +32,7 @@ public class Examples {
   public void creating_a_new_data_domain(){
 
     title("creating_a_new_data_domain");
-    DataDomainManager<SimpleDataSpecification> primitives = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(), Randoms.singleton());
+    DataDomainManager<SimpleDataSpecification> primitives = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
 
     out("a datadomain that will contain various java primitives (this is certainly not a real-life case) : %s", primitives);
 
@@ -53,7 +54,7 @@ public class Examples {
   public void creating_a_new_child_data_domain(){
 
     title("creating_a_new_child_data_domain");
-    DataDomainManager<SimpleDataSpecification> parent = DataDomainManager.newRoot("parent", SimpleDataSpecification.create(), Randoms.singleton());
+    DataDomainManager<SimpleDataSpecification> parent = DataDomainManager.newRoot("parent", SimpleDataSpecification.create(), RandomBuilder.PROVIDER.singleton());
 
     parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
     parent.newDataSet(String.class).composedOf("cat","dog","mouse");
@@ -74,7 +75,7 @@ public class Examples {
   public void creating_a_new_data_domain_with_dataset_of_the_same_type(){
 
     title("creating_a_new_data_domain_with_dataset_of_the_same_type");
-    DataDomainManager<SimpleDataSpecification> animals = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(), Randoms.singleton());
+    DataDomainManager<SimpleDataSpecification> animals = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(), RandomBuilder.PROVIDER.singleton());
 
     out("a datadomain that will contain various dataset composed of string : %s", animals);
 
@@ -158,7 +159,7 @@ public class Examples {
   public void using_simple_generation_strategy(){
     title("using_simple_generation_strategy");
 
-    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(), Randoms.singleton());
+    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(), RandomBuilder.PROVIDER.singleton());
     domain.newDataSet(Color.class).generatedBy(new ColorGenerator());
 
     DataSet<Color> aDataSetOfColors = domain.dataset(Color.class);
@@ -257,17 +258,29 @@ public class Examples {
 
   }
 
+
   @Test
   public void using_implicit_generation_strategy(){
     title("using_implicit_generation_strategy");
 
     DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
 
-    automotives.newDataSet(Trip.class).generatedBy(new TripGenerator());
+    automotives.newDataSet(Trip.class).generatedImplicitelyBy(new TripGenerator());
     out("List of cars : %s",automotives.dataset(Car.class).list());
 
     out("At least one trip was generated for each car : %s", automotives.dataset(Trip.class).list());
     out("Look at the %s generation strategy, look how it returns a collection instead of a single element ",TripGenerator.class);
+  }
+
+  @Test
+  public void restricting_on_empty_dataset(){
+    title("restricting_on_empty_dataset");
+
+    DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
+
+    automotives.newDataSet(Trip.class).generatedImplicitelyBy(new TripGenerator());
+    out("No trip were generated : %s",automotives.restrictTo(EmptyDataSet.ofType(Car.class)).dataset(Trip.class).isEmpty());
+
   }
 
   private void title(String title, Object... args) {

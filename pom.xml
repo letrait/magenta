@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.magenta</groupId>
 	<artifactId>magenta</artifactId>
-	<version>1.0.2.1</version>
+	<version>ioc-SNAPSHOT</version>
 	<name>Data generation framework</name>
 	<description>
 		Data generation framework for fixture setup and simulation.

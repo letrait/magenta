@@ -8,7 +8,9 @@ package org.magenta;
  *
  * @param <D>
  * @param <S>
+ * @deprecated prefer usage of Supplier with annotation.
  */
+@Deprecated
 public interface SimpleGenerationStrategy<D, S extends DataSpecification> {
 
   /**
@@ -20,12 +22,4 @@ public interface SimpleGenerationStrategy<D, S extends DataSpecification> {
    */
   public D generateItem(DataDomain<? extends S> dataDomain);
 
-  /**
-   * Return the preferred number of items if none were specified while building
-   * the {@link Generator} or {@link DataSet}.
-   *
-   * @param specification the specification from which (probably) extract the preferred number of items
-   * @return the preferred number of items
-   */
-  public int getPreferredNumberOfItems(S specification);
 }

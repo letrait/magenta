@@ -1,6 +1,6 @@
 package org.magenta.core;
 
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
@@ -28,7 +28,7 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
    * @param random
    *          the random
    */
-  public GenericDataSet(Iterable<D> data, Class<D> type, Randoms random) {
+  public GenericDataSet(Iterable<D> data, Class<D> type, RandomBuilder random) {
     super(type, random);
     this.delegate = Suppliers.ofInstance(data);
   }
@@ -44,7 +44,7 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
    *          the random
    *
    */
-  public GenericDataSet(Supplier<? extends Iterable<D>> delegate, Class<D> type, Randoms random) {
+  public GenericDataSet(Supplier<? extends Iterable<D>> delegate, Class<D> type, RandomBuilder random) {
     super(type, random);
     this.delegate = delegate;
   }

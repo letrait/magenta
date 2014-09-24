@@ -1,14 +1,14 @@
 package org.magenta.generators;
 
-import java.util.Set;
+import java.util.concurrent.Callable;
 
-import org.magenta.CycleDetectedInGenerationException;
 import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
+import org.magenta.core.LoopCycleDetector;
+import org.magenta.core.injection.FixtureContext;
 
-import com.google.inject.internal.Sets;
 
 
 /**
@@ -23,58 +23,38 @@ import com.google.inject.internal.Sets;
 public class NonReentrantDecorator<D, S extends DataSpecification> implements GenerationStrategy<D, S> {
 
   private GenerationStrategy<D, S> delegate;
-  private DataKey<D> key;
+  private FixtureContext<S> context;
 
-  private Set<DataDomain> generatingDataDomain;
 
-  //TODO
-  //use a map of stack using the datadomain as a key
-
-  public NonReentrantDecorator(GenerationStrategy<D, S> delegate, DataKey<D> key) {
+  public NonReentrantDecorator(GenerationStrategy<D, S> delegate, DataKey<D> key, FixtureContext<S> context) {
     this.delegate = delegate;
-    this.key = key;
-    this.generatingDataDomain = Sets.newHashSet();
+    this.context = new LoopCycleDetector<S>(context, key);
   }
 
   @Override
-  public Iterable<D> generate(int numberOfElements, DataDomain<? extends S> dataDomain) {
-    //DataDomainManager<S> manager = (DataDomainManager<S>) datasetMap;
-    //manager.pushOnGenerationCallStack(key);
+  public Iterable<D> generate(final int numberOfElements, final DataDomain<? extends S> fixture) {
 
-    if(generatingDataDomain.contains(dataDomain)){
-      throw new CycleDetectedInGenerationException("Infinite loop detected for generation of key " +key);
-    }
+    return this.context.execute(new Callable<Iterable<D>>(){
 
+      @Override
+      public Iterable<D> call() throws Exception {
+        return delegate.generate(numberOfElements, fixture);
+      }
 
-    try {
-
-      generatingDataDomain.add(dataDomain);
-
-      Iterable<D> data = this.delegate.generate(numberOfElements, dataDomain);
-
-      return data;
-    } finally {
-      generatingDataDomain.remove(dataDomain);
-    }
+    }, fixture);
   }
 
   @Override
-  public Iterable<D> generate(DataDomain<? extends S> dataDomain) {
-    //DataDomainManager<S> manager = (DataDomainManager<S>) dataDomain;
-    //manager.pushOnGenerationCallStack(key);
+  public Iterable<D> generate(final DataDomain<? extends S> fixture) {
 
-    if(generatingDataDomain.contains(dataDomain)){
-      throw new CycleDetectedInGenerationException("Infinite loop detected for generation of key " +key);
-    }
+    return this.context.execute(new Callable<Iterable<D>>(){
 
-    try {
-      generatingDataDomain.add(dataDomain);
-      Iterable<D> data = this.delegate.generate(dataDomain);
-      return data;
-    } finally {
-      generatingDataDomain.remove(dataDomain);
-    }
+      @Override
+      public Iterable<D> call() throws Exception {
+        return delegate.generate(fixture);
+      }
 
+    }, fixture);
   }
 
   @Override

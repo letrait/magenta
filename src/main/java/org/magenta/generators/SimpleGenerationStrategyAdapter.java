@@ -29,30 +29,15 @@ public class SimpleGenerationStrategyAdapter<D, S extends DataSpecification> ext
 
   private SimpleGenerationStrategy<? extends D, ? super S> strategy;
 
+
   /**
    * Default constructor.
    * @param generator the simple generation strategy implementation
    * @param affectedDataSet the affected data set
    */
-  public SimpleGenerationStrategyAdapter(SimpleGenerationStrategy<? extends D, ? super S> generator, List<DataKey<?>> affectedDataSet) {
-    this(generator, null, null, affectedDataSet);
-  }
-
-  /**
-   * Default constructor.
-   * @param generator the simple generation strategy implementation
-   * @param numberOfElements the number of elements to generate.
-   * @param affectedDataSet the affected data set
-   */
-  public SimpleGenerationStrategyAdapter(SimpleGenerationStrategy<? extends D, ? super S> generator, int numberOfElements,
+  public SimpleGenerationStrategyAdapter(DataKey<?> key, SimpleGenerationStrategy<? extends D, ? super S> generator,
       List<DataKey<?>> affectedDataSet) {
-    this(generator, numberOfElements, null, affectedDataSet);
-    Preconditions.checkArgument(numberOfElements >= 0, "Number of elements should be positive, illegal value : %s", numberOfElements);
-  }
-
-  private SimpleGenerationStrategyAdapter(SimpleGenerationStrategy<? extends D, ? super S> generator, Integer numberOfElements, Object extraArgs,
-      List<DataKey<?>> affectedDataSet) {
-    super(numberOfElements, affectedDataSet);
+    super(key, affectedDataSet);
     Preconditions.checkNotNull(generator);
 
     this.strategy = generator;
@@ -69,9 +54,5 @@ public class SimpleGenerationStrategyAdapter<D, S extends DataSpecification> ext
 
   }
 
-  @Override
-  protected int getPreferredNumberOfItems(S specification) {
-    return strategy.getPreferredNumberOfItems(specification);
-  }
 
 }

@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
@@ -20,7 +18,7 @@ import com.google.common.collect.Range;
  * @author ngagnon
  *
  */
-public class Randoms {
+public class RandomBuilderImpl implements RandomBuilder {
 
   private static final int DEFAULT_DOUBLE_NUMBER_OF_DECIMAL_PLACES = 8;
 
@@ -32,20 +30,13 @@ public class Randoms {
   private final RandomString strings;
   private final RandomDate dates;
 
-  private static final Supplier<Randoms> SINGLETON = Suppliers.memoize(new Supplier<Randoms>() {
 
-    @Override
-    public Randoms get() {
-      return new Randoms();
-    }
 
-  });
-
-  private Randoms() {
+  RandomBuilderImpl() {
     this(Helper.initWithDefaultRandom());
   }
 
-  private Randoms(Random random) {
+  RandomBuilderImpl(Random random) {
     // use suppliers?
     this.random = random;
     this.longs = new RandomLong(random);
@@ -56,27 +47,13 @@ public class Randoms {
     this.dates = new RandomDate(longs);
   }
 
-  /**
-   * @return the singleton
-   */
-  public static Randoms singleton() {
-    return SINGLETON.get();
-  }
 
-  /**
-   * Return a new instance of {@code Randoms} using the specified {@code random}.
-   *
-   * @param random the random
-   * @return a new instance
-   */
-  public static Randoms get(Random random) {
-    return new Randoms(random);
-  }
 
   /**
    * Get the random.
    * @return the random
    */
+  @Override
   public Random getRandom() {
     return this.random;
   }
@@ -86,6 +63,7 @@ public class Randoms {
   /**
    * @return date generator
    */
+  @Override
   public RandomDate dates() {
     return this.dates;
   }
@@ -93,6 +71,7 @@ public class Randoms {
   /**
    * @return string generator
    */
+  @Override
   public RandomString strings() {
     return this.strings;
   }
@@ -101,6 +80,7 @@ public class Randoms {
    * @param alphabet the alphabet from which to generate strings
    * @return string generator
    */
+  @Override
   public RandomString strings(String alphabet) {
     return new RandomString(alphabet, integers);
   }
@@ -108,6 +88,7 @@ public class Randoms {
   /**
    * @return a integer generator
    */
+  @Override
   public RandomInteger integers() {
     return this.integers;
   }
@@ -116,6 +97,7 @@ public class Randoms {
    * @param constrained the range of possible values.
    * @return a integer generator
    */
+  @Override
   public RandomInteger integers(Range<Integer> constrained) {
     return new RandomInteger(random, constrained, 1);
   }
@@ -123,6 +105,7 @@ public class Randoms {
   /**
    * @return a long generator.
    */
+  @Override
   public RandomLong longs() {
     return this.longs;
   }
@@ -131,6 +114,7 @@ public class Randoms {
    * @param constrained the range of possible values
    * @return a long generator
    */
+  @Override
   public RandomLong longs(Range<Long> constrained) {
     return new RandomLong(random, constrained, 1);
   }
@@ -138,6 +122,7 @@ public class Randoms {
   /**
    * @return a short generator
    */
+  @Override
   public RandomShort shorts() {
     return this.shorts;
   }
@@ -146,6 +131,7 @@ public class Randoms {
    * @param constrained the range of possible values
    * @return a short generators
    */
+  @Override
   public RandomShort shorts(Range<Short> constrained) {
     return new RandomShort(random, constrained, (short) 1);
   }
@@ -153,6 +139,7 @@ public class Randoms {
   /**
    * @return a double generator.
    */
+  @Override
   public RandomDouble doubles() {
     return this.doubles;
   }
@@ -161,6 +148,7 @@ public class Randoms {
    * @param numberOfDecimalPlaces number of decimal places in the generated numbers
    * @return a double generator
    */
+  @Override
   public RandomDouble doubles(int numberOfDecimalPlaces) {
     return new RandomDouble(random, numberOfDecimalPlaces);
   }
@@ -170,6 +158,7 @@ public class Randoms {
    * @param constrained the range of possible values
    * @return a double generator
    */
+  @Override
   public RandomDouble doubles(int numberOfDecimalPlaces, Range<Double> constrained) {
     return new RandomDouble(random, numberOfDecimalPlaces, constrained);
   }
@@ -180,6 +169,7 @@ public class Randoms {
    * @return a list picker
    *
    */
+  @Override
   @SafeVarargs
   public final <E> RandomList<E> array(E... values) {
     return new RandomList<>(random, integers(), Arrays.asList(values));
@@ -190,6 +180,7 @@ public class Randoms {
    * @param <E> type of enum
    * @return a enum picker
    */
+  @Override
   public final <E extends Enum<E>> RandomList<E> enums(Class<E> clazz) {
 
     List<E> enums = Arrays.asList(clazz.getEnumConstants());
@@ -202,6 +193,7 @@ public class Randoms {
    * @param <E> the type of value
    * @return a list picker
    */
+  @Override
   public <E> RandomList<E> iterable(Iterable<E> values) {
     return new RandomList<>(random, integers(), Lists.newArrayList(values));
   }
@@ -213,12 +205,13 @@ public class Randoms {
    * @param <E> the type of value
    * @return a mixed iterable
    */
+  @Override
   public <E> Iterable<E> mix(Iterable<Iterable<? extends E>> iterables) {
     return new MixedIterable<>(iterables, this);
   }
 
   private static class Helper {
-    private static final Logger LOG = LoggerFactory.getLogger(Randoms.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RandomBuilderImpl.class);
 
     public static final String RANDOM_SEED_SYSTEM_PROPERTY_KEY = "magenta.random.seed";
 

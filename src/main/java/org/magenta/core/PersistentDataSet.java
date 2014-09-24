@@ -2,7 +2,7 @@ package org.magenta.core;
 
 import org.magenta.DataSet;
 import org.magenta.DataStore;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 /**
  * Implementation of {@link DataSet} that persist data.
@@ -23,7 +23,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
    * @param store the store to use for persistence
    * @param randomizer the randomizer
    */
-  public PersistentDataSet(DataSet<D> dataset, DataStore<D> store, Randoms randomizer) {
+  public PersistentDataSet(DataSet<D> dataset, DataStore<D> store, RandomBuilder randomizer) {
     super(dataset.getType(), randomizer);
     this.source = dataset;
     this.persistedData = new LazyLoadedList<>(dataset, store);

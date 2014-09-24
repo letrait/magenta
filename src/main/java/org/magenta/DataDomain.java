@@ -2,7 +2,7 @@ package org.magenta;
 
 import java.util.Set;
 
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 /**
  * A <code>DataDomain</code> groups together different type of related {@link DataSet} and
@@ -33,11 +33,11 @@ public interface DataDomain<S extends DataSpecification> {
   public DataDomain<S> getParent();
 
   /**
-   * Return the {@linkplain Randoms} associated to this domain.
+   * Return the {@linkplain RandomBuilder} associated to this domain.
    *
    * @return the randomizer
    */
-  public Randoms getRandomizer();
+  public RandomBuilder getRandomizer();
 
   /**
    * Return the {@linkplain DataSet} associated to the default key of
@@ -50,6 +50,9 @@ public interface DataDomain<S extends DataSpecification> {
    * @return a DataSet
    */
   public abstract <D> DataSet<D> dataset(Class<D> clazz);
+
+
+  public Integer numberOfElementsFor(DataKey<?> key);
 
   /**
    * Return the {@linkplain DataSet} associated to the specified key.

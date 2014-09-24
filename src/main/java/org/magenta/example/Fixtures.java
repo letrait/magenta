@@ -10,13 +10,13 @@ import org.magenta.example.domain.Owner;
 import org.magenta.example.generators.CarGenerator;
 import org.magenta.example.generators.ColorGenerator;
 import org.magenta.example.generators.OwnerGenerator;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 public class Fixtures {
 
   public static DataDomain<SimpleDataSpecification> rgb() {
 
-    DataDomainManager<SimpleDataSpecification> domain = DataDomainManager.newRoot("colors", SimpleDataSpecification.create(), Randoms.singleton());
+    DataDomainManager<SimpleDataSpecification> domain = DataDomainManager.newRoot("colors", SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
     domain.newDataSet(Color.class).composedOf(Color.RED, Color.GREEN, Color.BLUE);
     return domain;
 
@@ -24,7 +24,7 @@ public class Fixtures {
 
   public static DataDomain<ExampleDataSpecification> multicolor() {
 
-    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(), Randoms.singleton());
+    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(),RandomBuilder.PROVIDER.singleton());
     domain.newDataSet(Color.class)
         .generatedBy(new ColorGenerator());
     return domain;
@@ -33,7 +33,7 @@ public class Fixtures {
 
 
   public static DataDomainManager<ExampleDataSpecification> automotives() {
-    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(), Randoms.singleton());
+    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(),RandomBuilder.PROVIDER.singleton());
     domain.newDataSet(Color.class).generatedBy(new ColorGenerator());
     domain.newDataSet(Car.class).generatedBy(new CarGenerator());
     domain.newDataSet(Car.Maker.class).composedOf(Car.Maker.values());

@@ -1,80 +1,54 @@
 package org.magenta.generators;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
+import org.magenta.SimpleGenerationStrategy;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 
 /**
- * This class adapts an existing {@link Supplier} to be used as
- * a {@link GenerationStrategy}.
+ * This class adapts an existing {@link SimpleGenerationStrategy} to be used as
+ * a {@link GenerationStrategy}. If no number Of elements to generate is passed
+ * in to the constructor, then the specified
+ * {@link SimpleGenerationStrategy#getPreferredNumberOfItems(DataSpecification)}
+ * will be used instead.
  *
  * @author normand
  *
  * @param <D>
  *          The type of data being generated
+ * @param <S>
+ *          the data specification
  */
-public class SupplierBasedSimpleGenerationStrategyAdapter<D> extends AbstractGenerationStrategyAdapter<D, DataSpecification> {
+public class SupplierBasedSimpleGenerationStrategyAdapter<D, S extends DataSpecification> extends AbstractGenerationStrategyAdapter<D, S> implements
+    GenerationStrategy<D, S> {
 
-  private Supplier<D> generator;
-
-  /**
-   * Default number of items to generate will be read from {@link DataSpecification#getDefaultNumberOfItems()}.
-   *
-   * @param generator the generator
-   */
-  public SupplierBasedSimpleGenerationStrategyAdapter(Supplier<D> generator) {
-    super(null, Collections.<DataKey<?>> emptyList());
-    this.generator = generator;
-  }
+  private Supplier<? extends D> strategy;
 
   /**
-   * Default number of items to generate will be read from {@link DataSpecification#getDefaultNumberOfItems()}.
+   * Default constructor.
    *
-   * @param generator the generator
-   * @param affectedDataSets the affected data sets
+   * @param generator
+   *          the simple generation strategy implementation
+   * @param numberOfElements
+   *          the number of elements to generate.
+   * @param affectedDataSet
+   *          the affected data set
    */
-  public SupplierBasedSimpleGenerationStrategyAdapter(Supplier<D> generator, List<DataKey<?>> affectedDataSets) {
-    super(null, affectedDataSets);
-    this.generator = generator;
-  }
-
-  /**
-   * Constructor where the number of elements to generate is specified.
-   *
-   * @param generator the generator
-   * @param numberOfElements the number of elements to generate
-   */
-  public SupplierBasedSimpleGenerationStrategyAdapter(Supplier<D> generator, Integer numberOfElements) {
-    super(numberOfElements, Collections.<DataKey<?>> emptyList());
-    this.generator = generator;
-  }
-
-  /**
-   * Constructor where the number of elements to generate is specified.
-   *
-   * @param generator the generator
-   * @param numberOfElements the number of elements
-   * @param affectedDataSets the affected data sets
-   */
-  public SupplierBasedSimpleGenerationStrategyAdapter(Supplier<D> generator, Integer numberOfElements, List<DataKey<?>> affectedDataSets) {
-    super(numberOfElements, affectedDataSets);
-    this.generator = generator;
+  public SupplierBasedSimpleGenerationStrategyAdapter(DataKey<?> key, Supplier<? extends D> generator, List<DataKey<?>> affectedDataSet) {
+    super(key, affectedDataSet);
+    Preconditions.checkNotNull(generator);
+    this.strategy = generator;
   }
 
   @Override
-  protected int getPreferredNumberOfItems(DataSpecification specification) {
-    return specification.getDefaultNumberOfItems();
-  }
-
-  @Override
-  protected D doGenerate(int i, DataDomain<? extends DataSpecification> dataDomain) {
-    return generator.get();
+  protected D doGenerate(int index, DataDomain<? extends S> datasets) {
+    return strategy.get();
   }
 
 }

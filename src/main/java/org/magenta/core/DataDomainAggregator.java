@@ -10,7 +10,7 @@ import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.magenta.Generator;
 import org.magenta.GeneratorNotFoundException;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -127,7 +127,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   }
 
   @Override
-  public Randoms getRandomizer() {
+  public RandomBuilder getRandomizer() {
     return delegate.getRandomizer();
   }
 
@@ -139,6 +139,11 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   @Override
   public String getName() {
     return "aggregation of " + delegate.getName() + " and " + parent.getName();
+  }
+
+  @Override
+  public Integer numberOfElementsFor(DataKey<?> key) {
+    return delegate.numberOfElementsFor(key);
   }
 
 }

@@ -61,10 +61,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
       return dataDomain.dataset(String.class).any();
     }
 
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
-    }
 
   }
 
@@ -75,10 +71,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
       return dataDomain.dataset(BAR).any();
     }
 
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
-    }
 
   }
 
@@ -89,10 +81,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
       return dataDomain.dataset(FOO).any();
     }
 
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
-    }
 
   }
 
@@ -101,11 +89,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
     @Override
     public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
       return dataDomain.dataset(TAC).any();
-    }
-
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
     }
 
   }
@@ -117,10 +100,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
       return dataDomain.dataset(TOE).any();
     }
 
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
-    }
 
   }
 
@@ -131,10 +110,6 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
       return dataDomain.dataset(TIC).any();
     }
 
-    @Override
-    public int getPreferredNumberOfItems(DataSpecification specification) {
-      return specification.getDefaultNumberOfItems();
-    }
 
   }
 }

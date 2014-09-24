@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
-import org.magenta.random.MixedIterable;
-import org.magenta.random.Randoms;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -24,7 +22,7 @@ public class RandomIterableTest {
 		Random random=mock(Random.class);
 
 
-		Randoms randomizer=Randoms.get(random);
+		RandomBuilder randomizer=RandomBuilder.PROVIDER.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);
@@ -53,7 +51,7 @@ public class RandomIterableTest {
 		Random random=mock(Random.class);
 
 
-		Randoms randomizer=Randoms.get(random);
+		RandomBuilder randomizer=RandomBuilder.PROVIDER.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);

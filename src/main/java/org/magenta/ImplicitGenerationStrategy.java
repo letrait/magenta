@@ -10,6 +10,7 @@ package org.magenta;
  * @param <D> the type of data being generated
  * @param <S> the data specification required by this implementation
  */
+@Deprecated
 public interface ImplicitGenerationStrategy<D, S extends DataSpecification> {
   /**
    * Generate some data, the actual number of items generated is

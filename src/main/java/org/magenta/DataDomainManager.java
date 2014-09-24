@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 
 import org.magenta.core.DataDomainAggregator;
 import org.magenta.core.EmptyDataSet;
@@ -15,14 +14,23 @@ import org.magenta.core.GeneratorImpl;
 import org.magenta.core.GenericDataSet;
 import org.magenta.core.PersistentDataSet;
 import org.magenta.core.RestrictionHelper;
+import org.magenta.core.injection.DataSetFieldHandler;
+import org.magenta.core.injection.DataSpecificationFieldHandler;
+import org.magenta.core.injection.FieldInjectionChainProcessor;
+import org.magenta.core.injection.FieldInjectionHandler;
+import org.magenta.core.injection.HiearchicalFieldsFinder;
+import org.magenta.core.injection.Injector;
+import org.magenta.core.injection.RandomBuilderFieldHandler;
+import org.magenta.core.injection.ThreadLocalDataDomainSupplier;
 import org.magenta.generators.DataSetAggregationStrategy;
 import org.magenta.generators.GeneratorAnnotationHelper;
 import org.magenta.generators.ImplicitGenerationStrategyAdapter;
+import org.magenta.generators.IterableSupplierGenerationStrategyAdapter;
 import org.magenta.generators.NonReentrantDecorator;
 import org.magenta.generators.SimpleGenerationStrategyAdapter;
 import org.magenta.generators.SupplierBasedSimpleGenerationStrategyAdapter;
 import org.magenta.generators.TransformedStrategy;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,16 +60,22 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   private final DataStoreProvider dataStoreProvider;
 
-  private final Randoms randomizer;
+  private final RandomBuilder randomizer;
 
   private final S specification;
 
   private final Map<DataKey<?>, DataSet<?>> dataSetMap;
   private final Map<DataKey<?>, GenerationStrategy<?, ? extends DataSpecification>> generatorMap;
+  private final Map<DataKey<?>, Integer> numberOfItemsMap;
+
   private final List<Processor<S>> processors;
 
+  private Injector injector;
+  //private final ThreadLocal<Stack<DataKey<?>>> generationCallStack;
 
-  private final ThreadLocal<Stack<DataKey<?>>> generationCallStack;
+  private ThreadLocalDataDomainSupplier<S> currentFixtureSupplier;
+
+
 
   private final String name;
 
@@ -79,19 +93,29 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @param datastoreProvider
    *          the datasource provider for persitent DataSet.
    */
-  private DataDomainManager(String name, DataDomain<S> parent, S specification, Randoms randomizer, DataStoreProvider datastoreProvider,
-      ThreadLocal<Stack<DataKey<?>>> getCallstack) {
+  private DataDomainManager(String name, DataDomain<S> parent, S specification, RandomBuilder randomizer, DataStoreProvider datastoreProvider,
+      ThreadLocalDataDomainSupplier fixtureSupplier/*,
+      ThreadLocal<Stack<DataKey<?>>> getCallstack*/) {
     this.name = name;
     this.parent = parent;
     this.specification = specification;
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
+    this.currentFixtureSupplier = fixtureSupplier;
 
-    this.generationCallStack = getCallstack;
+    //this.generationCallStack = getCallstack;
 
     this.dataSetMap = new HashMap<DataKey<?>, DataSet<?>>();
     this.generatorMap = new HashMap<DataKey<?>, GenerationStrategy<?, ?>>();
+    this.numberOfItemsMap = new HashMap<DataKey<?>, Integer>();
     this.processors = Lists.newArrayList();
+
+    List<FieldInjectionHandler> handlers = Lists.newArrayList();
+    handlers.add(new DataSetFieldHandler());
+    handlers.add(new DataSpecificationFieldHandler());
+    handlers.add(new RandomBuilderFieldHandler());
+
+    this.injector = new FieldInjectionChainProcessor(fixtureSupplier, HiearchicalFieldsFinder.SINGLETON, handlers);
 
 
 
@@ -116,8 +140,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    *          the type of {@link DataSpecification}
    * @return a new {@link DataDomainManager}
    */
-  public static <S extends DataSpecification> DataDomainManager<S> newRoot(String name, S specification, Randoms randomizer) {
-    return new DataDomainManager<S>(name, null, specification, randomizer, null, new ThreadLocal<Stack<DataKey<?>>>());
+  public static <S extends DataSpecification> DataDomainManager<S> newRoot(String name, S specification, RandomBuilder randomizer) {
+    return new DataDomainManager<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
   }
 
   /**
@@ -130,7 +154,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return a new {@link DataDomainManager} child of this one.
    */
   public DataDomainManager<S> newNode(String name) {
-    return new DataDomainManager<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider,this.generationCallStack);
+    return new DataDomainManager<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
   }
 
   /**
@@ -150,8 +174,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   public <X extends S> DataDomainManager<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    return new DataDomainManager<X>(name, (DataDomainManager<X>) this, dataspecification, this.randomizer, this.dataStoreProvider,
-       this.generationCallStack);
+    return new DataDomainManager<X>(name, (DataDomainManager<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+       this.generationCallStack*/);
   }
 
   /**
@@ -166,8 +190,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    */
   public DataDomainManager<S> newNode(DataDomain<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    return new DataDomainManager<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider,
-         this.generationCallStack);
+    return new DataDomainManager<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+         this.generationCallStack*/);
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -216,7 +240,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return the {@link Random}
    */
   @Override
-  public Randoms getRandomizer() {
+  public RandomBuilder getRandomizer() {
     return this.randomizer;
   }
 
@@ -452,6 +476,33 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
 
+  public DataDomainManager<S> setNumberOfElementsFor(DataKey<?> key, Integer numberOfElements) {
+
+    Preconditions.checkState(datasetKeys().contains(key), "Cannot set the number of elements of %s : No dataset exists for this key.", key);
+    this.numberOfItemsMap.put(key, numberOfElements);
+
+    return this;
+  }
+
+  @Override
+  public Integer numberOfElementsFor(DataKey<?> key) {
+
+    Integer n = null;
+
+    DataDomain<S> parent = this.getParent();
+
+    n = numberOfItemsMap.get(key);
+
+    if (n == null && parent != null) {
+      n = parent.numberOfElementsFor(key);
+    }
+
+    n = (n == null) ? getSpecification().getDefaultNumberOfItems() : n;
+
+    return n;
+  }
+
+
   <D> DataSet<D> doGet(DataKey<D> key) {
     Preconditions
         .checkNotNull(key);
@@ -518,7 +569,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     return generationCallStack.get() != null && generationCallStack.get().contains(key);
   }*/
 
-  public void pushOnGenerationCallStack(DataKey<?> key) {
+  /*public void pushOnGenerationCallStack(DataKey<?> key) {
     if (generationCallStack.get() == null) {
       generationCallStack.set(new Stack<DataKey<?>>());
     }
@@ -536,16 +587,16 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     }else{
       LOG.warn("Attempt to pop from the get call stack but it is empty");
     }
-  }
+  }*/
 
-  private String displayGenerationCallStack(DataKey<?> current) {
+  /*private String displayGenerationCallStack(DataKey<?> current) {
     StringBuilder sb = new StringBuilder("Stack:\n");
     sb.append(current).append('\n');
     for(DataKey<?> key:generationCallStack.get()){
       sb.append(key).append('\n');
     }
     return sb.toString();
-  }
+  }*/
 
 
 
@@ -872,9 +923,12 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return a new generated data set
      */
     public final DataSet<D> generatedBy(Supplier<? extends T> generator, int numberOfItems) {
-      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(generator, numberOfItems,
-          GeneratorAnnotationHelper.getAffectedDataSet(generator.getClass())));
+
+      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(originalKey, injector.inject(generator),
+          GeneratorAnnotationHelper.getAffectedDataSet(generator.getClass())), numberOfItems);
     }
+
+
 
     /**
      * Build a {@link DataSet} generated by a <code>generator</code> which implements the Goggle guava's {@link Supplier} interface.
@@ -883,10 +937,20 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return a new generated data set
      */
     public final DataSet<D> generatedBy(Supplier<? extends T> generator) {
-      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(generator, GeneratorAnnotationHelper.getAffectedDataSet(generator
-          .getClass())));
+      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(originalKey, injector.inject(generator),
+          GeneratorAnnotationHelper.getAffectedDataSet(generator.getClass())));
     }
 
+
+    /**
+     * Build a {@link DataSet} generated by an implicit <code>strategy</code> which generate a predetermined number of items.
+     *
+     * @param strategy the strategy to use
+     * @return a new generated data set
+     */
+    public final DataSet<D> generatedImplicitelyBy(Supplier<? extends Iterable<T>> strategy) {
+      return generatedBy(new IterableSupplierGenerationStrategyAdapter<>(injector.inject(strategy), GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
+    }
     /**
      * Build a {@link DataSet} generated by an implicit <code>strategy</code> which generate a predetermined number of items.
      *
@@ -903,8 +967,10 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return new generated data set
      */
     public final DataSet<D> generatedBy(SimpleGenerationStrategy<? extends T, ? super S> strategy) {
-      return generatedBy(new SimpleGenerationStrategyAdapter<>(strategy, GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
+      return generatedBy(new SimpleGenerationStrategyAdapter<>(originalKey, strategy, GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
     }
+
+
 
     /**
      * Build a {@link DataSet} generated by a simple <code>strategy</code>.
@@ -913,8 +979,26 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return new generated data set
      */
     public final DataSet<D> generatedBy(SimpleGenerationStrategy<? extends T, ? super S> strategy, int numberOfItems) {
-      return generatedBy(new SimpleGenerationStrategyAdapter<>(strategy, numberOfItems, GeneratorAnnotationHelper.getAffectedDataSet(strategy
-          .getClass())));
+
+
+      return generatedBy(new SimpleGenerationStrategyAdapter<>(originalKey, strategy, GeneratorAnnotationHelper.getAffectedDataSet(strategy
+          .getClass())), numberOfItems);
+    }
+
+    /**
+     * Build a {@link DataSet} generated by a generic <code>strategy</code>.
+     *
+     * @param strategy the strategy to use
+     * @return a new generated data set
+     */
+    public final DataSet<D> generatedBy(GenerationStrategy<? extends T, ? super S> strategy, Integer numberOfItems) {
+      DataSet<D> dataset = generatedBy(strategy);
+
+      if(numberOfItems != null){
+        DataDomainManager.this.setNumberOfElementsFor(originalKey, numberOfItems);
+      }
+
+      return dataset;
     }
 
     /**
@@ -924,12 +1008,14 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @return a new generated data set
      */
     public final DataSet<D> generatedBy(GenerationStrategy<? extends T, ? super S> strategy) {
-      GenerationStrategy<D, S> derivedStrategy = new NonReentrantDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey);
+      GenerationStrategy<D, S> derivedStrategy = new NonReentrantDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey,currentFixtureSupplier);
 
       GeneratedDataSet<D> dataset = new GeneratedDataSet<D>(DataDomainManager.this, derivedStrategy, originalKey.getType());
       DataDomainManager.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
+
+
       return dataset;
     }
 
@@ -1050,6 +1136,24 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     }
 
     /**
+     * Build a {@link Generator} that delegate to a generic <code>strategy</code>.
+     *
+     * @param strategy the strategy to use
+     * @return a new generated data set
+     */
+    public Generator<D> generatedBy(GenerationStrategy<? extends T, ? super S> strategy, Integer numberOfItems) {
+
+      Generator<D> generator = generatedBy(strategy);
+
+      if(numberOfItems !=null){
+        DataDomainManager.this.setNumberOfElementsFor(originalKey, numberOfItems);
+      }
+
+
+      return generator;
+    }
+
+    /**
      * Build a {@link Generator} that delegate to a simple <code>strategy</code>.
      *
      * @param strategy the strategy to use
@@ -1057,7 +1161,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      */
     public Generator<D> generatedBy(SimpleGenerationStrategy<? extends T, ? super S> strategy) {
 
-      return generatedBy(new SimpleGenerationStrategyAdapter<T, S>(strategy,
+      return generatedBy(new SimpleGenerationStrategyAdapter<T, S>(originalKey, strategy,
           GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
 
     }
@@ -1071,8 +1175,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      */
     public Generator<D> generatedBy(SimpleGenerationStrategy<? extends T, ? super S> strategy, int numberOfItems) {
 
-      return generatedBy(new SimpleGenerationStrategyAdapter<T, S>(strategy, numberOfItems,
-          GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
+      return generatedBy(new SimpleGenerationStrategyAdapter<T, S>(originalKey, strategy,
+          GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())), numberOfItems);
 
     }
 
@@ -1085,8 +1189,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      */
     public Generator<D> generatedBy(Supplier<? extends T> generator, int numberOfItems) {
 
-      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(generator, numberOfItems,
-          GeneratorAnnotationHelper.getAffectedDataSet(generator.getClass())));
+      return generatedBy(new SupplierBasedSimpleGenerationStrategyAdapter<>(originalKey, injector.inject(generator),
+          GeneratorAnnotationHelper.getAffectedDataSet(generator.getClass())), numberOfItems);
 
     }
 

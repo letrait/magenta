@@ -60,6 +60,10 @@ public class GeneratedDataSet<D> extends AbstractDataSet<D> {
   @Override
   public Iterable<D> get() {
     Iterable<D> data = this.supplier.get();
+
+    //This has to be called after the supplier is initialized, since the loading of the triggered data key may
+    //indirectly call this dataset again, in which case the initialized data will be returned and the relationProcessed
+    //flag will be true
     if (!relationProcessed) {
       relationProcessed = true;
       if (this.strategy.getTriggeredGeneratedDataKeys() != null) {

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 public class DataDomainManagerWithProcessorTest {
 
@@ -22,7 +22,7 @@ public class DataDomainManagerWithProcessorTest {
 
 		Processor<DataSpecification> processor=new IntegerIncrementerProcessor();
 
-		DataDomainManager<SimpleDataSpecification> testDataDomain=DataDomainManager.newRoot("test", SimpleDataSpecification.create(), Randoms.singleton());
+		DataDomainManager<SimpleDataSpecification> testDataDomain=DataDomainManager.newRoot("test", SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
 		testDataDomain.newDataSet(AtomicInteger.class).composedOf(int1,int2);
 
 		//exercise sut

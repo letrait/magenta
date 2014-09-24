@@ -1,6 +1,7 @@
 package org.magenta.core;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import org.magenta.DataDomainManager;
 import org.magenta.DataKey;
@@ -28,7 +29,9 @@ import com.google.common.collect.Multimap;
  * DataDomainManager tourismDomain = TourismDomain.createDomain();
  * City paris = CityBuilder.build(&quot;Paris&quot;); // custom logic to
  * // create/build/generate a city
- * Monument monument = tourismDomain.restrictTo(paris).dataset(Monument.class).any(); // existing
+ * Monument monument = tourismDomain.restrictTo(paris)
+ *     .dataset(Monument.class)
+ *     .any(); // existing
  * // city
  * // dataset
  * // replaced
@@ -47,6 +50,8 @@ import com.google.common.collect.Multimap;
  */
 public class RestrictionHelper {
 
+  private static final Object EMPTY = new Object();
+
   /**
    * Fixes corresponding dataset with the given <code>objects</code> into the
    * <code>domain</code>.
@@ -64,7 +69,15 @@ public class RestrictionHelper {
 
     for (DataKey key : multimap.keySet()) {
 
-      domain.newDataSet(key).composedOf(multimap.get(key));
+      Collection<Object> objs = multimap.get(key);
+      if (objs.size() == 1 && objs.iterator()
+          .next() == EMPTY) {
+        domain.newDataSet(key)
+            .composedOf();
+      } else {
+        domain.newDataSet(key)
+            .composedOf(multimap.get(key));
+      }
 
     }
   }
@@ -74,15 +87,34 @@ public class RestrictionHelper {
     for (Object o : objects) {
       if (o instanceof QualifiedDataSet) {
         QualifiedDataSet<?> qDataSetItem = (QualifiedDataSet<?>) o;
-        multimap.putAll(qDataSetItem.getKey(), qDataSetItem.get());
+        if (!qDataSetItem.isEmpty()) {
+          multimap.putAll(qDataSetItem.getKey(), qDataSetItem.get());
+        } else {
+
+          if (multimap.get(qDataSetItem.getKey())
+              .isEmpty()) {
+            multimap.put(qDataSetItem.getKey(), EMPTY);
+          }
+          ;
+
+        }
+
       } else if (o instanceof DataSet) {
         DataSet<?> dataSetItem = (DataSet<?>) o;
         DataKey<?> key = DataKey.makeDefault(dataSetItem.getType());
-        multimap.putAll(key, dataSetItem.get());
+        if (!dataSetItem.isEmpty()) {
+          multimap.putAll(key, dataSetItem.get());
+        } else {
+          if (!multimap.containsKey(key)) {
+            multimap.put(key, EMPTY);
+          }
+
+        }
       } else if (o instanceof Iterable) {
         Iterable<?> iterableItem = (Iterable<?>) o;
         normalize(domain, iterableItem, multimap);
-      } else if (o.getClass().isArray()) {
+      } else if (o.getClass()
+          .isArray()) {
         Object[] arrayItem = (Object[]) o;
         normalize(domain, Arrays.asList(arrayItem), multimap);
       } else {
@@ -98,7 +130,8 @@ public class RestrictionHelper {
   @VisibleForTesting
   static DataKey<?> findKeyForClass(DataDomainManager<?> domain, Class<? extends Object> clazz) {
     DataKey<?> key = DataKey.makeDefault(clazz);
-    if (domain.datasetKeys().contains(key)) {
+    if (domain.datasetKeys()
+        .contains(key)) {
       return key;
     }
 

@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.core.GenericDataSet;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -23,7 +23,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	public void testConstructorAndGetter(){
 		//setup fixtures
 	  SimpleDataSpecification specification = SimpleDataSpecification.create();
-		Randoms randomizer = Randoms.get(new Random());
+		RandomBuilder randomizer = RandomBuilder.PROVIDER.get(new Random());
 		String expectedName = "DataDomainSingleNodeTest";
 
 		//exercise sut

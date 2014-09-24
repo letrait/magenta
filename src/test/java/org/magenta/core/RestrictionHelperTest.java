@@ -9,7 +9,7 @@ import org.magenta.DataDomainManager;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.SimpleDataSpecification;
-import org.magenta.random.Randoms;
+import org.magenta.random.RandomBuilder;
 import org.magenta.testing.domain.Employee;
 import org.magenta.testing.domain.generators.EmployeeGenerator;
 
@@ -151,6 +151,23 @@ public class RestrictionHelperTest {
 		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
 	}
 
+	 @Test
+	  public void testApplyRestrictions_using_an_empty_dataset(){
+
+	    //setup fixtures
+	    DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+	    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
+
+	    DataKey<Employee> key = DataKey.makeDefault(Employee.class);
+
+	    DataSet<Employee> employees = key.asEmptyDataSet();
+	    //exercise sut
+	    RestrictionHelper.applyRestrictions(sut, employees);
+
+	    //verify outcome
+	    assertThat(sut.dataset(Employee.class).list()).isEmpty();
+	  }
+
 	private Employee createAnonymousEmployee(String name) {
 		Employee e=new Employee();
 		e.setEmployeeId(1234L);
@@ -160,6 +177,6 @@ public class RestrictionHelperTest {
 	}
 
 	private DataDomainManager<SimpleDataSpecification> createDataDomainManager() {
-		return DataDomainManager.newRoot("RestrictionHelperTest",SimpleDataSpecification.create(), Randoms.singleton());
+		return DataDomainManager.newRoot("RestrictionHelperTest",SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
 	}
 }
