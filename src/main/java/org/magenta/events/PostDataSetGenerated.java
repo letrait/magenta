@@ -4,12 +4,12 @@ import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 
-public class DataSetGenerated {
+public class PostDataSetGenerated {
 
   private DataKey<?> key;
   private DataDomain<? extends DataSpecification> fixture;
 
-  public DataSetGenerated(DataKey<?> key,DataDomain<? extends DataSpecification> fixture) {
+  public PostDataSetGenerated(DataKey<?> key,DataDomain<? extends DataSpecification> fixture) {
     super();
     this.key = key;
     this.fixture = fixture;

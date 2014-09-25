@@ -1,17 +1,18 @@
 package org.magenta.testing.domain.generators;
 
-import org.magenta.DataDomain;
-import org.magenta.DataSpecification;
-import org.magenta.SimpleGenerationStrategy;
+import org.magenta.annotations.InjectRandomBuilder;
 import org.magenta.random.RandomBuilder;
 import org.magenta.testing.domain.Employee;
 
-public class EmployeeGenerator implements SimpleGenerationStrategy<Employee, DataSpecification>{
+import com.google.common.base.Supplier;
+
+public class EmployeeGenerator implements Supplier<Employee>{
+
+  @InjectRandomBuilder
+  RandomBuilder r;
 
 	@Override
-	public Employee generateItem(DataDomain<? extends DataSpecification> datasets) {
-
-		RandomBuilder r=datasets.getRandomizer();
+	public Employee get() {
 
 		Employee e=new Employee();
 		e.setEmployeeId(r.longs().any());

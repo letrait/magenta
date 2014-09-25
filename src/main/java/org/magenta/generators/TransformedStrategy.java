@@ -6,7 +6,9 @@ import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 
 import com.google.common.base.Function;
+import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 
 /**
@@ -50,6 +52,25 @@ public class TransformedStrategy<D, O, S extends DataSpecification> implements G
   @Override
   public Iterable<DataKey<?>> getModifiedDataSet() {
     return strategy.getModifiedDataSet();
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+    if(this.filter != Predicates.alwaysTrue() || this.converter != Functions.identity()){
+      sb.append(TransformedStrategy.class.getSimpleName()).append(" using ");
+      if(this.filter != Predicates.alwaysTrue()){
+        sb.append("filter [").append(this.filter).append(']');
+        if(this.converter != Functions.identity()){
+          sb.append(" and ");
+        }
+      }
+      if(this.converter != Functions.identity()){
+        sb.append("converter [").append(this.converter).append(']');
+      }
+    }
+    sb.append(strategy.toString());
+    return sb.toString();
   }
 
 }

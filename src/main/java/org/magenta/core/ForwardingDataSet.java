@@ -173,6 +173,11 @@ public class ForwardingDataSet<D> implements DataSet<D> {
   }
 
   @Override
+  public boolean isPersistent() {
+    return delegate.get().isPersistent();
+  }
+
+  @Override
   public DataSet<D> without(Collection<D> items) {
     return delegate.get().without(items);
   }

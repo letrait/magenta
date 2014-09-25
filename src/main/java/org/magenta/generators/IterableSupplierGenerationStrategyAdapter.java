@@ -6,7 +6,6 @@ import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
-import org.magenta.ImplicitGenerationStrategy;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
@@ -51,6 +50,14 @@ public class IterableSupplierGenerationStrategyAdapter<D, S extends DataSpecific
   @Override
   public Iterable<DataKey<?>> getModifiedDataSet() {
     return affectedDataSet;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("Supplier of Iterable [").append(generator).append("]");
+    return sb.toString();
   }
 
 

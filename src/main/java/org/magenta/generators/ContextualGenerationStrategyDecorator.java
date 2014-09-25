@@ -8,12 +8,12 @@ import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.magenta.core.LoopCycleDetector;
 import org.magenta.core.injection.FixtureContext;
+import org.magenta.events.PreDataSetGenerated;
 
 
 
 /**
- * Decorator of a GenerationStrategy that validate that there are no cycle in its
- * delegate data generation strategy.
+ * Decorator of a GenerationStrategy that setups the FixtureContext.
  *
  * @author ngagnon
  *
@@ -36,7 +36,7 @@ public class ContextualGenerationStrategyDecorator<D, S extends DataSpecificatio
   @Override
   public Iterable<D> generate(final int numberOfElements, final DataDomain<? extends S> fixture) {
 
-    return this.context.execute(new Callable<Iterable<D>>(){
+    Iterable<D> data = this.context.execute(new Callable<Iterable<D>>(){
 
       @Override
       public Iterable<D> call() throws Exception {
@@ -44,19 +44,27 @@ public class ContextualGenerationStrategyDecorator<D, S extends DataSpecificatio
       }
 
     }, fixture);
+
+    return data;
   }
 
   @Override
   public Iterable<D> generate(final DataDomain<? extends S> fixture) {
 
-    return this.context.execute(new Callable<Iterable<D>>(){
+    Iterable<D> data =  this.context.execute(new Callable<Iterable<D>>(){
 
       @Override
       public Iterable<D> call() throws Exception {
-        return delegate.generate(fixture);
+        Iterable<D> data = delegate.generate(fixture);
+
+        context.post(new PreDataSetGenerated(key, data, fixture));
+
+        return data;
       }
 
     }, fixture);
+
+    return data;
   }
 
   @Override
@@ -64,9 +72,11 @@ public class ContextualGenerationStrategyDecorator<D, S extends DataSpecificatio
     return delegate.getModifiedDataSet();
   }
 
-
+  @Override
+  public String toString(){
+    StringBuilder sb = new StringBuilder();
+    sb.append(ContextualGenerationStrategyDecorator.class.getSimpleName()).append(" delegating to [").append(this.delegate.toString()).append(']');
+    return sb.toString();
+  }
 
 }
-
-
-

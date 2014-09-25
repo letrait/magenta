@@ -6,9 +6,9 @@ import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
-import org.magenta.SimpleGenerationStrategy;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 
 /**
  * This class adapts an existing {@link SimpleGenerationStrategy} to be used as
@@ -24,35 +24,39 @@ import com.google.common.base.Preconditions;
  * @param <S>
  *          the data specification
  */
-public class SimpleGenerationStrategyAdapter<D, S extends DataSpecification> extends AbstractGenerationStrategyAdapter<D, S> implements
+public class SupplierGenerationStrategyAdapter<D, S extends DataSpecification> extends AbstractGenerationStrategyAdapter<D, S> implements
     GenerationStrategy<D, S> {
 
-  private SimpleGenerationStrategy<? extends D, ? super S> strategy;
-
+  private Supplier<? extends D> strategy;
 
   /**
    * Default constructor.
-   * @param generator the simple generation strategy implementation
-   * @param affectedDataSet the affected data set
+   *
+   * @param generator
+   *          the simple generation strategy implementation
+   * @param numberOfElements
+   *          the number of elements to generate.
+   * @param affectedDataSet
+   *          the affected data set
    */
-  public SimpleGenerationStrategyAdapter(DataKey<?> key, SimpleGenerationStrategy<? extends D, ? super S> generator,
-      List<DataKey<?>> affectedDataSet) {
+  public SupplierGenerationStrategyAdapter(DataKey<?> key, Supplier<? extends D> generator, List<DataKey<?>> affectedDataSet) {
     super(key, affectedDataSet);
     Preconditions.checkNotNull(generator);
-
     this.strategy = generator;
   }
 
   @Override
   protected D doGenerate(int index, DataDomain<? extends S> datasets) {
-    try {
-      return strategy.generateItem(datasets);
-    } catch (RuntimeException re) {
-      //throw new IllegalStateException(String.format("Error while generating the element number %s", index), re);
-      throw re;
-    }
-
+    return strategy.get();
   }
 
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("Supplier [").append(strategy).append("]");
+    return sb.toString();
+  }
 
 }

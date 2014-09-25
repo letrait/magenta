@@ -64,17 +64,31 @@ public class DataSetFieldHandler implements FieldInjectionHandler {
 
   }
 
-  private Supplier<?> supplierFor(final DataKey<?> key, final Supplier<DataDomain> current) {
+  private Supplier<DataSet> supplierFor(final DataKey<?> key, final Supplier<DataDomain> current) {
 
-    return new Supplier() {
+    return new Supplier<DataSet>() {
+
+      private DataSet cached;
+      private DataDomain last;
+      private int lastVersion;
 
       @Override
-      public Object get() {
+      public DataSet get() {
         DataDomain domain = current.get();
+
         if (domain == null) {
           throw new IllegalStateException("No FixtureBuilder currently bound to the provided supplier : " + current);
         }
-        return domain.dataset(key);
+
+        if(cached != null && last == domain && lastVersion == domain.getVersion()){
+          return cached;
+        }
+
+        cached = domain.dataset(key);
+        last = domain;
+        lastVersion = domain.getVersion();
+
+        return cached;
       }
 
     };

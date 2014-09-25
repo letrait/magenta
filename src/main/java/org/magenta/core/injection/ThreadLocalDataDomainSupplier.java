@@ -37,7 +37,9 @@ public class ThreadLocalDataDomainSupplier<S extends DataSpecification> implemen
         responsible = true;
         setContext(fixture);
       }
-      return uncheckedCall(callable);
+      Iterable<D> data = uncheckedCall(callable);
+
+      return data;
     } finally {
       if (responsible) {
         removeContext();
@@ -53,6 +55,13 @@ public class ThreadLocalDataDomainSupplier<S extends DataSpecification> implemen
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Override
+  public void post(Object event) {
+
+    get().getEventBus().post(event);
+
   }
 
 }

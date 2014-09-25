@@ -25,6 +25,12 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
   public boolean isGenerated();
 
   /**
+   * @return true if this dataset is persistent or false if it is transient.
+   */
+  public boolean isPersistent();
+
+
+  /**
    * @return this dataset type
    */
   public Class<D> getType();

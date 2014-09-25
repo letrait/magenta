@@ -79,9 +79,21 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
 
   private Function<DataKey<? extends D>, DataSet<? extends D>> createGetDataSetFunction(final DataDomain<? extends S> dataDomain) {
     Function<DataKey<? extends D>, DataSet<? extends D>> toDataSet = new Function<DataKey<? extends D>, DataSet<? extends D>>() {
+
+      private int lastVersion;
+      private DataSet<? extends D> cached;
+
       @Override
       public DataSet<? extends D> apply(DataKey<? extends D> key) {
-        return dataDomain.dataset(key);
+
+        if(cached !=null && dataDomain.getVersion() == lastVersion){
+          return cached;
+        }
+
+        cached = dataDomain.dataset(key);
+        lastVersion = dataDomain.getVersion();
+
+        return cached;
       }
     };
     return toDataSet;
@@ -91,6 +103,19 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
   @Override
   public Iterable<DataKey<?>> getModifiedDataSet() {
     return Collections.EMPTY_LIST;
+  }
+
+  @Override
+  public String toString() {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append(DataSetAggregationStrategy.class.getSimpleName()).append(" materialized from ");
+    for(DataKey k:this.keys){
+      sb.append(k).append(',');
+    }
+
+    return sb.toString();
+
   }
 
 }

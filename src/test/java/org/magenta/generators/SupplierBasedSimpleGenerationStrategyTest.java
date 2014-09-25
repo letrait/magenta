@@ -35,7 +35,7 @@ public class SupplierBasedSimpleGenerationStrategyTest {
 
 		when(stringSupplier.get()).thenReturn(expected[0],expected[1],expected[2],expected[3],expected[4],expected[5],expected[6],expected[7],expected[8],expected[9]);
 
-		SupplierBasedSimpleGenerationStrategyAdapter<String, DataSpecification> sut=new SupplierBasedSimpleGenerationStrategyAdapter<>(key, stringSupplier, new ArrayList<DataKey<?>>());
+		SupplierGenerationStrategyAdapter<String, DataSpecification> sut=new SupplierGenerationStrategyAdapter<>(key, stringSupplier, new ArrayList<DataKey<?>>());
 
 		//exercise sut
 		Iterable<String> actual = sut.generate(dataDomain);

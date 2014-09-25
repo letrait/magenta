@@ -19,6 +19,8 @@ public interface DataDomain<S extends DataSpecification> {
    */
   public String getName();
 
+  public int getVersion();
+
   /**
    * Return the particular {@linkplain DataSpecification} implementation of this
    * domain.
@@ -55,6 +57,9 @@ public interface DataDomain<S extends DataSpecification> {
 
 
   public Integer numberOfElementsFor(DataKey<?> key);
+
+  public Integer numberOfElementsFor(Class<?> clazz);
+
 
   /**
    * Return the {@linkplain DataSet} associated to the specified key.
@@ -138,6 +143,9 @@ public interface DataDomain<S extends DataSpecification> {
    */
   public Iterable<GenerationStrategy<?, ? extends DataSpecification>> strategies();
 
+  /**
+   * @return the event bus linked to this Fixture.
+   */
   public EventBus getEventBus();
 
 }

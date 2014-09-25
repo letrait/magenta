@@ -12,7 +12,7 @@ import com.google.common.base.Supplier;
 import com.google.common.reflect.Reflection;
 
 /**
- * Inject the current Randoms object into a given field.
+ * Inject the current RandomBuilder object into a given field.
  *
  * @author ngagnon
  *

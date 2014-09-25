@@ -144,6 +144,11 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   }
 
   @Override
+  public int getVersion(){
+    return this.parent.getVersion() + this.delegate.getVersion();
+  }
+
+  @Override
   public Integer numberOfElementsFor(DataKey<?> key) {
     return delegate.numberOfElementsFor(key);
   }
@@ -151,6 +156,11 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   @Override
   public EventBus getEventBus() {
     return this.parent.getEventBus();
+  }
+
+  @Override
+  public Integer numberOfElementsFor(Class<?> clazz) {
+    return delegate.numberOfElementsFor(clazz);
   }
 
 }

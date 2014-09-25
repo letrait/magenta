@@ -218,6 +218,11 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
   }
 
   @Override
+  public boolean isPersistent() {
+    return false;
+  }
+
+  @Override
   public boolean isEmpty() {
     return false;
   }

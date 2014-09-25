@@ -39,4 +39,9 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
     return this.persistedData;
   }
 
+  @Override
+  public boolean isPersistent() {
+    return true;
+  }
+
 }

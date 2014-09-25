@@ -5,11 +5,10 @@ import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
-import org.magenta.events.DataSetGenerated;
+import org.magenta.events.PostDataSetGenerated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.eventbus.EventBus;
@@ -56,8 +55,9 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
     this.supplier = Suppliers.memoize(new Supplier<Iterable<D>>() {
       @Override
       public Iterable<D> get() {
-        LOG.trace("Generating data for {}.", GeneratedDataSet.this);
+        LOG.trace("Generating [{}] for {}.", GeneratedDataSet.this.key, GeneratedDataSet.this);
         Iterable<D> result = strategy.generate(domain);
+
         return result;
       }
     });
@@ -71,10 +71,10 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
     //indirectly call this dataset again, in which case the initialized data will be returned and the relationProcessed
     //flag will be true
 
-    //I don't think postprocessing is needed at each get
     if (!postProcessing) {
       postProcessing = true;
-      this.eventBus.post(new DataSetGenerated(this.key,this.domain));
+      this.eventBus.post(new PostDataSetGenerated(this.key,this.domain));
+      LOG.trace("GENERATION COMPETED for [{}]", GeneratedDataSet.this.key);
     }
 
     return data;
@@ -86,8 +86,18 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
   }
 
   @Override
-  public String toString() {
-    return Objects.toStringHelper(this).add("type", getType()).add("domain", domain.getName()).add("strategy", strategy).toString();
+  public boolean isPersistent() {
+    return false;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder sb=new StringBuilder();
+    sb.append(GeneratedDataSet.class.getSimpleName()).append(" using a [")
+    .append(this.strategy.toString()).append(']');
+
+    return sb.toString();
+  }
+
 
 }

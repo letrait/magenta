@@ -48,6 +48,11 @@ public class EmptyDataSet<D> implements DataSet<D> {
   }
 
   @Override
+  public boolean isPersistent() {
+    return false;
+  }
+
+  @Override
   public Iterable<D> get() {
     return Collections.emptyList();
   }

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.mockito.Mockito;
 
 import com.google.common.base.Supplier;
 
@@ -57,12 +56,12 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
 
     //setup fixtures
     DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
-    ImplicitGenerationStrategy<String,DataSpecification> colorSupplier = mock(ImplicitGenerationStrategy.class);
+    Supplier<Iterable<String>> colorSupplier = mock(Supplier.class);
 
-    when(colorSupplier.generate(Mockito.any(DataDomain.class))).thenReturn(Arrays.asList("red", "blue", "green"));
+    when(colorSupplier.get()).thenReturn(Arrays.asList("red", "blue", "green"));
 
     //exercise sut
-    DataSet<String> colors = sut.newDataSet(String.class).generatedBy(colorSupplier);
+    DataSet<String> colors = sut.newDataSet(String.class).generatedImplicitelyBy(colorSupplier);
 
     //verify outcome
     assertThat(sut).theDataSet(String.class).isNotNull().isEqualTo(colors).containsExactly("red","blue","green");
@@ -70,23 +69,6 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
 
   }
 
-  @Test
-  public void testGeneratedBySimpleGenerationStrategy_explicit_number(){
-
-    //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
-    SimpleGenerationStrategy<String,DataSpecification> colorSupplier = mock(SimpleGenerationStrategy.class);
-
-    when(colorSupplier.generateItem(Mockito.any(DataDomain.class))).thenReturn("red", "blue", "green","black");
-
-    //exercise sut
-    DataSet<String> colors = sut.newDataSet(String.class).generatedBy(colorSupplier,3);
-
-    //verify outcome
-    assertThat(sut).theDataSet(String.class).isNotNull().isEqualTo(colors).containsExactly("red","blue","green");
-
-
-  }
 
 
 }

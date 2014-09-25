@@ -39,4 +39,11 @@ public class LoopCycleDetector<S extends DataSpecification> implements FixtureCo
   public DataDomain<S> get() {
     return context.get();
   }
+
+  @Override
+  public void post(Object event) {
+    context.post(event);
+  }
+
+
 }

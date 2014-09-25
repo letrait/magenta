@@ -1,6 +1,9 @@
 package org.magenta;
 
 import org.junit.Test;
+import org.magenta.annotations.InjectDataSet;
+
+import com.google.common.base.Supplier;
 
 public class CycleDetectionTestCase extends DataDomainTestSupport{
 
@@ -54,60 +57,80 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
 
   }
 
-  public static class SelfReferencingGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class SelfReferencingGenerationStrategy implements Supplier<String>{
+
+    @InjectDataSet
+    DataSet<String> self;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(String.class).any();
+    public String get() {
+      return self.any();
     }
 
 
   }
 
-  public static class FooGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class FooGenerationStrategy implements Supplier<String>{
+
+    @InjectDataSet("Bar")
+    DataSet<String> bar;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(BAR).any();
+    public String  get() {
+      return bar.any();
     }
 
 
   }
 
-  public static class BarGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class BarGenerationStrategy implements Supplier<String>{
+
+    @InjectDataSet("Foo")
+    DataSet<String> foo;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(FOO).any();
+    public String  get() {
+      return foo.any();
     }
 
 
   }
 
-  public static class TicGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class TicGenerationStrategy implements Supplier<String>{
+
+    @InjectDataSet("Tac")
+    DataSet<String> tac;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(TAC).any();
+    public String  get() {
+      return tac.any();
     }
 
   }
 
-  public static class TacGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class TacGenerationStrategy implements Supplier<String>{
+
+
+    @InjectDataSet("Toe")
+    DataSet<String> toe;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(TOE).any();
+    public String  get() {
+      return toe.any();
     }
 
 
   }
 
-  public static class ToeGenerationStrategy implements SimpleGenerationStrategy<String, DataSpecification>{
+  public static class ToeGenerationStrategy implements Supplier<String>{
+
+
+    @InjectDataSet("Tic")
+    DataSet<String> tic;
 
     @Override
-    public String generateItem(DataDomain<? extends DataSpecification> dataDomain) {
-      return dataDomain.dataset(TIC).any();
+    public String get() {
+      return tic.any();
     }
 
 
