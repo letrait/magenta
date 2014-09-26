@@ -2,6 +2,8 @@ package org.magenta.generators;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.magenta.DataDomain;
 import org.magenta.DataKey;
@@ -80,20 +82,23 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
   private Function<DataKey<? extends D>, DataSet<? extends D>> createGetDataSetFunction(final DataDomain<? extends S> dataDomain) {
     Function<DataKey<? extends D>, DataSet<? extends D>> toDataSet = new Function<DataKey<? extends D>, DataSet<? extends D>>() {
 
-      private int lastVersion;
-      private DataSet<? extends D> cached;
+      private Map<DataKey,CacheEntry> cache = new HashMap<DataKey,CacheEntry>();
+
 
       @Override
       public DataSet<? extends D> apply(DataKey<? extends D> key) {
 
-        if(cached !=null && dataDomain.getVersion() == lastVersion){
-          return cached;
+        CacheEntry entry = cache.get(key);
+
+        if(entry !=null && dataDomain.getVersion() == entry.getLastVersion()){
+          return (DataSet)entry.getCached();
         }
 
-        cached = dataDomain.dataset(key);
-        lastVersion = dataDomain.getVersion();
+        entry = new CacheEntry( dataDomain.dataset(key), dataDomain.getVersion());
 
-        return cached;
+        cache.put(key, entry);
+
+        return (DataSet)entry.getCached();
       }
     };
     return toDataSet;
@@ -115,6 +120,28 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
     }
 
     return sb.toString();
+
+  }
+
+  private static class CacheEntry{
+
+    private final DataSet<?> cached;
+    private final int lastVersion;
+
+    public CacheEntry(DataSet<?> cached, int lastVersion) {
+      super();
+      this.cached = cached;
+      this.lastVersion = lastVersion;
+    }
+
+    public DataSet<?> getCached() {
+      return cached;
+    }
+    public int getLastVersion() {
+      return lastVersion;
+    }
+
+
 
   }
 

@@ -1,13 +1,27 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.magenta</groupId>
 	<artifactId>magenta</artifactId>
-	<version>ioc-SNAPSHOT</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<name>Data generation framework</name>
 	<description>
 		Data generation framework for fixture setup and simulation.
 	</description>
+	
+	<scm>
+  <connection>scm:git:https://github.com/letrait/magenta</connection>
+  <developerConnection>scm:git:git@github.com:letrait/magenta.git</developerConnection>
+  <url>https://github.com/letrait/magenta</url>
+	  <tag>HEAD</tag>
+  </scm>
+	
+	<distributionManagement>
+  <repository>
+    <id>bintray</id>
+    <url>https://api.bintray.com/maven/letrait/maven/magenta</url>
+  </repository>
+</distributionManagement>
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -20,6 +34,7 @@
 			</plugin>
 			<plugin>
       <artifactId>maven-source-plugin</artifactId>
+      <version>2.3</version>
       <executions>
         <execution>
           <id>attach-sources</id>
@@ -29,12 +44,22 @@
     </plugin>
     <plugin> 
       <artifactId>maven-javadoc-plugin</artifactId> 
+      <version>2.9.1</version>
       <executions> 
         <execution> 
           <id>attach-javadocs</id>
           <goals><goal>jar</goal></goals> 
         </execution> 
       </executions> 
+    </plugin>
+        <plugin>
+      <artifactId>maven-release-plugin</artifactId>
+      <version>2.4.1</version>
+      <configuration>
+        <useReleaseProfile>false</useReleaseProfile>
+        <releaseProfiles>release</releaseProfiles>
+        <autoVersionSubmodules>true</autoVersionSubmodules>
+      </configuration>
     </plugin>
 		</plugins>
 	</build>

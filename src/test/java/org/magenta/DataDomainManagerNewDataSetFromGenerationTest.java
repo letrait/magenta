@@ -61,7 +61,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
     when(colorSupplier.get()).thenReturn(Arrays.asList("red", "blue", "green"));
 
     //exercise sut
-    DataSet<String> colors = sut.newDataSet(String.class).generatedImplicitelyBy(colorSupplier);
+    DataSet<String> colors = sut.newDataSet(String.class).generatedAsIterableBy(colorSupplier);
 
     //verify outcome
     assertThat(sut).theDataSet(String.class).isNotNull().isEqualTo(colors).containsExactly("red","blue","green");
