@@ -263,7 +263,7 @@ public class Examples {
 
     DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
 
-    automotives.newDataSet(Trip.class).generatedImplicitelyBy(new TripGenerator());
+    automotives.newDataSet(Trip.class).generatedAsIterableBy(new TripGenerator());
     out("List of cars : %s",automotives.dataset(Car.class).list());
 
     out("At least one trip was generated for each car : %s", automotives.dataset(Trip.class).list());
@@ -276,7 +276,7 @@ public class Examples {
 
     DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
 
-    automotives.newDataSet(Trip.class).generatedImplicitelyBy(new TripGenerator());
+    automotives.newDataSet(Trip.class).generatedAsIterableBy(new TripGenerator());
     out("No trip were generated : %s",automotives.restrictTo(EmptyDataSet.ofType(Car.class)).dataset(Trip.class).isEmpty());
 
   }

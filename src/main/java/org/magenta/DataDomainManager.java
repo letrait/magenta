@@ -1005,7 +1005,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      * @param strategy the strategy to use
      * @return a new generated data set
      */
-    public final DataSet<D> generatedImplicitelyBy(Supplier<? extends Iterable<T>> strategy) {
+    public final DataSet<D> generatedAsIterableBy(Supplier<? extends Iterable<T>> strategy) {
       return generatedBy(new IterableSupplierGenerationStrategyAdapter<>(injector.inject(strategy), GeneratorAnnotationHelper.getAffectedDataSet(strategy.getClass())));
     }
 
