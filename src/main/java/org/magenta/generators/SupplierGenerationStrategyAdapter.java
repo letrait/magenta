@@ -2,7 +2,7 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -46,7 +46,7 @@ public class SupplierGenerationStrategyAdapter<D, S extends DataSpecification> e
   }
 
   @Override
-  protected D doGenerate(int index, DataDomain<? extends S> datasets) {
+  protected D doGenerate(int index, Fixture<? extends S> datasets) {
     return strategy.get();
   }
 

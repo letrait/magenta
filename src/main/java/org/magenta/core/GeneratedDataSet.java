@@ -1,6 +1,6 @@
 package org.magenta.core;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
@@ -27,7 +27,7 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
   private static final  Logger LOG = LoggerFactory.getLogger(GeneratedDataSet.class);
 
   private Supplier<Iterable<D>> supplier;
-  private DataDomain<S> domain;
+  private Fixture<S> domain;
   private GenerationStrategy<D, S> strategy;
   private DataKey<D> key;
   private EventBus eventBus;
@@ -46,7 +46,7 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
    * @param <S>
    *          the data specification type
    */
-  public  GeneratedDataSet(final DataDomain<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, EventBus eventBus) {
+  public  GeneratedDataSet(final Fixture<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, EventBus eventBus) {
     super(key.getType(), domain.getRandomizer());
     this.strategy = (GenerationStrategy)strategy;
     this.domain = domain;

@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
@@ -23,8 +23,8 @@ public class FieldInjectionProcessorTest {
   public void test() throws NoSuchFieldException, SecurityException{
 
     //setup fixture
-    DataDomain fixture = mock(DataDomain.class);
-    Supplier<DataDomain> currentFixture = Suppliers.ofInstance(fixture);
+    Fixture fixture = mock(Fixture.class);
+    Supplier<Fixture> currentFixture = Suppliers.ofInstance(fixture);
 
     FieldInjectionHandler handler1 = mock(FieldInjectionHandler.class);
     FieldInjectionHandler handler2 = mock(FieldInjectionHandler.class);

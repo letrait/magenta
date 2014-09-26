@@ -1,15 +1,15 @@
 package org.magenta.events;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 
 public class PreDataSetGenerated {
 
   private DataKey<?> key;
   private Iterable<?> data;
-  private  DataDomain<?> fixture;
+  private  Fixture<?> fixture;
 
-  public PreDataSetGenerated(DataKey<?> key, Iterable<?> data, DataDomain<?> fixture) {
+  public PreDataSetGenerated(DataKey<?> key, Iterable<?> data, Fixture<?> fixture) {
     super();
     this.key = key;
     this.data = data;
@@ -23,7 +23,7 @@ public class PreDataSetGenerated {
     return data;
   }
 
-  public DataDomain<?> getFixture(){
+  public Fixture<?> getFixture(){
     return this.fixture;
   }
 

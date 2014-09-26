@@ -1,13 +1,13 @@
 package org.magenta.generators;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.magenta.generators.TransformedStrategy;
@@ -24,7 +24,7 @@ public class TransformedStrategyTest {
 	public void testGenerate() {
 		// setup fixtures
 
-		DataDomain<DataSpecification> dataDomain = mock(DataDomain.class);
+		Fixture<DataSpecification> dataDomain = mock(Fixture.class);
 		GenerationStrategy<Integer, DataSpecification> strategy = createIntegerGenerationStrategy(1, 2, 3, 4, 5, 6);
 
 		Function<Integer, String> converter = integerToStringFunction();
@@ -44,7 +44,7 @@ public class TransformedStrategyTest {
 	public void testGenerateSpecificNumberOfElements() {
 		// setup fixtures
 
-		DataDomain<DataSpecification> dataDomain = mock(DataDomain.class);
+		Fixture<DataSpecification> dataDomain = mock(Fixture.class);
 		GenerationStrategy<Integer, DataSpecification> strategy = createIntegerGenerationStrategy(1, 2, 3, 4, 5, 6);
 
 		Function<Integer, String> converter = integerToStringFunction();
@@ -64,9 +64,9 @@ public class TransformedStrategyTest {
 
 		GenerationStrategy<Integer, DataSpecification> g = mock(GenerationStrategy.class);
 
-		when(g.generate(Mockito.any(DataDomain.class))).thenReturn(Arrays.asList(values));
+		when(g.generate(Mockito.any(Fixture.class))).thenReturn(Arrays.asList(values));
 
-		when(g.generate(Mockito.anyInt(), Mockito.any(DataDomain.class))).thenAnswer(new Answer<Iterable<Integer>>() {
+		when(g.generate(Mockito.anyInt(), Mockito.any(Fixture.class))).thenAnswer(new Answer<Iterable<Integer>>() {
 
 			@Override
 			public Iterable<Integer> answer(InvocationOnMock invocation) throws Throwable {

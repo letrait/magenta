@@ -1,15 +1,15 @@
 package org.magenta.events;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 
 public class PostDataSetGenerated {
 
   private DataKey<?> key;
-  private DataDomain<? extends DataSpecification> fixture;
+  private Fixture<? extends DataSpecification> fixture;
 
-  public PostDataSetGenerated(DataKey<?> key,DataDomain<? extends DataSpecification> fixture) {
+  public PostDataSetGenerated(DataKey<?> key,Fixture<? extends DataSpecification> fixture) {
     super();
     this.key = key;
     this.fixture = fixture;
@@ -19,7 +19,7 @@ public class PostDataSetGenerated {
     return key;
   }
 
-  public DataDomain<? extends DataSpecification> getFixture() {
+  public Fixture<? extends DataSpecification> getFixture() {
     return fixture;
   }
 

@@ -21,7 +21,7 @@ import org.magenta.core.injection.FieldInjectionChainProcessor;
 import org.magenta.core.injection.FieldInjectionHandler;
 import org.magenta.core.injection.HiearchicalFieldsFinder;
 import org.magenta.core.injection.Injector;
-import org.magenta.core.injection.RandomBuilderFieldHandler;
+import org.magenta.core.injection.FluentRandomFieldHandler;
 import org.magenta.core.injection.ThreadLocalDataDomainSupplier;
 import org.magenta.events.DataSetRegistered;
 import org.magenta.events.DataSetRemoved;
@@ -31,7 +31,7 @@ import org.magenta.generators.GeneratorAnnotationHelper;
 import org.magenta.generators.IterableSupplierGenerationStrategyAdapter;
 import org.magenta.generators.SupplierGenerationStrategyAdapter;
 import org.magenta.generators.TransformedStrategy;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,15 +55,15 @@ import com.google.common.eventbus.Subscribe;
  * @author normand
  *
  */
-public class DataDomainManager<S extends DataSpecification> implements DataDomain<S> {
+public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
-  private static final  Logger LOG = LoggerFactory.getLogger(DataDomainManager.class);
+  private static final  Logger LOG = LoggerFactory.getLogger(FixtureFactory.class);
 
-  private final DataDomain<S> parent;
+  private final Fixture<S> parent;
 
   private final DataStoreProvider dataStoreProvider;
 
-  private final RandomBuilder randomizer;
+  private final FluentRandom randomizer;
 
   private final S specification;
 
@@ -99,7 +99,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @param datastoreProvider
    *          the datasource provider for persitent DataSet.
    */
-  private DataDomainManager(String name, DataDomain<S> parent, S specification, RandomBuilder randomizer, DataStoreProvider datastoreProvider,
+  private FixtureFactory(String name, Fixture<S> parent, S specification, FluentRandom randomizer, DataStoreProvider datastoreProvider,
       ThreadLocalDataDomainSupplier fixtureSupplier/*,
       ThreadLocal<Stack<DataKey<?>>> getCallstack*/) {
     this.name = name;
@@ -121,7 +121,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     List<FieldInjectionHandler> handlers = Lists.newArrayList();
     handlers.add(new DataSetFieldHandler());
     handlers.add(new DataSpecificationFieldHandler());
-    handlers.add(new RandomBuilderFieldHandler());
+    handlers.add(new FluentRandomFieldHandler());
 
     this.injector = new FieldInjectionChainProcessor(fixtureSupplier, HiearchicalFieldsFinder.SINGLETON, handlers);
 
@@ -136,7 +136,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   // -------------------------------------------------------------------------------------------------------------------------------------------------
 
   /**
-   * Create a new root {@link DataDomainManager}.
+   * Create a new root {@link FixtureFactory}.
    *
    * @param name
    *          the name of this data domain
@@ -146,10 +146,10 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    *          the randomizer to use
    * @param <S>
    *          the type of {@link DataSpecification}
-   * @return a new {@link DataDomainManager}
+   * @return a new {@link FixtureFactory}
    */
-  public static <S extends DataSpecification> DataDomainManager<S> newRoot(String name, S specification, RandomBuilder randomizer) {
-    DataDomainManager<S> fixtureBuilder = new DataDomainManager<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
+  public static <S extends DataSpecification> FixtureFactory<S> newRoot(String name, S specification, FluentRandom randomizer) {
+    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
 
     fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
 
@@ -157,16 +157,16 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Open a new scope using this {@link DataDomainManager} as parent. The new
-   * scope is itself a {@link DataDomainManager} where new {@link DataSet} may
-   * be added that won't be visible for this {@link DataDomainManager}.
+   * Open a new scope using this {@link FixtureFactory} as parent. The new
+   * scope is itself a {@link FixtureFactory} where new {@link DataSet} may
+   * be added that won't be visible for this {@link FixtureFactory}.
    *
    * @param name
    *          the name of the new node.
-   * @return a new {@link DataDomainManager} child of this one.
+   * @return a new {@link FixtureFactory} child of this one.
    */
-  public DataDomainManager<S> newNode(String name) {
-    DataDomainManager<S> child = new DataDomainManager<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+  public FixtureFactory<S> newNode(String name) {
+    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
 
     child.getEventBus().register(this);
 
@@ -174,9 +174,9 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Open a new scope using this {@link DataDomainManager} as parent. The new
-   * scope is itself a {@link DataDomainManager} where new {@link DataSet} may
-   * be added that won't be visible for this {@link DataDomainManager}.
+   * Open a new scope using this {@link FixtureFactory} as parent. The new
+   * scope is itself a {@link FixtureFactory} where new {@link DataSet} may
+   * be added that won't be visible for this {@link FixtureFactory}.
    *
    * @param name
    *          the new of the new node
@@ -187,10 +187,10 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return a new DataSetManager child of this one.
    */
   @SuppressWarnings("unchecked")
-  public <X extends S> DataDomainManager<X> newNode(String name, X dataspecification) {
+  public <X extends S> FixtureFactory<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    DataDomainManager<X> child = new DataDomainManager<X>(name, (DataDomainManager<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
        this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -200,17 +200,17 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   /**
    * Open a new scope delegating to <code>dataDomain</code> and using this
-   * {@link DataDomainManager} as parent. The new scope is itself a
-   * {@link DataDomainManager} where new {@link DataSet} may be added that won't
-   * be visible for this {@link DataDomainManager}.
+   * {@link FixtureFactory} as parent. The new scope is itself a
+   * {@link FixtureFactory} where new {@link DataSet} may be added that won't
+   * be visible for this {@link FixtureFactory}.
    *
    * @param dataDomain
    *          the delegated data domain
    * @return a new DataSetManager child of this one.
    */
-  public DataDomainManager<S> newNode(DataDomain<? super S> dataDomain) {
+  public FixtureFactory<S> newNode(Fixture<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    DataDomainManager<S> child = new DataDomainManager<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
          this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -251,7 +251,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return the parent or null if this is the root parent.
    */
   @Override
-  public DataDomain<S> getParent() {
+  public Fixture<S> getParent() {
     return parent;
   }
 
@@ -269,7 +269,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * @return the {@link Random}
    */
   @Override
-  public RandomBuilder getRandomizer() {
+  public FluentRandom getRandomizer() {
     return this.randomizer;
   }
 
@@ -295,7 +295,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    * Here is a sample of code:
    *
    * <pre>
-   * DataDomainManager tourismDomain = TourismDomain.createDomain();
+   * FixtureFactory tourismDomain = TourismDomain.createDomain();
    * City paris = CityBuilder.build(&quot;Paris&quot;);
    * Monument monument = tourismDomain.restrictTo(paris).dataset(Monument.class).any();
    *
@@ -307,9 +307,9 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
    *          an array of object from which the dataset will be created
    * @return this FixturesManager
    */
-  public DataDomainManager<S> restrictTo(Object... objects) {
+  public FixtureFactory<S> restrictTo(Object... objects) {
 
-    DataDomainManager<S> child = newNode("restricted " + this.getName());
+    FixtureFactory<S> child = newNode("restricted " + this.getName());
 
     RestrictionHelper.applyRestrictions(child, objects);
 
@@ -317,17 +317,17 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Return a new {@link DataDomainManager} node which return fixed values for
+   * Return a new {@link FixtureFactory} node which return fixed values for
    * every {@link DataSet} identified by <code>classes</code>. Normally,
    * generated data set are regenerated for new node but this method "fixes" the
    * generated values as they are currently found in this
-   * {@link DataDomainManager}.
+   * {@link FixtureFactory}.
    *
    * @param classes
    *          the dataset default identifiers.
-   * @return a new {@link DataDomainManager} node.
+   * @return a new {@link FixtureFactory} node.
    */
-  public DataDomainManager<S> fix(Class<?>... classes) {
+  public FixtureFactory<S> fix(Class<?>... classes) {
 
     DataKey<?>[] keys = FluentIterable.from(Arrays.asList(classes)).transform(DataKey.classToKey()).toArray(DataKey.class);
 
@@ -335,18 +335,18 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Return a new {@link DataDomainManager} node which return fixed values for
+   * Return a new {@link FixtureFactory} node which return fixed values for
    * every {@link DataSet} identified by <code>keys</code>. Normally, generated
    * data set are regenerated for new node but this method "fixes" the generated
-   * values as they are currently found in this {@link DataDomainManager}.
+   * values as they are currently found in this {@link FixtureFactory}.
    *
    * @param keys
    *          the data set identifiers.
-   * @return a new {@link DataDomainManager} node.
+   * @return a new {@link FixtureFactory} node.
    */
   @SuppressWarnings("unchecked")
-  public DataDomainManager<S> fix(DataKey<?>... keys) {
-    DataDomainManager<S> child = newNode("frozen " + this.getName());
+  public FixtureFactory<S> fix(DataKey<?>... keys) {
+    FixtureFactory<S> child = newNode("frozen " + this.getName());
     for (DataKey<?> key : keys) {
       @SuppressWarnings("rawtypes")
       DataSet ds = this.dataset(key);
@@ -367,7 +367,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   /**
    * Return a builder allowing you to create a new {@link DataSet} for the
-   * <code>key</code> in this {@link DataDomainManager}.
+   * <code>key</code> in this {@link FixtureFactory}.
    *
    * @param key
    *          the qualifier of the {@link DataSet} to create.
@@ -381,7 +381,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   /**
    * Return a builder allowing you to create a new {@link DataSet} for the
-   * <code>clazz</code> in this {@link DataDomainManager}.
+   * <code>clazz</code> in this {@link FixtureFactory}.
    *
    * @param clazz
    *          the type of data the data set will contain, will be use to create
@@ -397,7 +397,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Add a new empty {@link DataSet} in this {@link DataDomainManager} and
+   * Add a new empty {@link DataSet} in this {@link FixtureFactory} and
    * return it.
    *
    * @param clazz
@@ -414,7 +414,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Add a new empty {@link DataSet} in this {@link DataDomainManager} and
+   * Add a new empty {@link DataSet} in this {@link FixtureFactory} and
    * return it.
    *
    * @param key
@@ -432,7 +432,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
   /**
    * Return a builder allowing you to create a new {@link Generator} for the
-   * <code>key</code> in this {@link DataDomainManager}.
+   * <code>key</code> in this {@link FixtureFactory}.
    *
    * @param key
    *          the key of the {@link DataSet} to create.
@@ -462,7 +462,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Add new {@link Processor} to this {@link DataDomainManager}.
+   * Add new {@link Processor} to this {@link FixtureFactory}.
    *
    * @param processor the processor to add.
    */
@@ -499,17 +499,17 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   @Override
   public <D> DataSet<D> dataset(DataKey<D> key) {
 
-    LOG.trace("lookup [{}] in [{}] domain", key, DataDomainManager.this.getName());
+    LOG.trace("lookup [{}] in [{}] domain", key, FixtureFactory.this.getName());
 
     return doGet(key);
   }
 
-  public DataDomainManager<S> setNumberOfElementsFor(Class<?> key, Integer numberOfElements) {
+  public FixtureFactory<S> setNumberOfElementsFor(Class<?> key, Integer numberOfElements) {
     return setNumberOfElementsFor(getKeyFor(key), numberOfElements);
   }
 
 
-  public DataDomainManager<S> setNumberOfElementsFor(DataKey<?> key, Integer numberOfElements) {
+  public FixtureFactory<S> setNumberOfElementsFor(DataKey<?> key, Integer numberOfElements) {
 
     Preconditions.checkState(datasetKeys().contains(key), "Cannot set the number of elements of %s : No dataset exists for this key.", key);
     this.numberOfItemsMap.put(key, numberOfElements);
@@ -526,7 +526,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
     Integer n = null;
 
-    DataDomain<S> parent = this.getParent();
+    Fixture<S> parent = this.getParent();
 
     n = numberOfItemsMap.get(key);
 
@@ -553,7 +553,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
       if (ds == null) {
         throw new DataSetNotFoundException("No dataset found for key " + key);
       } else {
-        LOG.trace("FOUND [{}] as a [{}] in [{}] domain", new Object[]{key, ds.toString(), DataDomainManager.this.getName()});
+        LOG.trace("FOUND [{}] as a [{}] in [{}] domain", new Object[]{key, ds.toString(), FixtureFactory.this.getName()});
         return ds;
       }
 
@@ -668,7 +668,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
     for (Processor<S> p : matchingProcessor) {
       LOG.trace("processing {} with {}", key, p);
-      p.process(DataDomainManager.this);
+      p.process(FixtureFactory.this);
     }
   }*/
 
@@ -689,10 +689,10 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   private <D> DataSet<D> regenerateData(DataKey<D> key, DataSet<D> ds) {
-    LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", DataDomainManager.this.getName());
+    LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", FixtureFactory.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
-      ds = new GeneratedDataSet<D,S>(DataDomainManager.this, s, key, eventBus);
+      ds = new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
       put(key, ds);
     }
     return ds;
@@ -716,7 +716,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     if (gen == null) {
       throw new GeneratorNotFoundException("No generator found for key " + clazz);
     } else {
-      return new GeneratorImpl<D, S>(DataDomainManager.this, gen, clazz);
+      return new GeneratorImpl<D, S>(FixtureFactory.this, gen, clazz);
     }
   }
 
@@ -727,7 +727,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     if (gen == null) {
       throw new GeneratorNotFoundException("No generator found for key " + key);
     } else {
-      return new GeneratorImpl<D, S>(DataDomainManager.this, gen, key.getType());
+      return new GeneratorImpl<D, S>(FixtureFactory.this, gen, key.getType());
     }
 
   }
@@ -802,7 +802,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
   }
 
   /**
-   * Remove the {@link DataSet} identified by <code>key</code> from this {@link DataDomainManager}.
+   * Remove the {@link DataSet} identified by <code>key</code> from this {@link FixtureFactory}.
    *
    * @param key
    *          the qualifier associated to the {@link DataSet}.
@@ -1021,7 +1021,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
       DataSet<D> dataset = generatedBy(strategy);
 
       if(numberOfItems != null){
-        DataDomainManager.this.setNumberOfElementsFor(originalKey, numberOfItems);
+        FixtureFactory.this.setNumberOfElementsFor(originalKey, numberOfItems);
       }
 
       return dataset;
@@ -1036,8 +1036,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     public final DataSet<D> generatedBy(GenerationStrategy<? extends T, ? super S> strategy) {
       GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey,currentFixtureSupplier);
 
-      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(DataDomainManager.this, derivedStrategy, originalKey, eventBus);
-      DataDomainManager.this.put(originalKey, derivedStrategy);
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
 
@@ -1048,7 +1048,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     // TODO : add a generatedBy from a list of generation strategy key
 
     /**
-     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link DataDomainManager}.  The resulting {@link DataSet} is
+     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link FixtureFactory}.  The resulting {@link DataSet} is
      * a view of the {@link DataSet} is materialized from.
      *
      * @param keys the default keys of the data sets
@@ -1065,7 +1065,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     }
 
     /**
-     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link DataDomainManager}.  The resulting {@link DataSet} is
+     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link FixtureFactory}.  The resulting {@link DataSet} is
      * a view of the {@link DataSet} is materialized from.
      *
      * @param keys the keys of the data sets
@@ -1077,7 +1077,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
     }
 
     /**
-     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link DataDomainManager}.  The resulting {@link DataSet} is
+     * Build a {@link DataSet} materialized from existing {@link DataSet} of this {@link FixtureFactory}.  The resulting {@link DataSet} is
      * a view of the {@link DataSet} is materialized from.
      *
      * @param keys the keys of the data sets
@@ -1085,8 +1085,8 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
      */
     public final DataSet<D> materalizedFrom(final Iterable<DataKey<? extends T>> keys) {
       GenerationStrategy<D, S> derivedStrategy = new TransformedStrategy<D, T, S>(new DataSetAggregationStrategy<T, S>(keys), filter, converter);
-      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(DataDomainManager.this, derivedStrategy, originalKey, eventBus);
-      DataDomainManager.this.put(originalKey, derivedStrategy);
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
       return dataset;
@@ -1094,9 +1094,9 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
     private void addToDataDomain(DataSet<D> dataset) {
       if (persistent) {
-        dataset = new PersistentDataSet<>(dataset, DataDomainManager.this.getDataStoreProvider().get(originalKey), randomizer);
+        dataset = new PersistentDataSet<>(dataset, FixtureFactory.this.getDataStoreProvider().get(originalKey), randomizer);
       }
-      DataDomainManager.this.put(originalKey, dataset);
+      FixtureFactory.this.put(originalKey, dataset);
     }
 
   }
@@ -1155,9 +1155,9 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
       GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter, converter), originalKey,currentFixtureSupplier);
 
-      DataDomainManager.this.put(originalKey, derivedStrategy);
+      FixtureFactory.this.put(originalKey, derivedStrategy);
 
-      Generator<D> generator = new GeneratorImpl<D, S>(DataDomainManager.this, derivedStrategy, originalKey.getType());
+      Generator<D> generator = new GeneratorImpl<D, S>(FixtureFactory.this, derivedStrategy, originalKey.getType());
 
       addToDataDomain(generator);
 
@@ -1175,7 +1175,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
       Generator<D> generator = generatedBy(strategy);
 
       if(numberOfItems !=null){
-        DataDomainManager.this.setNumberOfElementsFor(originalKey, numberOfItems);
+        FixtureFactory.this.setNumberOfElementsFor(originalKey, numberOfItems);
       }
 
 
@@ -1214,7 +1214,7 @@ public class DataDomainManager<S extends DataSpecification> implements DataDomai
 
 
     private void addToDataDomain(Generator<D> dataset) {
-      DataDomainManager.this.put(originalKey, dataset);
+      FixtureFactory.this.put(originalKey, dataset);
     }
   }
 

@@ -2,15 +2,15 @@ package org.magenta.core;
 
 import java.util.Set;
 
-import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSetNotFoundException;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 import org.magenta.Generator;
 import org.magenta.GeneratorNotFoundException;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.FluentIterable;
@@ -24,11 +24,11 @@ import com.google.common.eventbus.EventBus;
  *
  * @param <S>
  */
-public class DataDomainAggregator<S extends DataSpecification> implements DataDomain<S> {
+public class DataDomainAggregator<S extends DataSpecification> implements Fixture<S> {
 
-  private final DataDomain<S> parent;
+  private final Fixture<S> parent;
 
-  private final DataDomain<? super S> delegate;
+  private final Fixture<? super S> delegate;
 
   /**
    * Default constructor.
@@ -38,7 +38,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
    * @param parent
    *          the parent
    */
-  public DataDomainAggregator(DataDomain<? super S> delegate, DataDomain<S> parent) {
+  public DataDomainAggregator(Fixture<? super S> delegate, Fixture<S> parent) {
     this.parent = parent;
     this.delegate = delegate;
     this.delegate.getEventBus().register(parent);
@@ -124,12 +124,12 @@ public class DataDomainAggregator<S extends DataSpecification> implements DataDo
   }
 
   @Override
-  public DataDomain<S> getParent() {
+  public Fixture<S> getParent() {
     return parent;
   }
 
   @Override
-  public RandomBuilder getRandomizer() {
+  public FluentRandom getRandomizer() {
     return delegate.getRandomizer();
   }
 

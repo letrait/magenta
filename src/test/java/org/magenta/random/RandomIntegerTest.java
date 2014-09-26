@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import com.google.common.collect.Range;
 
 import static org.mockito.Mockito.*;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RandomIntegerTest {
 

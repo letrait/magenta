@@ -19,7 +19,7 @@ public interface GenerationStrategy<D, S extends DataSpecification> {
    *          the dataset map to use
    * @return data
    */
-  public Iterable<D> generate(int numberOfElements, DataDomain<? extends S> datasetMap);
+  public Iterable<D> generate(int numberOfElements, Fixture<? extends S> datasetMap);
 
   /**
    * Generate some data, the actual number of items generated being
@@ -29,7 +29,7 @@ public interface GenerationStrategy<D, S extends DataSpecification> {
    *          the datasetmap to use
    * @return some data
    */
-  public Iterable<D> generate(DataDomain<? extends S> datasetMap);
+  public Iterable<D> generate(Fixture<? extends S> datasetMap);
 
   /**
    * Return the list of {@link DataKey}s of the data sets that will be modified when this generation strategy is used.

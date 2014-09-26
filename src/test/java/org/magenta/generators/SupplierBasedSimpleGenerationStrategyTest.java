@@ -1,13 +1,13 @@
 package org.magenta.generators;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 
@@ -25,7 +25,7 @@ public class SupplierBasedSimpleGenerationStrategyTest {
 
 	  DataKey<String> key = DataKey.makeDefault(String.class);
 
-		DataDomain<DataSpecification> dataDomain=mock(DataDomain.class);
+		Fixture<DataSpecification> dataDomain=mock(Fixture.class);
 
 		when(dataDomain.numberOfElementsFor(key)).thenReturn(CONFIGURED_NUMBER_OF_ITEMS);
 

@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.magenta.DataDomainManager;
+import org.magenta.FixtureFactory;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -36,7 +36,7 @@ import com.google.common.collect.Sets;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class GeneratorImpl<T, S extends DataSpecification> implements Generator<T> {
 
-  private final DataDomainManager<S> dataSetMap;
+  private final FixtureFactory<S> dataSetMap;
   private final GenerationStrategy<T, ? super S> strategy;
   private final Class<T> type;
   private static final int MAX_COUNT = 1000;
@@ -51,7 +51,7 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
    * @param type
    *          the type of generated data.
    */
-  public GeneratorImpl(DataDomainManager dataSetMap, GenerationStrategy<T, ? super S> strategy, Class<T> type) {
+  public GeneratorImpl(FixtureFactory dataSetMap, GenerationStrategy<T, ? super S> strategy, Class<T> type) {
     this.dataSetMap = dataSetMap;
     this.strategy = strategy;
     this.type = type;
@@ -60,7 +60,7 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
   @Override
   public Generator<T> restrictTo(Object... objects) {
 
-    DataDomainManager child = this.dataSetMap.newNode("restricted " + this.dataSetMap.getName());
+    FixtureFactory child = this.dataSetMap.newNode("restricted " + this.dataSetMap.getName());
 
     RestrictionHelper.applyRestrictions(child, objects);
 

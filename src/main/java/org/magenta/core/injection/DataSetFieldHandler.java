@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.QualifiedDataSet;
@@ -16,7 +16,7 @@ import com.google.common.base.Supplier;
 public class DataSetFieldHandler implements FieldInjectionHandler {
 
   @Override
-  public boolean handle(Field f, Object target, Supplier<DataDomain> current) {
+  public boolean handle(Field f, Object target, Supplier<Fixture> current) {
 
     if (f.isAnnotationPresent(org.magenta.annotations.InjectDataSet.class)) {
 
@@ -64,17 +64,17 @@ public class DataSetFieldHandler implements FieldInjectionHandler {
 
   }
 
-  private Supplier<DataSet> supplierFor(final DataKey<?> key, final Supplier<DataDomain> current) {
+  private Supplier<DataSet> supplierFor(final DataKey<?> key, final Supplier<Fixture> current) {
 
     return new Supplier<DataSet>() {
 
       private DataSet cached;
-      private DataDomain last;
+      private Fixture last;
       private int lastVersion;
 
       @Override
       public DataSet get() {
-        DataDomain domain = current.get();
+        Fixture domain = current.get();
 
         if (domain == null) {
           throw new IllegalStateException("No FixtureBuilder currently bound to the provided supplier : " + current);

@@ -1,14 +1,14 @@
 package org.magenta.events;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 
 public class DataSetRemoved {
 
   private final DataKey<?> key;
-  private final DataDomain<?> fixture;
+  private final Fixture<?> fixture;
 
-  public DataSetRemoved(DataKey<?> key, DataDomain<?> fixture) {
+  public DataSetRemoved(DataKey<?> key, Fixture<?> fixture) {
     super();
     this.key = key;
     this.fixture = fixture;
@@ -18,7 +18,7 @@ public class DataSetRemoved {
     return key;
   }
 
-  public DataDomain<?> getFixture() {
+  public Fixture<?> getFixture() {
     return fixture;
   }
 

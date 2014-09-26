@@ -2,7 +2,7 @@ package org.magenta.generators;
 
 import java.util.concurrent.Callable;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -34,7 +34,7 @@ public class ContextualGenerationStrategyDecorator<D, S extends DataSpecificatio
   }
 
   @Override
-  public Iterable<D> generate(final int numberOfElements, final DataDomain<? extends S> fixture) {
+  public Iterable<D> generate(final int numberOfElements, final Fixture<? extends S> fixture) {
 
     Iterable<D> data = this.context.execute(new Callable<Iterable<D>>(){
 
@@ -49,7 +49,7 @@ public class ContextualGenerationStrategyDecorator<D, S extends DataSpecificatio
   }
 
   @Override
-  public Iterable<D> generate(final DataDomain<? extends S> fixture) {
+  public Iterable<D> generate(final Fixture<? extends S> fixture) {
 
     Iterable<D> data =  this.context.execute(new Callable<Iterable<D>>(){
 

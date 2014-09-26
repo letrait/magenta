@@ -12,7 +12,7 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
   public void test_one_generator_referencing_itself_should_be_detected(){
 
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
 
     sut.newDataSet(String.class).generatedBy(new SelfReferencingGenerationStrategy());
 
@@ -27,7 +27,7 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
   @Test(expected=CycleDetectedInGenerationException.class)
   public void test_two_generators_referencing_each_other_should_be_detected(){
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
 
     sut.newDataSet(FOO).generatedBy(new FooGenerationStrategy());
     sut.newDataSet(BAR).generatedBy(new BarGenerationStrategy());
@@ -45,7 +45,7 @@ public class CycleDetectionTestCase extends DataDomainTestSupport{
   @Test(expected=CycleDetectedInGenerationException.class)
   public void test_three_generators_referencing_each_other_should_be_detected(){
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
 
     sut.newDataSet(TIC).generatedBy(new TicGenerationStrategy());
     sut.newDataSet(TAC).generatedBy(new TacGenerationStrategy());

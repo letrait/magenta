@@ -9,7 +9,7 @@ import java.util.List;
  * @author normand
  *
  *         L'implementation devrait vérifier si le processing a déjà été fait
- *         pour ce DataDomain
+ *         pour ce Fixture
  * @param <S>
  */
 public interface Processor<S extends DataSpecification> {
@@ -20,7 +20,7 @@ public interface Processor<S extends DataSpecification> {
    * @param dataDomain
    *          the data domain
    */
-  public void process(DataDomain<? super S> dataDomain);
+  public void process(Fixture<? super S> dataDomain);
 
   /**
    * @return the affected data set keys

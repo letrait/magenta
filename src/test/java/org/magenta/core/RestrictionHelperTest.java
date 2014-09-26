@@ -1,15 +1,15 @@
 package org.magenta.core;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.DataDomainManager;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.FixtureFactory;
 import org.magenta.SimpleDataSpecification;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Employee;
 import org.magenta.testing.domain.generators.EmployeeGenerator;
 
@@ -19,7 +19,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_with_non_existing_dataset(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 
 
 		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
@@ -36,7 +36,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_single_item(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
@@ -52,7 +52,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_item_lists(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -70,7 +70,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_item_array(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -88,7 +88,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_mix_of_array_and_list(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -109,7 +109,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_using_a_dataset(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -131,7 +131,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_using_a_qualified_dataset(){
 
 		//setup fixtures
-		DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -155,7 +155,7 @@ public class RestrictionHelperTest {
 	  public void testApplyRestrictions_using_an_empty_dataset(){
 
 	    //setup fixtures
-	    DataDomainManager<SimpleDataSpecification> sut=createDataDomainManager();
+	    FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
 	    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 	    DataKey<Employee> key = DataKey.makeDefault(Employee.class);
@@ -176,7 +176,7 @@ public class RestrictionHelperTest {
 		return e;
 	}
 
-	private DataDomainManager<SimpleDataSpecification> createDataDomainManager() {
-		return DataDomainManager.newRoot("RestrictionHelperTest",SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
+	private FixtureFactory<SimpleDataSpecification> createDataDomainManager() {
+		return FixtureFactory.newRoot("RestrictionHelperTest",SimpleDataSpecification.create(),FluentRandom.singleton());
 	}
 }

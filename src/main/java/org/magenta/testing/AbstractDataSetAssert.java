@@ -1,7 +1,7 @@
 package org.magenta.testing;
 
-import org.fest.assertions.api.AbstractAssert;
-import org.fest.assertions.api.Assertions;
+import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.Assertions;
 import org.magenta.DataSet;
 
 /**

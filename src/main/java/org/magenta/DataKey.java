@@ -7,7 +7,7 @@ import java.util.Arrays;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.core.ForwardingDataSet;
 import org.magenta.core.GenericDataSet;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -99,7 +99,7 @@ public class DataKey<D> {
    * @param domain the domain
    * @return the matching data set
    */
-  public DataSet<D> getDataSetFrom(DataDomain<?> domain) {
+  public DataSet<D> getDataSetFrom(Fixture<?> domain) {
     return domain.dataset(this);
   }
 
@@ -114,7 +114,7 @@ public class DataKey<D> {
    */
 
   @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> asDataSet(RandomBuilder randomizer, D... data) {
+  public QualifiedDataSet<D> asDataSet(FluentRandom randomizer, D... data) {
     return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
   }
 

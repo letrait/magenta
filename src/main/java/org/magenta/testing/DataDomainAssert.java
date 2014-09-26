@@ -1,16 +1,16 @@
 package org.magenta.testing;
 
-import org.fest.assertions.api.AbstractAssert;
-import org.fest.assertions.api.Assertions;
-import org.magenta.DataDomain;
+import org.assertj.core.api.AbstractAssert;
+import org.assertj.core.api.Assertions;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
-import org.magenta.random.RandomBuilder;
+import org.magenta.Fixture;
+import org.magenta.random.FluentRandom;
 
-public class DataDomainAssert<DATA_SPEC extends DataSpecification> extends AbstractAssert<DataDomainAssert<DATA_SPEC>, DataDomain<DATA_SPEC>> {
+public class DataDomainAssert<DATA_SPEC extends DataSpecification> extends AbstractAssert<DataDomainAssert<DATA_SPEC>, Fixture<DATA_SPEC>> {
 
-  protected DataDomainAssert(DataDomain<DATA_SPEC> actual) {
+  protected DataDomainAssert(Fixture<DATA_SPEC> actual) {
     super(actual, DataDomainAssert.class);
   }
 
@@ -31,7 +31,7 @@ public class DataDomainAssert<DATA_SPEC extends DataSpecification> extends Abstr
     return myself;
   }
 
-  public DataDomainAssert<DATA_SPEC> hasRandomizer(RandomBuilder randomizer) {
+  public DataDomainAssert<DATA_SPEC> hasRandomizer(FluentRandom randomizer) {
     Assertions.assertThat(actual.getRandomizer())
         .overridingErrorMessage("Expected data domain randomizer to be <%s> but was <%s>", randomizer, actual.getSpecification())
         .isEqualTo(randomizer);

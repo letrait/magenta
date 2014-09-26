@@ -1,25 +1,31 @@
 package org.magenta;
 
 import org.magenta.annotations.InjectDataSpecification;
-import org.magenta.annotations.InjectRandomBuilder;
-import org.magenta.random.RandomBuilder;
-
-import com.google.common.base.Supplier;
+import org.magenta.annotations.InjectFixture;
+import org.magenta.annotations.InjectFluentRandom;
+import org.magenta.random.FluentRandom;
 
 public class GenerationSupport<S extends DataSpecification> {
 
-  @InjectRandomBuilder
-  private RandomBuilder randomBuilder;
+  @InjectFluentRandom
+  private FluentRandom randomBuilder;
 
   @InjectDataSpecification
-  private Supplier<S> spec;
+  private S spec;
+
+  @InjectFixture
+  private Fixture<S> fixture;
 
   public S getDataSpecification(){
-    return spec.get();
+    return spec;
   }
 
-  public RandomBuilder getRandomBuilder(){
+  public FluentRandom getRandomBuilder(){
     return randomBuilder;
+  }
+
+  public Fixture<S> getFixture(){
+    return fixture;
   }
 
 }

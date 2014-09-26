@@ -1,6 +1,6 @@
 package org.magenta;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
+
 
 public class DataDomainManagerWithProcessorTest {
 
@@ -22,7 +23,7 @@ public class DataDomainManagerWithProcessorTest {
 
 		Processor<DataSpecification> processor=new IntegerIncrementerProcessor();
 
-		DataDomainManager<SimpleDataSpecification> testDataDomain=DataDomainManager.newRoot("test", SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
+		FixtureFactory<SimpleDataSpecification> testDataDomain=FixtureFactory.newRoot("test", SimpleDataSpecification.create(),FluentRandom.singleton());
 		testDataDomain.newDataSet(AtomicInteger.class).composedOf(int1,int2);
 
 		//exercise sut
@@ -48,7 +49,7 @@ public class DataDomainManagerWithProcessorTest {
 		List keys=Arrays.asList((DataKey<?>)DataKey.makeDefault(AtomicInteger.class));
 
 		@Override
-		public void process(DataDomain<? super DataSpecification> dataDomain) {
+		public void process(Fixture<? super DataSpecification> dataDomain) {
 
 			for(AtomicInteger integer:dataDomain.dataset(AtomicInteger.class).array()){
 				integer.incrementAndGet();

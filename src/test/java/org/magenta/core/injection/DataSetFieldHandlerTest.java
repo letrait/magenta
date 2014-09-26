@@ -1,6 +1,6 @@
 package org.magenta.core.injection;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -9,7 +9,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSetNotFoundException;
@@ -48,7 +48,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("notAnnotated");
 
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
@@ -66,7 +66,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("qualifiedDataSet");
 
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
@@ -87,7 +87,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("qualifiedDataSetWithACustomKey");
 
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
@@ -110,7 +110,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("dataSet");
 
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
@@ -130,7 +130,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("dataSet");
 
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
     when(fixture.dataset(Mockito.any(DataKey.class))).thenThrow(new DataSetNotFoundException("not found"));
 
     //exercise sut
@@ -155,7 +155,7 @@ public class DataSetFieldHandlerTest<D> {
 
     Field f = this.getClass().getDeclaredField("dataSet");
 
-    DataDomain fixture = null;
+    Fixture fixture = null;
 
     //exercise sut
     boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
@@ -178,7 +178,7 @@ public class DataSetFieldHandlerTest<D> {
     DataSetFieldHandler sut = new DataSetFieldHandler();
 
     Field f = this.getClass().getDeclaredField("missingGenericDataSet");
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
 
     //exercise sut
     try{
@@ -195,7 +195,7 @@ public class DataSetFieldHandlerTest<D> {
     DataSetFieldHandler sut = new DataSetFieldHandler();
 
     Field f = this.getClass().getDeclaredField("genericDataSet");
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
 
     //exercise sut
     try{
@@ -212,7 +212,7 @@ public class DataSetFieldHandlerTest<D> {
     DataSetFieldHandler sut = new DataSetFieldHandler();
 
     Field f = this.getClass().getDeclaredField("notADataSet");
-    DataDomain fixture = mock(DataDomain.class);
+    Fixture fixture = mock(Fixture.class);
 
     //exercise sut
     try{

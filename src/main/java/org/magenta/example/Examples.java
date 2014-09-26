@@ -1,15 +1,15 @@
 package org.magenta.example;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.awt.Color;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
-import org.magenta.DataDomainManager;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.Fixture;
+import org.magenta.FixtureFactory;
 import org.magenta.Generator;
 import org.magenta.SimpleDataSpecification;
 import org.magenta.core.EmptyDataSet;
@@ -19,7 +19,7 @@ import org.magenta.example.domain.Trip;
 import org.magenta.example.generators.CarGenerator;
 import org.magenta.example.generators.ColorGenerator;
 import org.magenta.example.generators.TripGenerator;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -30,7 +30,7 @@ public class Examples {
   public void creating_a_new_data_domain(){
 
     title("creating_a_new_data_domain");
-    DataDomainManager<SimpleDataSpecification> primitives = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(),RandomBuilder.PROVIDER.singleton());
+    FixtureFactory<SimpleDataSpecification> primitives = FixtureFactory.newRoot("primitives", SimpleDataSpecification.create(),FluentRandom.singleton());
 
     out("a datadomain that will contain various java primitives (this is certainly not a real-life case) : %s", primitives);
 
@@ -52,12 +52,12 @@ public class Examples {
   public void creating_a_new_child_data_domain(){
 
     title("creating_a_new_child_data_domain");
-    DataDomainManager<SimpleDataSpecification> parent = DataDomainManager.newRoot("parent", SimpleDataSpecification.create(), RandomBuilder.PROVIDER.singleton());
+    FixtureFactory<SimpleDataSpecification> parent = FixtureFactory.newRoot("parent", SimpleDataSpecification.create(), FluentRandom.singleton());
 
     parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
     parent.newDataSet(String.class).composedOf("cat","dog","mouse");
 
-    DataDomainManager<SimpleDataSpecification> child = parent.newNode("child");
+    FixtureFactory<SimpleDataSpecification> child = parent.newNode("child");
     child.newDataSet(Integer.class).composedOf(6,7,8,9);
 
     out("parent Integers : %s", parent.dataset(Integer.class).list());
@@ -73,7 +73,7 @@ public class Examples {
   public void creating_a_new_data_domain_with_dataset_of_the_same_type(){
 
     title("creating_a_new_data_domain_with_dataset_of_the_same_type");
-    DataDomainManager<SimpleDataSpecification> animals = DataDomainManager.newRoot("primitives", SimpleDataSpecification.create(), RandomBuilder.PROVIDER.singleton());
+    FixtureFactory<SimpleDataSpecification> animals = FixtureFactory.newRoot("primitives", SimpleDataSpecification.create(), FluentRandom.singleton());
 
     out("a datadomain that will contain various dataset composed of string : %s", animals);
 
@@ -98,7 +98,7 @@ public class Examples {
   public void manipulating_a_dataset() {
     title("useful_method_on_a_dataset");
 
-    DataDomain<SimpleDataSpecification> domain = Fixtures.rgb();
+    Fixture<SimpleDataSpecification> domain = Fixtures.rgb();
 
     DataSet<Color> colors = domain.dataset(Color.class);
 
@@ -124,7 +124,7 @@ public class Examples {
 
   @Test
   public void using_function_on_dataset(){
-    DataDomain<ExampleDataSpecification> domain = Fixtures.multicolor();
+    Fixture<ExampleDataSpecification> domain = Fixtures.multicolor();
 
     DataSet<Color> colors = domain.dataset(Color.class);
 
@@ -157,7 +157,7 @@ public class Examples {
   public void using_simple_generation_strategy(){
     title("using_simple_generation_strategy");
 
-    DataDomainManager<ExampleDataSpecification> domain = DataDomainManager.newRoot("colors", new ExampleDataSpecification(), RandomBuilder.PROVIDER.singleton());
+    FixtureFactory<ExampleDataSpecification> domain = FixtureFactory.newRoot("colors", new ExampleDataSpecification(), FluentRandom.singleton());
     domain.newDataSet(Color.class).generatedBy(new ColorGenerator());
 
     DataSet<Color> aDataSetOfColors = domain.dataset(Color.class);
@@ -169,7 +169,7 @@ public class Examples {
   @Test
   public void distinction_between_a_generated_dataset_and_a_generator() {
     title("\ndistinction_between_a_generated_dataset_and_a_generator\n");
-    DataDomain<ExampleDataSpecification> multicolors = Fixtures.multicolor();
+    Fixture<ExampleDataSpecification> multicolors = Fixtures.multicolor();
 
     List<Color> listOfColors = multicolors.dataset(Color.class).list();
     out("A list of %d colors : %s",multicolors.getSpecification().getDefaultNumberOfItems(),listOfColors);
@@ -191,7 +191,7 @@ public class Examples {
   public void configuring_data_generation_from_a_specification(){
     title("configuring_data_generation_from_a_specification");
 
-    DataDomain<ExampleDataSpecification> multicolors = Fixtures.multicolor();
+    Fixture<ExampleDataSpecification> multicolors = Fixtures.multicolor();
 
     out("This data domain is using the following spec : %s",multicolors.getSpecification());
 
@@ -210,7 +210,7 @@ public class Examples {
   public void reusing_existing_datasets_when_generating_data(){
     title("reusing_existing_datasets_when_generating_data");
 
-    DataDomain<ExampleDataSpecification> automotives = Fixtures.automotives();
+    Fixture<ExampleDataSpecification> automotives = Fixtures.automotives();
 
     out("Here are the list of available colors : %s",automotives.dataset(Color.class).list());
     out("Here are the cars generated with them : %s",automotives.dataset(Car.class).list());
@@ -221,7 +221,7 @@ public class Examples {
   public void generating_objects_having_bidirectional_associations(){
 
     title("generating_objects_having_bidirectional_associations");
-    DataDomain<ExampleDataSpecification> automotives = Fixtures.automotives();
+    Fixture<ExampleDataSpecification> automotives = Fixtures.automotives();
     out("Here are an owner with its generated cars: %s",automotives.dataset(Owner.class).any());
     out("The car is associated to its owner in the  %s strategy", CarGenerator.class.getName());
     out("The annotation means 'generate also cars when you need to generate owners'");
@@ -231,7 +231,7 @@ public class Examples {
   public void restricting_generated_dataset(){
     title("restricting_generated_dataset");
 
-    DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
+    FixtureFactory<ExampleDataSpecification> automotives = Fixtures.automotives();
 
     out("random blue cars : %s",automotives.restrictTo(Color.BLUE).dataset(Car.class).list());
     out("random Ford cars : %s",automotives.restrictTo(Car.Maker.FORD).dataset(Car.class).list());
@@ -239,7 +239,7 @@ public class Examples {
 
     //using "restrictTo" is a convenient way of replacing generated data by predetermined ones
     //you may also do the following, but it is longer and less intention-revealing:
-    DataDomainManager<ExampleDataSpecification> node=automotives.newNode("child");
+    FixtureFactory<ExampleDataSpecification> node=automotives.newNode("child");
     node.newDataSet(Color.class).composedOf(Color.GREEN, Color.PINK);
     node.newDataSet(Car.Maker.class).composedOf(Car.Maker.CHEVROLET);
 
@@ -250,7 +250,7 @@ public class Examples {
   public void restricting_generated_dataset_part2(){
     title("restricting_generated_dataset_part2");
 
-    DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
+    FixtureFactory<ExampleDataSpecification> automotives = Fixtures.automotives();
 
     out("random drivers having a random number of blue cars : %s",automotives.restrictTo(Color.BLUE).dataset(Owner.class).any());
 
@@ -261,7 +261,7 @@ public class Examples {
   public void using_implicit_generation_strategy(){
     title("using_implicit_generation_strategy");
 
-    DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
+    FixtureFactory<ExampleDataSpecification> automotives = Fixtures.automotives();
 
     automotives.newDataSet(Trip.class).generatedAsIterableBy(new TripGenerator());
     out("List of cars : %s",automotives.dataset(Car.class).list());
@@ -274,7 +274,7 @@ public class Examples {
   public void restricting_on_empty_dataset(){
     title("restricting_on_empty_dataset");
 
-    DataDomainManager<ExampleDataSpecification> automotives = Fixtures.automotives();
+    FixtureFactory<ExampleDataSpecification> automotives = Fixtures.automotives();
 
     automotives.newDataSet(Trip.class).generatedAsIterableBy(new TripGenerator());
     out("No trip were generated : %s",automotives.restrictTo(EmptyDataSet.ofType(Car.class)).dataset(Trip.class).isEmpty());

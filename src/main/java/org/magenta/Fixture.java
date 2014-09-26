@@ -2,17 +2,17 @@ package org.magenta;
 
 import java.util.Set;
 
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.eventbus.EventBus;
 
 /**
- * A <code>DataDomain</code> groups together different type of related {@link DataSet} and
+ * A <code>Fixture</code> groups together different type of related {@link DataSet} and
  * {@link Generator} so they can be retrieved in a convenient way.
  *
  * @author ngagnon
  */
-public interface DataDomain<S extends DataSpecification> {
+public interface Fixture<S extends DataSpecification> {
 
   /**
    * @return the display name of this data domain.
@@ -34,14 +34,14 @@ public interface DataDomain<S extends DataSpecification> {
    *
    * @return the parent domain or null if this domain has no parent.
    */
-  public DataDomain<S> getParent();
+  public Fixture<S> getParent();
 
   /**
    * Return the {@linkplain RandomBuilder} associated to this domain.
    *
    * @return the randomizer
    */
-  public RandomBuilder getRandomizer();
+  public FluentRandom getRandomizer();
 
   /**
    * Return the {@linkplain DataSet} associated to the default key of

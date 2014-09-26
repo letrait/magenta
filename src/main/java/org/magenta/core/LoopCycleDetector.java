@@ -3,7 +3,7 @@ package org.magenta.core;
 import java.util.concurrent.Callable;
 
 import org.magenta.CycleDetectedInGenerationException;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.core.injection.FixtureContext;
@@ -20,7 +20,7 @@ public class LoopCycleDetector<S extends DataSpecification> implements FixtureCo
   }
 
   @Override
-  public <D> Iterable<D> execute(Callable<Iterable<D>> callable, DataDomain<? extends S> fixture) {
+  public <D> Iterable<D> execute(Callable<Iterable<D>> callable, Fixture<? extends S> fixture) {
 
     try {
       if (active) {
@@ -36,7 +36,7 @@ public class LoopCycleDetector<S extends DataSpecification> implements FixtureCo
 
 
   @Override
-  public DataDomain<S> get() {
+  public Fixture<S> get() {
     return context.get();
   }
 

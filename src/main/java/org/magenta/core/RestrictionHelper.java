@@ -3,7 +3,7 @@ package org.magenta.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.magenta.DataDomainManager;
+import org.magenta.FixtureFactory;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.QualifiedDataSet;
@@ -26,7 +26,7 @@ import com.google.common.collect.Multimap;
  * Here is a sample of code:
  *
  * <pre>
- * DataDomainManager tourismDomain = TourismDomain.createDomain();
+ * FixtureFactory tourismDomain = TourismDomain.createDomain();
  * City paris = CityBuilder.build(&quot;Paris&quot;); // custom logic to
  * // create/build/generate a city
  * Monument monument = tourismDomain.restrictTo(paris)
@@ -62,7 +62,7 @@ public class RestrictionHelper {
    *          an array of object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static void applyRestrictions(DataDomainManager<?> domain, Object... objects) {
+  public static void applyRestrictions(FixtureFactory<?> domain, Object... objects) {
     Multimap<DataKey<?>, Object> multimap = ArrayListMultimap.create();
 
     normalize(domain, Arrays.asList(objects), multimap);
@@ -83,7 +83,7 @@ public class RestrictionHelper {
   }
 
   @VisibleForTesting
-  static void normalize(DataDomainManager<?> domain, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap) {
+  static void normalize(FixtureFactory<?> domain, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap) {
     for (Object o : objects) {
       if (o instanceof QualifiedDataSet) {
         QualifiedDataSet<?> qDataSetItem = (QualifiedDataSet<?>) o;
@@ -128,7 +128,7 @@ public class RestrictionHelper {
   }
 
   @VisibleForTesting
-  static DataKey<?> findKeyForClass(DataDomainManager<?> domain, Class<? extends Object> clazz) {
+  static DataKey<?> findKeyForClass(FixtureFactory<?> domain, Class<? extends Object> clazz) {
     DataKey<?> key = DataKey.makeDefault(clazz);
     if (domain.datasetKeys()
         .contains(key)) {

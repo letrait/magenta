@@ -2,14 +2,14 @@ package org.magenta.core;
 
 import java.util.Arrays;
 
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Suppliers;
 
 public class Fixtures {
 
-	public static RandomBuilder randomizer(){
-		return RandomBuilder.PROVIDER.singleton();
+	public static FluentRandom randomizer(){
+		return FluentRandom.singleton();
 	}
 
   public static GenericDataSet<String> createAnonymousDataSet(int size) {

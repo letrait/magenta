@@ -1,6 +1,6 @@
 package org.magenta.random;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -22,7 +22,7 @@ public class RandomIterableTest {
 		Random random=mock(Random.class);
 
 
-		RandomBuilder randomizer=RandomBuilder.PROVIDER.get(random);
+		FluentRandom randomizer=FluentRandom.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);
@@ -51,7 +51,7 @@ public class RandomIterableTest {
 		Random random=mock(Random.class);
 
 
-		RandomBuilder randomizer=RandomBuilder.PROVIDER.get(random);
+		FluentRandom randomizer=FluentRandom.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);

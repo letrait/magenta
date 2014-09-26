@@ -1,6 +1,6 @@
 package org.magenta;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 import org.mockito.Mockito;
 
 public class DataSetKeyTest {
@@ -137,7 +137,7 @@ public class DataSetKeyTest {
 		DataKey<String> sut = DataKey.makeDefault(String.class);
 
 		//exercise sut
-		QualifiedDataSet<String> actual=sut.asDataSet(RandomBuilder.PROVIDER.singleton(),"foo","bar");
+		QualifiedDataSet<String> actual=sut.asDataSet(FluentRandom.singleton(),"foo","bar");
 
 		//verify outcome
 		assertThat(actual.getKey()).isSameAs(sut);
@@ -149,7 +149,7 @@ public class DataSetKeyTest {
 
 			//setup fixtures
 			DataKey<String> sut = DataKey.makeDefault(String.class);
-			DataDomain<DataSpecification> domain=mock(DataDomain.class);
+			Fixture<DataSpecification> domain=mock(Fixture.class);
 			DataSet<String> expected=mock(DataSet.class);
 
 			when(domain.dataset(Mockito.any(DataKey.class))).thenReturn(expected);

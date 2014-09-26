@@ -16,9 +16,9 @@ import com.google.common.collect.Lists;
 public class MixedIterable<D> implements Iterable<D> {
 
   private final Iterable<? extends Iterable<? extends D>> iterables;
-  private final RandomBuilder randomizer;
+  private final FluentRandom randomizer;
 
-  MixedIterable(Iterable<? extends Iterable<? extends D>> iterables, RandomBuilder randomizer) {
+  MixedIterable(Iterable<? extends Iterable<? extends D>> iterables, FluentRandom randomizer) {
     this.iterables = iterables;
     this.randomizer = randomizer;
   }

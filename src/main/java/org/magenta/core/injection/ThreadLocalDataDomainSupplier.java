@@ -2,15 +2,15 @@ package org.magenta.core.injection;
 
 import java.util.concurrent.Callable;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataSpecification;
 
 public class ThreadLocalDataDomainSupplier<S extends DataSpecification> implements FixtureContext<S> {
 
-  private ThreadLocal<DataDomain> current = new ThreadLocal<DataDomain>();
+  private ThreadLocal<Fixture> current = new ThreadLocal<Fixture>();
 
 
-  protected void setContext(DataDomain<? extends S> domain) {
+  protected void setContext(Fixture<? extends S> domain) {
     current.set(domain);
   }
 
@@ -19,12 +19,12 @@ public class ThreadLocalDataDomainSupplier<S extends DataSpecification> implemen
   }
 
   @Override
-  public DataDomain<S> get() {
+  public Fixture<S> get() {
     return current.get();
   }
 
   @Override
-  public <D> Iterable<D> execute(Callable<Iterable<D>> callable, DataDomain<? extends S> fixture) {
+  public <D> Iterable<D> execute(Callable<Iterable<D>> callable, Fixture<? extends S> fixture) {
 
     if (get() != null && !fixture.equals(get())) {
       throw new IllegalStateException("Illegal attemp to set a new context when one is already active");

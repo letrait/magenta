@@ -1,7 +1,7 @@
 package org.magenta.core;
 
 import org.magenta.CycleDetectedInGenerationException;
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -19,7 +19,7 @@ public class DataSetRelationLoader {
   @Subscribe
   public void onGenerationEvent(PostDataSetGenerated event){
 
-    DataDomain<? extends DataSpecification> fixture= event.getFixture();
+    Fixture<? extends DataSpecification> fixture= event.getFixture();
     DataKey<?> key = event.getKey();
 
   //cache the computation of key to load and use a guava event to know when to flush the cache

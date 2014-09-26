@@ -1,6 +1,6 @@
 package org.magenta.generators;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -8,12 +8,12 @@ import java.util.Arrays;
 import java.util.Random;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.core.GenericDataSet;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
@@ -30,7 +30,7 @@ public class DataSetAggregationGenerationStrategyTest {
 		Random random = mock(Random.class);
 		when(random.nextInt(Mockito.anyInt())).thenReturn(0,1,0,2,0,0,0,0,0);
 
-		RandomBuilder randomizer = RandomBuilder.PROVIDER.get(random);
+		FluentRandom randomizer = FluentRandom.get(random);
 
 		//keys
 		DataKey<Integer> integersKey=DataKey.makeDefault(Integer.class);
@@ -41,7 +41,7 @@ public class DataSetAggregationGenerationStrategyTest {
 		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, randomizer);
 		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, randomizer);
 
-		DataDomain<DataSpecification> domain = mock(DataDomain.class);
+		Fixture<DataSpecification> domain = mock(Fixture.class);
 
 		//mapping keys and values
 		when(domain.getRandomizer()).thenReturn(randomizer);
@@ -68,7 +68,7 @@ public class DataSetAggregationGenerationStrategyTest {
 		Random random = mock(Random.class);
 		when(random.nextInt(Mockito.anyInt())).thenReturn(0,1,0,2,0,0,0,0,0);
 
-		RandomBuilder randomizer = RandomBuilder.PROVIDER.get(random);
+		FluentRandom randomizer = FluentRandom.get(random);
 
 		//keys
 		DataKey<Integer> integersKey=DataKey.makeDefault(Integer.class);
@@ -79,7 +79,7 @@ public class DataSetAggregationGenerationStrategyTest {
 		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, randomizer);
 		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, randomizer);
 
-		DataDomain<DataSpecification> domain = mock(DataDomain.class);
+		Fixture<DataSpecification> domain = mock(Fixture.class);
 
 		//mapping keys and values
 		when(domain.getRandomizer()).thenReturn(randomizer);

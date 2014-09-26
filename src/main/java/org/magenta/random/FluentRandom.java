@@ -8,6 +8,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
@@ -18,25 +20,23 @@ import com.google.common.collect.Range;
  * @author ngagnon
  *
  */
-public class RandomBuilderImpl implements RandomBuilder {
+public class FluentRandom {
 
   private static final int DEFAULT_DOUBLE_NUMBER_OF_DECIMAL_PLACES = 8;
 
-  private final Random random;
-  private final RandomInteger integers;
-  private final RandomShort shorts;
-  private final RandomDouble doubles;
-  private final RandomLong longs;
-  private final RandomString strings;
-  private final RandomDate dates;
+  private Random random;
+  private RandomInteger integers;
+  private RandomShort shorts;
+  private RandomDouble doubles;
+  private RandomLong longs;
+  private RandomString strings;
+  private RandomDate dates;
 
-
-
-  RandomBuilderImpl() {
-    this(Helper.initWithDefaultRandom());
+  FluentRandom(){
+    //for cglib
   }
 
-  RandomBuilderImpl(Random random) {
+  FluentRandom(Random random) {
     // use suppliers?
     this.random = random;
     this.longs = new RandomLong(random);
@@ -47,13 +47,38 @@ public class RandomBuilderImpl implements RandomBuilder {
     this.dates = new RandomDate(longs);
   }
 
+  private static final Supplier<FluentRandom> SINGLETON = Suppliers.memoize(new Supplier<FluentRandom>() {
+
+    @Override
+    public FluentRandom get() {
+      return new FluentRandom(Helper.initWithDefaultRandom());
+    }
+
+  });
+
+  /**
+   * @return the singleton
+   */
+  public static FluentRandom singleton() {
+    return SINGLETON.get();
+  }
+
+  /**
+   * Return a new instance of {@code Randoms} using the specified {@code random}.
+   *
+   * @param random the random
+   * @return a new instance
+   */
+  public static FluentRandom get(Random random) {
+    return new FluentRandom(random);
+  }
+
 
 
   /**
    * Get the random.
    * @return the random
    */
-  @Override
   public Random getRandom() {
     return this.random;
   }
@@ -63,7 +88,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return date generator
    */
-  @Override
   public RandomDate dates() {
     return this.dates;
   }
@@ -71,7 +95,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return string generator
    */
-  @Override
   public RandomString strings() {
     return this.strings;
   }
@@ -80,7 +103,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param alphabet the alphabet from which to generate strings
    * @return string generator
    */
-  @Override
   public RandomString strings(String alphabet) {
     return new RandomString(alphabet, integers);
   }
@@ -88,7 +110,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return a integer generator
    */
-  @Override
   public RandomInteger integers() {
     return this.integers;
   }
@@ -97,7 +118,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param constrained the range of possible values.
    * @return a integer generator
    */
-  @Override
   public RandomInteger integers(Range<Integer> constrained) {
     return new RandomInteger(random, constrained, 1);
   }
@@ -105,7 +125,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return a long generator.
    */
-  @Override
   public RandomLong longs() {
     return this.longs;
   }
@@ -114,7 +133,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param constrained the range of possible values
    * @return a long generator
    */
-  @Override
   public RandomLong longs(Range<Long> constrained) {
     return new RandomLong(random, constrained, 1);
   }
@@ -122,7 +140,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return a short generator
    */
-  @Override
   public RandomShort shorts() {
     return this.shorts;
   }
@@ -131,7 +148,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param constrained the range of possible values
    * @return a short generators
    */
-  @Override
   public RandomShort shorts(Range<Short> constrained) {
     return new RandomShort(random, constrained, (short) 1);
   }
@@ -139,7 +155,6 @@ public class RandomBuilderImpl implements RandomBuilder {
   /**
    * @return a double generator.
    */
-  @Override
   public RandomDouble doubles() {
     return this.doubles;
   }
@@ -148,7 +163,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param numberOfDecimalPlaces number of decimal places in the generated numbers
    * @return a double generator
    */
-  @Override
   public RandomDouble doubles(int numberOfDecimalPlaces) {
     return new RandomDouble(random, numberOfDecimalPlaces);
   }
@@ -158,7 +172,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param constrained the range of possible values
    * @return a double generator
    */
-  @Override
   public RandomDouble doubles(int numberOfDecimalPlaces, Range<Double> constrained) {
     return new RandomDouble(random, numberOfDecimalPlaces, constrained);
   }
@@ -169,7 +182,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @return a list picker
    *
    */
-  @Override
   @SafeVarargs
   public final <E> RandomList<E> array(E... values) {
     return new RandomList<>(random, integers(), Arrays.asList(values));
@@ -180,7 +192,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param <E> type of enum
    * @return a enum picker
    */
-  @Override
   public final <E extends Enum<E>> RandomList<E> enums(Class<E> clazz) {
 
     List<E> enums = Arrays.asList(clazz.getEnumConstants());
@@ -193,7 +204,6 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param <E> the type of value
    * @return a list picker
    */
-  @Override
   public <E> RandomList<E> iterable(Iterable<E> values) {
     return new RandomList<>(random, integers(), Lists.newArrayList(values));
   }
@@ -205,13 +215,12 @@ public class RandomBuilderImpl implements RandomBuilder {
    * @param <E> the type of value
    * @return a mixed iterable
    */
-  @Override
   public <E> Iterable<E> mix(Iterable<Iterable<? extends E>> iterables) {
     return new MixedIterable<>(iterables, this);
   }
 
   private static class Helper {
-    private static final Logger LOG = LoggerFactory.getLogger(RandomBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FluentRandom.class);
 
     public static final String RANDOM_SEED_SYSTEM_PROPERTY_KEY = "magenta.random.seed";
 

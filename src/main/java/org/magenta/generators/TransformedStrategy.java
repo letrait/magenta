@@ -1,6 +1,6 @@
 package org.magenta.generators;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -40,12 +40,12 @@ public class TransformedStrategy<D, O, S extends DataSpecification> implements G
   }
 
   @Override
-  public Iterable<D> generate(DataDomain<? extends S> dataDomain) {
+  public Iterable<D> generate(Fixture<? extends S> dataDomain) {
     return FluentIterable.from(strategy.generate(dataDomain)).filter(filter).transform(converter);
   }
 
   @Override
-  public Iterable<D> generate(int numberOfElements, DataDomain<? extends S> dataDomain) {
+  public Iterable<D> generate(int numberOfElements, Fixture<? extends S> dataDomain) {
     return FluentIterable.from(strategy.generate(dataDomain)).filter(filter).transform(converter).limit(numberOfElements);
   }
 

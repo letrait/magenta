@@ -2,7 +2,7 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -40,10 +40,10 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
    * @param dataDomain the data domain
    * @return a generated item of type <code>D</code>
    */
-  protected abstract D doGenerate(int index, DataDomain<? extends S> dataDomain);
+  protected abstract D doGenerate(int index, Fixture<? extends S> dataDomain);
 
   @Override
-  public Iterable<D> generate(DataDomain<? extends S> fixture) {
+  public Iterable<D> generate(Fixture<? extends S> fixture) {
 
     List<D> result = Lists.newArrayList();
 
@@ -57,7 +57,7 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
   }
 
   @Override
-  public Iterable<D> generate(int numberOfElements, DataDomain<? extends S> repo) {
+  public Iterable<D> generate(int numberOfElements, Fixture<? extends S> repo) {
     List<D> result = Lists.newArrayList();
     for (int i = 0; i < numberOfElements; i++) {
       result.add(doGenerate(i, repo));

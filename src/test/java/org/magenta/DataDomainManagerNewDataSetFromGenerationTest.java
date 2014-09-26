@@ -1,6 +1,6 @@
 package org.magenta;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.magenta.testing.MagentaAssertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -17,7 +17,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
   public void testGeneratedBySupplier(){
 
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
     Supplier<String> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn("red", "blue", "green","black");
@@ -35,7 +35,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
   public void testGeneratedBySupplier_default_number_of_generated_item(){
 
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
     Supplier<Integer> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -55,7 +55,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
   public void testGeneratedByImplicitGenerationStrategy(){
 
     //setup fixtures
-    DataDomainManager<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
     Supplier<Iterable<String>> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn(Arrays.asList("red", "blue", "green"));

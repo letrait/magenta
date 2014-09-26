@@ -14,8 +14,8 @@ public interface Generator<T> extends DataSet<T> {
   /**
    * Restrict the data domain of this generator to the specified items. This
    * will replace any {@link DataSet} of the same type currently defined in the
-   * {@link DataDomain}. The override will only be visible for that generator as it is
-   * using a new child {@link DataDomain} node.
+   * {@link Fixture}. The override will only be visible for that generator as it is
+   * using a new child {@link Fixture} node.
    *
    * @param o
    *          an array of object, {@link DataSet} or collection.

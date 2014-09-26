@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
@@ -62,7 +62,7 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
   }
 
   @Override
-  public Iterable<D> generate(final DataDomain<? extends S> dataDomain) {
+  public Iterable<D> generate(final Fixture<? extends S> dataDomain) {
 
     Function<DataKey<? extends D>, DataSet<? extends D>> getDataSetFromKey = createGetDataSetFunction(dataDomain);
 
@@ -71,7 +71,7 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
   }
 
   @Override
-  public Iterable<D> generate(int numberOfElements, final DataDomain<? extends S> dataDomain) {
+  public Iterable<D> generate(int numberOfElements, final Fixture<? extends S> dataDomain) {
 
     Function<DataKey<? extends D>, DataSet<? extends D>> getDataSetFromKey = createGetDataSetFunction(dataDomain);
 
@@ -79,7 +79,7 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
         numberOfElements);
   }
 
-  private Function<DataKey<? extends D>, DataSet<? extends D>> createGetDataSetFunction(final DataDomain<? extends S> dataDomain) {
+  private Function<DataKey<? extends D>, DataSet<? extends D>> createGetDataSetFunction(final Fixture<? extends S> dataDomain) {
     Function<DataKey<? extends D>, DataSet<? extends D>> toDataSet = new Function<DataKey<? extends D>, DataSet<? extends D>>() {
 
       private Map<DataKey,CacheEntry> cache = new HashMap<DataKey,CacheEntry>();

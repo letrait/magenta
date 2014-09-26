@@ -3,7 +3,7 @@ package org.magenta.core;
 import static com.google.common.base.Predicates.containsPattern;
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.or;
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.DataSet;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Functions;
 import com.google.common.base.Predicate;
@@ -29,7 +29,7 @@ public class GenericDataSetTest {
 
 		List<Integer> expectedData=Arrays.asList(1,3,5);
 		Class<Integer> expectedType=Integer.class;
-		RandomBuilder expectedRandomizer=RandomBuilder.PROVIDER.singleton();
+		FluentRandom expectedRandomizer=FluentRandom.singleton();
 		GenericDataSet<Integer> sut=new GenericDataSet<>(Arrays.asList(1,3,5), expectedType, expectedRandomizer);
 
 		//exercise sut
@@ -48,7 +48,7 @@ public class GenericDataSetTest {
 	public void testEmpty() {
 
 		// setup fixtures
-		GenericDataSet<String> sut = new GenericDataSet<>(Collections.EMPTY_LIST, String.class,RandomBuilder.PROVIDER.singleton());
+		GenericDataSet<String> sut = new GenericDataSet<>(Collections.EMPTY_LIST, String.class,FluentRandom.singleton());
 
 		// exercise sut
 		boolean actual = sut.isEmpty();
@@ -298,7 +298,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list()), String.class,RandomBuilder.PROVIDER.singleton());
+    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list()), String.class,FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isEqualTo(ds1);
@@ -318,7 +318,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list(4)), String.class,RandomBuilder.PROVIDER.singleton());
+    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list(4)), String.class,FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isNotEqualTo(ds2);
@@ -330,7 +330,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     GenericDataSet<String> sut = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> expected = new GenericDataSet<String>(Suppliers.ofInstance(sut.list(3)), String.class,RandomBuilder.PROVIDER.singleton());
+    DataSet<String> expected = new GenericDataSet<String>(Suppliers.ofInstance(sut.list(3)), String.class,FluentRandom.singleton());
 
     // exercise SUT
     DataSet<String> actual = sut.subset(3);

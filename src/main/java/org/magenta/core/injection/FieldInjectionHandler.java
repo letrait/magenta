@@ -2,7 +2,7 @@ package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 
 import com.google.common.base.Supplier;
 
@@ -21,5 +21,5 @@ public interface FieldInjectionHandler {
    * @param context a supplier of fixture
    * @return true if the field was handled
    */
-  public boolean handle(Field f, Object target, Supplier<DataDomain> context);
+  public boolean handle(Field f, Object target, Supplier<Fixture> context);
 }

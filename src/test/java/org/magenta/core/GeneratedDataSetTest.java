@@ -1,6 +1,6 @@
 package org.magenta.core;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -8,8 +8,8 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.DataDomain;
-import org.magenta.DataDomainManager;
+import org.magenta.Fixture;
+import org.magenta.FixtureFactory;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -27,7 +27,7 @@ public class GeneratedDataSetTest {
 		Integer[] expected={1,2,3,4,5};
 
 
-		DataDomainManager<DataSpecification> domain=mock(DataDomainManager.class);
+		FixtureFactory<DataSpecification> domain=mock(FixtureFactory.class);
 		GenerationStrategy<Integer, DataSpecification> strategy=mock(GenerationStrategy.class);
 
 		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
@@ -47,10 +47,10 @@ public class GeneratedDataSetTest {
 		Integer[] expected={1,2,3,4,5};
 
 
-		DataDomainManager<DataSpecification> domain=mock(DataDomainManager.class);
+		FixtureFactory<DataSpecification> domain=mock(FixtureFactory.class);
 		GenerationStrategy<Integer, DataSpecification> strategy=mock(GenerationStrategy.class);
 
-		when(strategy.generate(Mockito.any(DataDomain.class))).thenReturn(Arrays.asList(expected));
+		when(strategy.generate(Mockito.any(Fixture.class))).thenReturn(Arrays.asList(expected));
 
 		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
 

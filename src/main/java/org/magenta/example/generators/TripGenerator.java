@@ -8,21 +8,21 @@ import java.util.concurrent.TimeUnit;
 import org.magenta.DataSet;
 import org.magenta.annotations.InjectDataSet;
 import org.magenta.annotations.InjectDataSpecification;
-import org.magenta.annotations.InjectRandomBuilder;
+import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.example.domain.Car;
 import org.magenta.example.domain.Trip;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
 import com.google.inject.internal.Lists;
 
 public class TripGenerator implements Supplier<Iterable<Trip>> {
 
-  @InjectRandomBuilder
-  private RandomBuilder rnd;
+  @InjectFluentRandom
+  private FluentRandom rnd;
 
   @InjectDataSpecification
-  private Supplier<TripSpecification> spec;
+  private TripSpecification spec;
 
   @InjectDataSet
   private DataSet<Car> cars;
@@ -34,11 +34,11 @@ public class TripGenerator implements Supplier<Iterable<Trip>> {
 
     for(Car car:cars.list()){
 
-      Integer numberOfTrips = rnd.integers(spec.get().getNumberOfTripsByCar()).any();
+      Integer numberOfTrips = rnd.integers(spec.getNumberOfTripsByCar()).any();
 
       for(int i = 0 ; i< numberOfTrips; i++){
 
-        Integer distanceInKm = rnd.integers(spec.get().getTripDistanceInKm()).any();
+        Integer distanceInKm = rnd.integers(spec.getTripDistanceInKm()).any();
 
         Trip trip = new Trip();
         trip.setCar(car);

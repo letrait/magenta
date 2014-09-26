@@ -1,6 +1,6 @@
 package org.magenta.core;
 
-import static org.fest.assertions.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
@@ -13,12 +13,12 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.magenta.DataDomainManager;
+import org.magenta.FixtureFactory;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
 import org.magenta.core.GeneratorImpl;
-import org.magenta.random.RandomBuilderImpl;
+import org.magenta.random.FluentRandom;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -31,7 +31,7 @@ import com.google.common.base.Suppliers;
 public class GeneratorImplTest {
 
   @Mock
-  DataDomainManager<DataSpecification> datasetMap;
+  FixtureFactory<DataSpecification> datasetMap;
   @Mock
   GenerationStrategy<String,DataSpecification> spy;
 
@@ -51,7 +51,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     Iterable<String> expected = Arrays.asList("result");
 
-    when(spy.generate(Mockito.anyInt(), any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(Mockito.anyInt(), any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     String result = sut.any();
@@ -68,7 +68,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     String[] expected =new String[]{"1", "2", "3"};
 
-    when(spy.generate(any(DataDomainManager.class))).thenReturn(Arrays.asList(expected));
+    when(spy.generate(any(FixtureFactory.class))).thenReturn(Arrays.asList(expected));
 
     // exercise sut
     String[] actual = sut.array();
@@ -85,7 +85,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     String[] expected =new String[]{"1", "2"};
 
-    when(spy.generate(Mockito.anyInt(), any(DataDomainManager.class))).thenReturn(Arrays.asList("1","2"));
+    when(spy.generate(Mockito.anyInt(), any(FixtureFactory.class))).thenReturn(Arrays.asList("1","2"));
 
     // exercise sut
     String[] actual = sut.array(2);
@@ -102,7 +102,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     String[] expected =new String[]{"1", "2", "3"};
 
-    when(spy.generate(any(DataDomainManager.class))).thenReturn(Arrays.asList(expected));
+    when(spy.generate(any(FixtureFactory.class))).thenReturn(Arrays.asList(expected));
 
     // exercise sut
     String[] actual = sut.randomArray();
@@ -120,7 +120,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     String[] expected =new String[]{"1", "2"};
 
-    when(spy.generate(Mockito.anyInt(),any(DataDomainManager.class))).thenReturn(Arrays.asList("1","2"));
+    when(spy.generate(Mockito.anyInt(),any(FixtureFactory.class))).thenReturn(Arrays.asList("1","2"));
 
     // exercise sut
     String[] actual = sut.randomArray(2);
@@ -138,7 +138,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     List<String> expected = Arrays.asList("1", "2", "3");
 
-    when(spy.generate(any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     List<String> actual = sut.list();
@@ -156,7 +156,7 @@ public class GeneratorImplTest {
     List<String> expected = Arrays.asList("1", "2");
     int expectedSize = 2;
 
-    when(spy.generate(Mockito.anyInt(), any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(Mockito.anyInt(), any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     List<String> actual = sut.list(expectedSize);
@@ -173,7 +173,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     List<String> expected = Arrays.asList("1", "2", "3");
 
-    when(spy.generate(any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     List<String> actual = sut.randomList();
@@ -192,7 +192,7 @@ public class GeneratorImplTest {
     List<String> expected = Arrays.asList("1", "2");
     int expectedSize = 2;
 
-    when(spy.generate(Mockito.anyInt(), any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(Mockito.anyInt(), any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     List<String> actual = sut.randomList(expectedSize);
@@ -210,7 +210,7 @@ public class GeneratorImplTest {
     GeneratorImpl<String,DataSpecification> sut = createGeneratorImpl(spy);
     List<String> expected = Arrays.asList("1", "2", "3");
 
-    when(spy.generate(any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     Set<String> actual = sut.set();
@@ -228,7 +228,7 @@ public class GeneratorImplTest {
     List<String> expected = Arrays.asList("1", "2");
     int expectedSize = 2;
 
-    when(spy.generate(Mockito.anyInt(), any(DataDomainManager.class))).thenReturn(expected);
+    when(spy.generate(Mockito.anyInt(), any(FixtureFactory.class))).thenReturn(expected);
 
     // exercise sut
     Set<String> actual = sut.set(expectedSize);

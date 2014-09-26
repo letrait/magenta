@@ -2,7 +2,7 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.DataDomain;
+import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.GenerationStrategy;
@@ -38,12 +38,12 @@ public class IterableSupplierGenerationStrategyAdapter<D, S extends DataSpecific
   }
 
   @Override
-  public Iterable<D> generate(int numberOfElements, DataDomain<? extends S> domain) {
+  public Iterable<D> generate(int numberOfElements, Fixture<? extends S> domain) {
     return Iterables.limit(generate(domain), numberOfElements);
   }
 
   @Override
-  public Iterable<D> generate(DataDomain<? extends S> domain) {
+  public Iterable<D> generate(Fixture<? extends S> domain) {
     return generator.get();
   }
 

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.magenta.DataSet;
-import org.magenta.random.RandomBuilder;
+import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
@@ -35,7 +35,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   private final Class<D> type;
 
-  private final RandomBuilder randomizer;
+  private final FluentRandom randomizer;
 
   /**
    * Construct a new dataset using the provided supplier as source.
@@ -45,7 +45,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
    * @param randomizer
    *          the java random to use for shuffling and by the "any()" method
    */
-  public AbstractDataSet(Class<D> type, RandomBuilder randomizer) {
+  public AbstractDataSet(Class<D> type, FluentRandom randomizer) {
     this.links = new LinkedHashMap<Object, D>();
     this.type = type;
     this.randomizer = randomizer;
@@ -210,7 +210,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
   /**
    * @return this data set randomizer
    */
-  protected RandomBuilder getRandomizer() {
+  protected FluentRandom getRandomizer() {
     return randomizer;
   }
 
