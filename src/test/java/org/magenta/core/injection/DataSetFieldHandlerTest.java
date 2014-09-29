@@ -9,10 +9,10 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 
 import org.junit.Test;
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSetNotFoundException;
+import org.magenta.Fixture;
 import org.magenta.QualifiedDataSet;
 import org.magenta.annotations.InjectDataSet;
 import org.mockito.Mockito;
@@ -67,7 +67,6 @@ public class DataSetFieldHandlerTest<D> {
     Field f = this.getClass().getDeclaredField("qualifiedDataSet");
 
     Fixture fixture = mock(Fixture.class);
-    when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
     boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
@@ -76,6 +75,8 @@ public class DataSetFieldHandlerTest<D> {
     //verify outcome
     assertThat(handled).overridingErrorMessage("The field 'aDataSet' of this test class was expected to be handled").isTrue();
     assertThat(qualifiedDataSet).overridingErrorMessage("No dataset injected into field 'aDataset'").isNotNull();
+
+    assertThat(qualifiedDataSet.getKey()).isEqualTo(DataKey.makeDefault(String.class));
 
     assertThat(qualifiedDataSet.getKey()).isEqualTo(DataKey.makeDefault(String.class));
   }
@@ -115,11 +116,17 @@ public class DataSetFieldHandlerTest<D> {
 
     //exercise sut
     boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
-
-    //verify outcome
+    dataSet.get();
     dataSet.get();
 
+    //verify outcome
     verify(fixture).dataset(DataKey.makeDefault(String.class));
+
+    //validate cached is used
+
+
+
+
 
   }
 

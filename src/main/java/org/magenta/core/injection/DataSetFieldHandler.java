@@ -4,9 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.Fixture;
 import org.magenta.QualifiedDataSet;
 import org.magenta.annotations.InjectDataSet;
 
