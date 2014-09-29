@@ -4,16 +4,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
+import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.annotations.InjectFixture;
 
 import com.google.common.base.Supplier;
 import com.google.common.reflect.Reflection;
 
-public class FixtureFieldHandler implements FieldInjectionHandler {
+public class FixtureFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {
 
   @Override
-  public boolean handle(Field f, Object target, Supplier<Fixture> context) {
+  public boolean handle(Field f, Object target, Supplier<Fixture<S>> context) {
     if (f.isAnnotationPresent(org.magenta.annotations.InjectFixture.class)) {
 
       InjectFixture annotation = f.getAnnotation(org.magenta.annotations.InjectFixture.class);
@@ -31,7 +32,7 @@ public class FixtureFieldHandler implements FieldInjectionHandler {
     }
   }
 
-  private InvocationHandler handler(final Supplier<Fixture> context) {
+  private InvocationHandler handler(final Supplier<Fixture<S>> context) {
     return new InvocationHandler() {
 
       @Override

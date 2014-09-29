@@ -2,6 +2,7 @@ package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
 
+import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 
 import com.google.common.base.Supplier;
@@ -11,7 +12,7 @@ import com.google.common.base.Supplier;
  * @author ngagnon
  *
  */
-public interface FieldInjectionHandler {
+public interface FieldInjectionHandler<S extends DataSpecification> {
 
   /**
    * Initialize a field according to its attribute such as annotations.
@@ -21,5 +22,5 @@ public interface FieldInjectionHandler {
    * @param context a supplier of fixture
    * @return true if the field was handled
    */
-  public boolean handle(Field f, Object target, Supplier<Fixture> context);
+  public boolean handle(Field f, Object target, Supplier<Fixture<S>> context);
 }

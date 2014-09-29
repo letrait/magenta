@@ -6,6 +6,7 @@ import java.lang.reflect.Type;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.QualifiedDataSet;
 import org.magenta.annotations.InjectDataSet;
@@ -13,10 +14,10 @@ import org.magenta.annotations.InjectDataSet;
 import com.google.common.base.Supplier;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public class DataSetFieldHandler implements FieldInjectionHandler {
+public class DataSetFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {
 
   @Override
-  public boolean handle(Field f, Object target, Supplier<Fixture> current) {
+  public boolean handle(Field f, Object target, Supplier<Fixture<S>> current) {
 
     if (f.isAnnotationPresent(org.magenta.annotations.InjectDataSet.class)) {
 
@@ -64,7 +65,7 @@ public class DataSetFieldHandler implements FieldInjectionHandler {
 
   }
 
-  private Supplier<DataSet> supplierFor(final DataKey<?> key, final Supplier<Fixture> current) {
+  private Supplier<DataSet> supplierFor(final DataKey<?> key, final Supplier<Fixture<S>> current) {
 
     return new Supplier<DataSet>() {
 

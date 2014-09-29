@@ -2,9 +2,9 @@ package org.magenta.generators;
 
 import java.util.concurrent.Callable;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 import org.magenta.core.LoopCycleDetector;
 import org.magenta.core.injection.FixtureContext;

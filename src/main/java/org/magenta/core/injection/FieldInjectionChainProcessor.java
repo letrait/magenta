@@ -3,6 +3,7 @@ package org.magenta.core.injection;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 
 import com.google.common.base.Function;
@@ -14,15 +15,14 @@ import com.google.common.base.Supplier;
  * @author ngagnon
  *
  */
-public class FieldInjectionChainProcessor implements Injector {
+public class FieldInjectionChainProcessor<S extends DataSpecification> implements Injector {
 
-  @SuppressWarnings("rawtypes")
-  private Supplier<Fixture> current;
+  private Supplier<Fixture<S>> current;
 
   private Function<Class<?>,List<Field>> fieldFinder;
-  private List<FieldInjectionHandler> handlers;
+  private List<FieldInjectionHandler<S>> handlers;
 
-  public FieldInjectionChainProcessor(@SuppressWarnings("rawtypes") Supplier<Fixture> current, Function<Class<?>, List<Field>> fieldFinder, List<FieldInjectionHandler> handlers){
+  public FieldInjectionChainProcessor(Supplier<Fixture<S>> current, Function<Class<?>, List<Field>> fieldFinder, List<FieldInjectionHandler<S>> handlers){
     this.current = current;
     this.fieldFinder = fieldFinder;
     this.handlers = handlers;
@@ -37,7 +37,7 @@ public class FieldInjectionChainProcessor implements Injector {
     List<Field> fields = fieldFinder.apply(o.getClass());
 
     for(Field f:fields){
-        for(FieldInjectionHandler handler:handlers){
+        for(FieldInjectionHandler<S> handler:handlers){
           if(handler.handle(f, o, current)){
             break;
           }

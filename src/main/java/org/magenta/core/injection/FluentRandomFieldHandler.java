@@ -1,7 +1,6 @@
 package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
 import net.sf.cglib.proxy.Callback;
@@ -9,6 +8,7 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
+import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.random.FluentRandom;
@@ -21,10 +21,10 @@ import com.google.common.base.Supplier;
  * @author ngagnon
  *
  */
-public class FluentRandomFieldHandler implements FieldInjectionHandler{
+public class FluentRandomFieldHandler<S  extends DataSpecification> implements FieldInjectionHandler<S>{
 
   @Override
-  public boolean handle(Field f, Object target, Supplier<Fixture> current) {
+  public boolean handle(Field f, Object target, Supplier<Fixture<S>> current) {
 
     if (f.isAnnotationPresent(org.magenta.annotations.InjectFluentRandom.class)) {
 
@@ -62,20 +62,7 @@ public class FluentRandomFieldHandler implements FieldInjectionHandler{
     };
   }
 
-  private InvocationHandler handler(final Supplier<FluentRandom> current) {
-   return new InvocationHandler() {
-
-    @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-      FluentRandom r = current.get();
-
-      return method.invoke(r, args);
-    }
-  };
-  }
-
-  private Supplier<FluentRandom> supplierOfFluentRandom(final Supplier<Fixture> current) {
+  private Supplier<FluentRandom> supplierOfFluentRandom(final Supplier<Fixture<S>> current) {
     return new Supplier<FluentRandom>() {
 
       @Override

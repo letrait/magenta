@@ -14,10 +14,10 @@ import org.magenta.annotations.InjectDataSpecification;
 
 import com.google.common.base.Supplier;
 
-public class DataSpecificationFieldHandler implements FieldInjectionHandler {
+public class DataSpecificationFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {
 
   @Override
-  public boolean handle(Field f, Object target, Supplier<Fixture> current) {
+  public boolean handle(Field f, Object target, Supplier<Fixture<S>> current) {
 
     if (f.isAnnotationPresent(org.magenta.annotations.InjectDataSpecification.class)) {
 
@@ -26,7 +26,7 @@ public class DataSpecificationFieldHandler implements FieldInjectionHandler {
       if (DataSpecification.class.isAssignableFrom(f.getType())) {
 
         Enhancer e = new Enhancer();
-        e.setSuperclass(f.getType());
+        e.setSuperclass(current.get().getSpecification().getClass());
         e.setCallback(interceptor(supplierOfDataSpecification(current)));
         e.setInterceptDuringConstruction(false);
 
@@ -43,7 +43,7 @@ public class DataSpecificationFieldHandler implements FieldInjectionHandler {
     }
   }
 
-  private Callback interceptor(final Supplier<DataSpecification> current) {
+  private Callback interceptor(final Supplier<S> current) {
     return new MethodInterceptor() {
 
       @Override
@@ -55,11 +55,11 @@ public class DataSpecificationFieldHandler implements FieldInjectionHandler {
   }
 
 
-  private Supplier<DataSpecification> supplierOfDataSpecification(final Supplier<Fixture> current) {
-    return new Supplier<DataSpecification>(){
+  private Supplier<S> supplierOfDataSpecification(final Supplier<Fixture<S>> current) {
+    return new Supplier<S>(){
 
       @Override
-      public DataSpecification get() {
+      public S get() {
         return current.get().getSpecification();
       }
     };
