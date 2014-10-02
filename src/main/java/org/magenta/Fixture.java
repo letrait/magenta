@@ -12,6 +12,16 @@ import com.google.common.eventbus.EventBus;
  *
  * @author ngagnon
  */
+/**
+ * @author ngagnon
+ *
+ * @param <S>
+ */
+/**
+ * @author ngagnon
+ *
+ * @param <S>
+ */
 public interface Fixture<S extends DataSpecification> {
 
   /**
@@ -56,9 +66,21 @@ public interface Fixture<S extends DataSpecification> {
   public abstract <D> DataSet<D> dataset(Class<D> clazz);
 
 
-  public Integer numberOfElementsFor(DataKey<?> key);
+  /**
+   *
+   * Return the size of dataset identified by the <code>key</code>.
+   * @param key
+   * @return the size
+   */
+  public Integer sizeOf(DataKey<?> key);
 
-  public Integer numberOfElementsFor(Class<?> clazz);
+  /**
+   * Return the size of dataset identified by the <code>clazz</code>.
+   *
+   * @param clazz
+   * @return the size
+   */
+  public Integer sizeOf(Class<?> clazz);
 
 
   /**

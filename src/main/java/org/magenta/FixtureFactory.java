@@ -508,12 +508,12 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return doGet(key);
   }
 
-  public FixtureFactory<S> setNumberOfElementsFor(Class<?> key, Integer numberOfElements) {
-    return setNumberOfElementsFor(getKeyFor(key), numberOfElements);
+  public FixtureFactory<S> setSizeOf(Class<?> key, Integer numberOfElements) {
+    return setSizeOf(getKeyFor(key), numberOfElements);
   }
 
 
-  public FixtureFactory<S> setNumberOfElementsFor(DataKey<?> key, Integer numberOfElements) {
+  public FixtureFactory<S> setSizeOf(DataKey<?> key, Integer numberOfElements) {
 
     Preconditions.checkState(datasetKeys().contains(key), "Cannot set the number of elements of %s : No dataset exists for this key.", key);
     this.numberOfItemsMap.put(key, numberOfElements);
@@ -521,12 +521,31 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return this;
   }
 
+  public FixtureFactory<S> setEmpty(Class<?>...clazzes) {
+    for(Class<?> k:clazzes){
+      setSizeOf(k, 0);
+    }
+
+    return this;
+  }
+
+
+  public FixtureFactory<S> setEmpty(DataKey<?>...keys) {
+
+    for(DataKey<?> k:keys){
+      setSizeOf(k, 0);
+    }
+
+    return this;
+
+  }
+
   @Override
-  public Integer numberOfElementsFor(Class<?> key) {
-    return numberOfElementsFor(getKeyFor(key));
+  public Integer sizeOf(Class<?> key) {
+    return sizeOf(getKeyFor(key));
   }
   @Override
-  public Integer numberOfElementsFor(DataKey<?> key) {
+  public Integer sizeOf(DataKey<?> key) {
 
     Integer n = null;
 
@@ -535,10 +554,15 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     n = numberOfItemsMap.get(key);
 
     if (n == null && parent != null) {
-      n = parent.numberOfElementsFor(key);
+      n = parent.sizeOf(key);
     }
 
-    n = (n == null) ? getSpecification().getDefaultNumberOfItems() : n;
+    if (n == null) {
+      DataSet<?> d = Preconditions.checkNotNull(this.dataSetMap.get(key));
+      n = d.isGenerated() ? getSpecification().getDefaultNumberOfItems() : d.list()
+          .size();
+    }
+
 
     return n;
   }
@@ -1060,7 +1084,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       DataSet<D> dataset = generatedBy(strategy);
 
       if(numberOfItems != null){
-        FixtureFactory.this.setNumberOfElementsFor(originalKey, numberOfItems);
+        FixtureFactory.this.setSizeOf(originalKey, numberOfItems);
       }
 
       return dataset;
@@ -1242,7 +1266,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
           Generator<D> generator = generatedBy(strategy);
 
           if(numberOfItems !=null){
-            FixtureFactory.this.setNumberOfElementsFor(originalKey, numberOfItems);
+            FixtureFactory.this.setSizeOf(originalKey, numberOfItems);
           }
 
           return generator;

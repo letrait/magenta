@@ -149,8 +149,8 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   }
 
   @Override
-  public Integer numberOfElementsFor(DataKey<?> key) {
-    return delegate.numberOfElementsFor(key);
+  public Integer sizeOf(DataKey<?> key) {
+    return delegate.sizeOf(key);
   }
 
   @Override
@@ -159,8 +159,8 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   }
 
   @Override
-  public Integer numberOfElementsFor(Class<?> clazz) {
-    return delegate.numberOfElementsFor(clazz);
+  public Integer sizeOf(Class<?> clazz) {
+    return delegate.sizeOf(clazz);
   }
 
 }

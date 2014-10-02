@@ -47,7 +47,7 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
 
     List<D> result = Lists.newArrayList();
 
-    int s = fixture.numberOfElementsFor(key);
+    int s = fixture.sizeOf(key);
 
     for (int i = 0; i < s; i++) {
       result.add(doGenerate(i, fixture));
