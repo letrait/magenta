@@ -205,7 +205,9 @@ public class FluentRandom {
    * @return a list picker
    */
   public <E> RandomList<E> iterable(Iterable<E> values) {
-    return new RandomList<>(random, integers(), Lists.newArrayList(values));
+    List<E> l = values instanceof List?(List<E>)values:Lists.newArrayList(values);
+
+    return new RandomList<>(random, integers(), l);
   }
 
   /**

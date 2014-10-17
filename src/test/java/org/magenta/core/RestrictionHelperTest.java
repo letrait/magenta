@@ -142,7 +142,7 @@ public class RestrictionHelperTest {
 
 		DataKey<Employee> key = DataKey.makeDefault(Employee.class);
 
-		DataSet<Employee> employees = key.asDataSet(sut.getRandomizer(), candidate1,candidate2,candidate3,candidate4,candidate5);
+		DataSet<Employee> employees = key.datasetOf(sut.getRandomizer(), candidate1,candidate2,candidate3,candidate4,candidate5);
 
 		//exercise sut
 		RestrictionHelper.applyRestrictions(sut, employees);

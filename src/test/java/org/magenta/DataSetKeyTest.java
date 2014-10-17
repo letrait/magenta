@@ -137,7 +137,7 @@ public class DataSetKeyTest {
 		DataKey<String> sut = DataKey.makeDefault(String.class);
 
 		//exercise sut
-		QualifiedDataSet<String> actual=sut.asDataSet(FluentRandom.singleton(),"foo","bar");
+		QualifiedDataSet<String> actual=sut.datasetOf(FluentRandom.singleton(),"foo","bar");
 
 		//verify outcome
 		assertThat(actual.getKey()).isSameAs(sut);

@@ -179,6 +179,22 @@ public class EmptyDataSet<D> implements DataSet<D> {
     return Objects.toStringHelper(this).add("type", getType()).toString();
   }
 
+  @Override
+  public DataSet<D> toTransient() {
+    return this;
+  }
+
+  @Override
+  public DataSet<D> persist() {
+    throw new UnsupportedOperationException("This dataset is not persistent:"+this.toString());
+  }
+
+  @Override
+  public DataSet<D> load() {
+
+    return this;
+  }
+
 
 
 }

@@ -1,9 +1,10 @@
 package org.magenta.core;
 
 import org.magenta.CycleDetectedInGenerationException;
-import org.magenta.Fixture;
 import org.magenta.DataKey;
+import org.magenta.DataSet;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 import org.magenta.events.PostDataSetGenerated;
 import org.slf4j.Logger;
@@ -32,6 +33,12 @@ public class DataSetRelationLoader {
 
 
             fixture.dataset(k).get();
+
+            //The dataset identified by key must be persisted again
+            DataSet modified = fixture.dataset(key);
+            if(modified.isPersistent()){
+              fixture.dataset(key).persist();
+            }
           } catch (CycleDetectedInGenerationException cdge) {
             // ignore
             // the key is already being loaded elsewhere

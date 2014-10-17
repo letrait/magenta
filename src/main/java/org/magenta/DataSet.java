@@ -29,6 +29,11 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
    */
   public boolean isPersistent();
 
+  /**
+   * @return a transient dataset if this dataset is persistent, no effect if this dataset is already transient
+   */
+  public DataSet<D> toTransient();
+
 
   /**
    * @return this dataset type
@@ -223,6 +228,10 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
    * @return true if this dataset is empty
    */
   public boolean isEmpty();
+
+  public DataSet<D> persist();
+
+  public DataSet<D> load();
 
 
 

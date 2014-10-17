@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import org.magenta.FixtureFactory;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
+import org.magenta.FixtureFactory;
 import org.magenta.GenerationStrategy;
 import org.magenta.Generator;
 import org.magenta.generators.TransformedStrategy;
@@ -225,6 +225,21 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
   @Override
   public boolean isEmpty() {
     return false;
+  }
+
+  @Override
+  public DataSet<T> toTransient() {
+    return this;
+  }
+
+  @Override
+  public DataSet<T> persist() {
+    throw new UnsupportedOperationException("This dataset is not persistent:"+this.toString());
+  }
+
+  @Override
+  public DataSet<T> load() {
+    return this;
   }
 
 

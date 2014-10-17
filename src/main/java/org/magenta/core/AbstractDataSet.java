@@ -56,6 +56,13 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
     return Iterables.isEmpty(get());
   }
 
+
+
+  @Override
+  public DataSet<D> toTransient() {
+   return this;
+  }
+
   @Override
   public DataSet<D> subset(int size) {
     return new GenericDataSet<D>(Iterables.limit(get(), size), this.type, getRandomizer());
@@ -137,12 +144,15 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public List<D> list() {
-    return Lists.newArrayList(get());
+    Iterable<D> i = get();
+
+    return (i instanceof List)?(List<D>)i :Lists.newArrayList(i);
   }
 
   @Override
   public List<D> list(int size) {
-    return Lists.newArrayList(Iterables.limit(get(), size));
+    Iterable<D> i = Iterables.limit(get(), size);
+    return i instanceof List? (List<D>)i:Lists.newArrayList(i);
   }
 
   @Override
@@ -165,9 +175,6 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
     return Sets.newLinkedHashSet(Iterables.limit(get(), size));
   }
 
-
-
-
   @Override
   public D any() {
     return getRandomizer().iterable(get()).any();
@@ -176,6 +183,20 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
   @Override
   public D any(Predicate<? super D> filter) {
     return getRandomizer().iterable(Iterables.filter(get(), filter)).any();
+  }
+
+  @Override
+  public DataSet<D> load(){
+    for(D data:get()){
+    }
+
+    return this;
+  }
+
+  @Override
+  public DataSet<D> persist() {
+    throw new UnsupportedOperationException("This dataset is not persistent:"+toString());
+
   }
 
   @Override
@@ -216,7 +237,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public int hashCode() {
-    return !this.isGenerated() ? get().hashCode() : super.hashCode();
+    return !this.isGenerated() && !this.isPersistent() ? get().hashCode() : super.hashCode();
   }
 
   @Override
@@ -229,7 +250,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
       @SuppressWarnings("unchecked")
       DataSet<D> other = (DataSet<D>) obj;
 
-      return !this.isGenerated() && !other.isGenerated() && Iterables.elementsEqual(this.get(), other.get());
+      return !this.isGenerated() && !other.isGenerated() && !this.isPersistent() && !other.isPersistent() && Iterables.elementsEqual(this.get(), other.get());
     }
     return false;
   }

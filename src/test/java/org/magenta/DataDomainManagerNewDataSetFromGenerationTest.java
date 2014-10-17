@@ -11,13 +11,13 @@ import org.junit.Test;
 
 import com.google.common.base.Supplier;
 
-public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTestSupport {
+public class DataDomainManagerNewDataSetFromGenerationTest extends FixtureFactoryTestSupport {
 
   @Test
   public void testGeneratedBySupplier(){
 
     //setup fixtures
-    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
     Supplier<String> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn("red", "blue", "green","black");
@@ -35,7 +35,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
   public void testGeneratedBySupplier_default_number_of_generated_item(){
 
     //setup fixtures
-    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
     Supplier<Integer> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
@@ -55,7 +55,7 @@ public class DataDomainManagerNewDataSetFromGenerationTest extends DataDomainTes
   public void testGeneratedByImplicitGenerationStrategy(){
 
     //setup fixtures
-    FixtureFactory<SimpleDataSpecification> sut = createAnonymousDomain();
+    FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
     Supplier<Iterable<String>> colorSupplier = mock(Supplier.class);
 
     when(colorSupplier.get()).thenReturn(Arrays.asList("red", "blue", "green"));

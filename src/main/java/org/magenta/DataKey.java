@@ -114,8 +114,23 @@ public class DataKey<D> {
    */
 
   @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> asDataSet(FluentRandom randomizer, D... data) {
+  public QualifiedDataSet<D> datasetOf(FluentRandom randomizer, D... data) {
     return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
+  }
+
+  /**
+   * Return a {@link Qualified} dataset.
+   *
+   * @param randomizer
+   *          the randomizer to use
+   * @param data
+   *          the data composing the qualified data set.
+   * @return a new QualifiedDataSet
+   */
+
+  @SuppressWarnings("unchecked")
+  public QualifiedDataSet<D> datasetOf(D... data) {
+    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
   }
 
   /**

@@ -17,7 +17,7 @@ import com.google.common.base.Predicate;
 
 
 
-public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTestSupport{
+public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFactoryTestSupport{
 
 	@Test
 	public void testConstructorAndGetter(){
@@ -49,7 +49,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test(expected = DataSetNotFoundException.class)
 	public void testThrowNotFoundException(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf("red","blue","green");
 
 		//exercise sut
@@ -61,7 +61,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet(){
 			//setup fixtures
-			FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+			FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 			DataKey<String> colorKey = DataKey.makeDefault(String.class);
 
@@ -84,7 +84,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_varargs(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		//exercise sut
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf("red","blue","green");
@@ -108,7 +108,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_iterable(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		//exercise sut
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf(Arrays.asList("red","blue","green"));
@@ -133,7 +133,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_dataset(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		DataSet<String> expectedColors = new GenericDataSet<>(Arrays.asList("red","blue","green"), String.class, domain.getRandomizer());
 
@@ -152,7 +152,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_override(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		//exercise sut
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf("red","blue","green");
@@ -172,7 +172,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_transform(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		//exercise sut
 		DataSet<String> numberInString = domain.newDataSet(String.class)
@@ -191,7 +191,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_filter(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		Predicate<Integer> isPositive = new Predicate<Integer>(){
 			@Override
@@ -216,7 +216,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_filter_and_transform(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		Predicate<Integer> isPositive = new Predicate<Integer>(){
 			@Override
@@ -245,7 +245,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testNewDataSet_ComposedOf_transform_chain(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		Function<Integer,Integer> multiplyByTwo = new Function<Integer,Integer>(){
 
@@ -274,7 +274,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends DataDomainTe
 	@Test
 	public void testRemove(){
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> domain = createAnonymousDomain();
+		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf("red","blue","green");
 
 		//exercise sut

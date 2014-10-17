@@ -178,6 +178,11 @@ public class ForwardingDataSet<D> implements DataSet<D> {
   }
 
   @Override
+  public DataSet<D> toTransient() {
+    return delegate.get().toTransient();
+  }
+
+  @Override
   public DataSet<D> without(Collection<D> items) {
     return delegate.get().without(items);
   }
@@ -201,6 +206,16 @@ public class ForwardingDataSet<D> implements DataSet<D> {
   public String toString() {
     return Objects.toStringHelper(this).add("delegate", delegate).toString();
   }
+  @Override
+  public DataSet<D> persist() {
+
+    return delegate.get().persist();
+  }
+  @Override
+  public DataSet<D> load() {
+    return delegate.get().load();
+  }
+
 
 
 }

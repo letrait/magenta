@@ -32,9 +32,9 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
    * @param repo
    *          the datasource to which persist data
    */
-  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, DataStore<D> repo) {
+  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, DataStore<D> store) {
     this.generator = generator;
-    this.store = repo;
+    this.store = store;
   }
 
   private List<D> getGenerated() {
@@ -62,8 +62,8 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
 
   @Override
   public D get(int index) {
+    D target = getGenerated().get(index);
     boolean persisted = persistenceFlags[index];
-    D target = generated.get(index);
     D result;
     if (!persisted) {
       result = store.persist(target);
