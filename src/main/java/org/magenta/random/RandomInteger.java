@@ -1,8 +1,14 @@
 package org.magenta.random;
 
+import java.util.List;
 import java.util.Random;
 
+import org.assertj.core.util.Lists;
+
+import com.google.common.base.Preconditions;
 import com.google.common.collect.BoundType;
+import com.google.common.collect.ContiguousSet;
+import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Range;
 
 /**
@@ -105,6 +111,18 @@ public class RandomInteger {
    */
   public int any() {
     return any(ALL);
+  }
+
+  public List<Integer> some(int size) {
+
+    ContiguousSet<Integer> a = ContiguousSet.create(constraint, DiscreteDomain.integers());
+
+    Preconditions.checkArgument(size <= a.size(), "the number of items to pick (%s) must be lower than the number of integers available in the range (%s): ",size, a.size());
+
+    RandomList<Integer> integers = new RandomList<Integer>(random, this, Lists.newArrayList(a));
+
+    return integers.some(size);
+
   }
 
   /**

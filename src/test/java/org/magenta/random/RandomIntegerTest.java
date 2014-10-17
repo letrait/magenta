@@ -1,16 +1,16 @@
 package org.magenta.random;
 
-import java.util.Locale;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
-import org.magenta.random.RandomInteger;
-import org.mockito.Mockito;
 
 import com.google.common.collect.Range;
-
-import static org.mockito.Mockito.*;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class RandomIntegerTest {
 
@@ -130,6 +130,20 @@ public class RandomIntegerTest {
 		assertThat(actual).isLessThan(0)
 				.isEqualTo(expected);
 
+	}
+
+	@Test
+	public void testSomeIntegers() {
+	  // setup fixtures
+	  RandomInteger sut = newConstrainedInstance(Range.open(0, 5));
+
+	  //exercise sut
+	  List<Integer> integers = sut.some(3);
+
+	  //verify outcome
+	  for(Integer i:integers){
+	    assertThat(i).isGreaterThan(0).isLessThan(5);
+	  }
 	}
 
 	@Test(expected = IllegalStateException.class)
