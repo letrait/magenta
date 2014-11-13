@@ -62,6 +62,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   private final Fixture<S> parent;
 
+  private boolean persistent;
   private DataStoreProvider dataStoreProvider;
 
   private final FluentRandom randomizer;
@@ -106,6 +107,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     this.specification = specification;
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
+    this.persistent = datastoreProvider!=null;
     this.currentFixtureSupplier = fixtureSupplier;
     this.eventBus = new EventBus(name);
 
@@ -215,6 +217,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   public FixtureFactory<S> setDataStoreProvider(DataStoreProvider provider) {
    this.dataStoreProvider = provider;
+   this.persistent = this.dataStoreProvider!=null;
    return this;
   }
 
@@ -253,6 +256,21 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   @Override
   public Fixture<S> getParent() {
     return parent;
+  }
+
+  public boolean isTransient() {
+
+    return !persistent;
+  }
+
+  public boolean isPersistent() {
+
+    return persistent;
+  }
+
+  public FixtureFactory<S> persistent(boolean persistent){
+    this.persistent = persistent;
+    return this;
   }
 
   /**
@@ -577,124 +595,17 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       if (ds == null) {
         throw new DataSetNotFoundException("No dataset found for key " + key);
       } else {
+        if(isTransient()){
+          ds = ds.toTransient();
+        }
         LOG.trace("FOUND [{}] as a [{}] in [{}] domain", new Object[]{key, ds.toString(), FixtureFactory.this.getName()});
         return ds;
       }
 
   }
 
-  /*private <D> void processRelations(DataKey<D> key) {
-    // prevent infinite loop
-    if (!isCurrentlyProcessingRelationOfThisKey(key)) {
-      LOG.trace("lookup relations of [{}]", key);
-      try {
-        pushOnCallStack(key);
-        Iterable<DataKey<?>> relations = computeRelationsOf(key);
-
-        for (DataKey<?> relationKey : relations) {
-          LOG.trace("{} is related to {} and must be generated first", relationKey, key);
-          // call "get" on the returned dataset so it triggers data generation
-          // which is what we want since this dataset is a relation to the one
-          // we are looking for
-          // and must be generated before that one
-          if(!isCurrentlyGeneratingThisDataSet(relationKey)){
-            doGet(relationKey).get();
-          }
-        }
-
-        executeProcessorsFor(key);
-
-      } finally {
-        popFromCallStack();
-
-      }
-    }
-  }*/
-
-  /*private <D> boolean isCurrentlyProcessingRelationOfThisKey(DataKey<D> key) {
-    return currentCallStack.get() != null && currentCallStack.get().contains(key);
-  }
-
-  private void pushOnCallStack(DataKey<?> key) {
-    if (currentCallStack.get() == null) {
-      currentCallStack.set(new Stack<DataKey<?>>());
-    }
-    currentCallStack.get().push(key);
-  }
-
-  private void popFromCallStack() {
-    currentCallStack.get().pop();
-  }
-
-  private <D> boolean isCurrentlyGeneratingThisDataSet(DataKey<D> key) {
-    return generationCallStack.get() != null && generationCallStack.get().contains(key);
-  }*/
-
-  /*public void pushOnGenerationCallStack(DataKey<?> key) {
-    if (generationCallStack.get() == null) {
-      generationCallStack.set(new Stack<DataKey<?>>());
-    }
-
-    if(generationCallStack.get().contains(key)){
-      throw new CycleDetectedInGenerationException("Infinite loop detected for generation of key " + displayGenerationCallStack(key));
-    }
-
-    generationCallStack.get().push(key);
-  }
-
-  public void popFromGenerationCallStack() {
-    if(!generationCallStack.get().isEmpty()) {
-      generationCallStack.get().pop();
-    }else{
-      LOG.warn("Attempt to pop from the get call stack but it is empty");
-    }
-  }*/
-
-  /*private String displayGenerationCallStack(DataKey<?> current) {
-    StringBuilder sb = new StringBuilder("Stack:\n");
-    sb.append(current).append('\n');
-    for(DataKey<?> key:generationCallStack.get()){
-      sb.append(key).append('\n');
-    }
-    return sb.toString();
-  }*/
 
 
-
-
-  /*private <D> Collection<DataKey<?>> computeRelationsOf(DataKey<D> key) {
-
-
-
-      GenerationStrategy<?, ?> gs = strategy(key);
-      if (gs != null) {
-        return Lists.newArrayList(gs.getTriggeredGeneratedDataKeys());
-      }
-
-    return Collections.emptyList();
-
-
-
-  }*/
-
-  /*private void executeProcessorsFor(final DataKey<?> key) {
-    Iterable<Processor<S>> matchingProcessor = Iterables.filter(processors, new Predicate<Processor<S>>() {
-
-      @Override
-      public boolean apply(Processor<S> input) {
-        if (input.getAffectedDataSetKeys().contains(key)) {
-          return true;
-        }
-        return false;
-      }
-
-    });
-
-    for (Processor<S> p : matchingProcessor) {
-      LOG.trace("processing {} with {}", key, p);
-      p.process(FixtureFactory.this);
-    }
-  }*/
 
   private <D> DataSet<D> doGetFromThisDomain(DataKey<D> key) {
     @SuppressWarnings("unchecked")

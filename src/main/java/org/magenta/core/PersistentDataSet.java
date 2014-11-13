@@ -58,15 +58,9 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
     return this;
   }
 
-
-
   @Override
   public String toString() {
     return Objects.toStringHelper(this).add("type", getType()).toString();
   }
-
-
-
-
 
 }
