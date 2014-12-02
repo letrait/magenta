@@ -73,5 +73,51 @@ public class RandomIterableTest {
 		assertThat(actual).containsExactly(expected);
 	}
 
+	@Test
+	public void testTraversalWhenOneOfTheListIsEmpty(){
+
+	  //setup fixtures
+	  FluentRandom randomizer=FluentRandom.get(new Random());
+
+    List<Integer> list1=Arrays.asList(1,2,3);
+    List<Integer> list2=Arrays.asList(4,5,6);
+    List<Integer> list3=Arrays.asList();
+
+    Integer[] expected = new Integer[]{1,2,3,4,5,6};
+
+    List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
+
+    MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+
+    //exercise sut (should not throw error)
+    List<Integer> actual=Lists.newArrayList(sut);
+
+    // verify outcome
+    assertThat(actual).containsOnly(expected);
+	}
+
+	 @Test
+	  public void testTraversalWhenAllListAreEmpty(){
+
+	    //setup fixtures
+	    FluentRandom randomizer=FluentRandom.get(new Random());
+
+	    List<Integer> list1=Arrays.asList();
+	    List<Integer> list2=Arrays.asList();
+	    List<Integer> list3=Arrays.asList();
+
+	    Integer[] expected = new Integer[]{};
+
+	    List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
+
+	    MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+
+	    //exercise sut (should not throw error)
+	    List<Integer> actual=Lists.newArrayList(sut);
+
+	    // verify outcome
+	    assertThat(actual).isEmpty();
+	  }
+
 	//TODO test with a list that is a view and see when it is actually rendered
 }

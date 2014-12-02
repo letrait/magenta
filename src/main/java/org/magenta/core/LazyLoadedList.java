@@ -19,7 +19,7 @@ import com.google.common.collect.Lists;
 public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
 
   private final Supplier<? extends Iterable<D>> generator;
-  private final DataStore<D> store;
+  private final Supplier<DataStore<D>> store;
 
   private transient volatile List<D> generated;
   private transient boolean[] persistenceFlags;
@@ -32,7 +32,7 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
    * @param repo
    *          the datasource to which persist data
    */
-  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, DataStore<D> store) {
+  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, Supplier<DataStore<D>> store) {
     this.generator = generator;
     this.store = store;
   }
@@ -66,10 +66,10 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
     boolean persisted = persistenceFlags[index];
     D result;
     if (!persisted) {
-      result = store.persist(target);
+      result = store.get().persist(target);
       persistenceFlags[index] = true;
     } else {
-      result = store.retrieve(target);
+      result = store.get().retrieve(target);
     }
     return result;
   }

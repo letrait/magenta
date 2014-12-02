@@ -5,6 +5,7 @@ import org.magenta.DataStore;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Supplier;
 
 /**
  * Implementation of {@link DataSet} that persist data.
@@ -17,7 +18,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
 
   private LazyLoadedList<D> persistedData;
   private DataSet<D> source;
-  private DataStore<D> store;
+  private Supplier<DataStore<D>> store;
 
   /**
    * Default constructor.
@@ -26,7 +27,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
    * @param store the store to use for persistence
    * @param randomizer the randomizer
    */
-  public PersistentDataSet(DataSet<D> dataset, DataStore<D> store, FluentRandom randomizer) {
+  public PersistentDataSet(DataSet<D> dataset, Supplier<DataStore<D>> store, FluentRandom randomizer) {
     super(dataset.getType(), randomizer);
     this.source = dataset;
     this.persistedData = new LazyLoadedList<>(dataset, store);

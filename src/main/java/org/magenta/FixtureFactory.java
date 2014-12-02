@@ -572,9 +572,11 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     }
 
     if (n == null) {
-      DataSet<?> d = Preconditions.checkNotNull(this.dataSetMap.get(key));
-      n = d.isGenerated() ? getSpecification().getDefaultNumberOfItems() : d.list()
-          .size();
+      DataSet<?> d = this.dataSetMap.get(key);
+      if (d != null) {
+        n = d.isGenerated() ? getSpecification().getDefaultNumberOfItems() : d.list()
+            .size();
+      }
     }
 
 
@@ -623,14 +625,21 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return ds;
   }
 
-  private <D> DataSet<D> regenerateData(DataKey<D> key, DataSet<D> ds) {
+  private <D> DataSet<D> regenerateData(final DataKey<D> key, DataSet<D> ds) {
     LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", FixtureFactory.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
       DataSet<D> gd=  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
 
       if (ds.isPersistent()) {
-        ds = new PersistentDataSet<D>(gd, this.dataStoreProvider.get(key), this.getRandomizer());
+        ds = new PersistentDataSet<D>(gd, new Supplier<DataStore<D>>(){
+
+          @Override
+          public DataStore<D> get() {
+            return FixtureFactory.this.getDataStoreProvider().get(key);
+          }
+
+        }, this.getRandomizer());
       } else {
         ds = gd;
       }
@@ -1073,7 +1082,14 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
     private void addToDataDomain(DataSet<D> dataset) {
       if (persistent) {
-        dataset = new PersistentDataSet<>(dataset, FixtureFactory.this.getDataStoreProvider().get(originalKey), randomizer);
+        dataset = new PersistentDataSet<>(dataset, new Supplier<DataStore<D>>(){
+
+          @Override
+          public DataStore<D> get() {
+            return FixtureFactory.this.getDataStoreProvider().get(originalKey);
+          }
+
+        }, randomizer);
       }
       FixtureFactory.this.put(originalKey, dataset);
     }
