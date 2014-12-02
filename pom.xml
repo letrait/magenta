@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.magenta</groupId>
 	<artifactId>magenta</artifactId>
-	<version>1.0.12</version>
+	<version>1.0.13-SNAPSHOT</version>
 	<name>Data generation framework</name>
 	<description>
 		Data generation framework for test fixture setup and simulator.
@@ -12,7 +12,7 @@
 		<connection>scm:git:https://github.com/letrait/magenta</connection>
 		<developerConnection>scm:git:git@github.com:letrait/magenta.git</developerConnection>
 		<url>https://github.com/letrait/magenta</url>
-		<tag>magenta-1.0.12</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<distributionManagement>
