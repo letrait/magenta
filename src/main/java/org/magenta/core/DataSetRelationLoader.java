@@ -30,9 +30,7 @@ public class DataSetRelationLoader {
         if (Iterables.contains(s.getModifiedDataSet(), key)) {
           try {
             LOG.trace("DataSet [{}] is modified by dataset [{}], tiggering generation...",key, k);
-
-
-            fixture.dataset(k).get();
+            fixture.dataset(k).toTransient().get();
 
             //The dataset identified by key must be persisted again
             DataSet modified = fixture.dataset(key);

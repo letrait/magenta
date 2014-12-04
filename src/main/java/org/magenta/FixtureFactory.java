@@ -62,6 +62,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   private final Fixture<S> parent;
 
+  private boolean persistent;
   private DataStoreProvider dataStoreProvider;
 
   private final FluentRandom randomizer;
@@ -99,13 +100,14 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @param datastoreProvider
    *          the datasource provider for persitent DataSet.
    */
-  private FixtureFactory(String name, Fixture<S> parent, S specification, FluentRandom randomizer, DataStoreProvider datastoreProvider,
+  private FixtureFactory(String name, Fixture<S> parent, S specification, boolean persistent, FluentRandom randomizer, DataStoreProvider datastoreProvider,
       ThreadLocalDataDomainSupplier<S> fixtureSupplier) {
     this.name = name;
     this.parent = parent;
     this.specification = specification;
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
+    this.persistent = persistent;
     this.currentFixtureSupplier = fixtureSupplier;
     this.eventBus = new EventBus(name);
 
@@ -144,7 +146,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory}
    */
   public static <S extends DataSpecification> FixtureFactory<S> newRoot(String name, S specification, FluentRandom randomizer) {
-    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
+    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, false, randomizer, null, new ThreadLocalDataDomainSupplier());
 
     fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
 
@@ -161,7 +163,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory} child of this one.
    */
   public FixtureFactory<S> newNode(String name) {
-    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
 
     child.getEventBus().register(this);
 
@@ -185,7 +187,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   public <X extends S> FixtureFactory<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
+    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
        this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -205,7 +207,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public FixtureFactory<S> newNode(Fixture<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
          this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -213,8 +215,9 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return child;
   }
 
-  public FixtureFactory<S> setDataStoreProvider(DataStoreProvider provider) {
+  public FixtureFactory<S> setDataStoreProvider(DataStoreProvider provider, boolean enablePersistence) {
    this.dataStoreProvider = provider;
+   this.persistent = enablePersistence;
    return this;
   }
 
@@ -253,6 +256,21 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   @Override
   public Fixture<S> getParent() {
     return parent;
+  }
+
+  public boolean isTransient() {
+
+    return !persistent;
+  }
+
+  public boolean isPersistent() {
+
+    return persistent;
+  }
+
+  public FixtureFactory<S> persistent(boolean persistent){
+    this.persistent = persistent;
+    return this;
   }
 
   /**
@@ -554,9 +572,11 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     }
 
     if (n == null) {
-      DataSet<?> d = Preconditions.checkNotNull(this.dataSetMap.get(key));
-      n = d.isGenerated() ? getSpecification().getDefaultNumberOfItems() : d.list()
-          .size();
+      DataSet<?> d = this.dataSetMap.get(key);
+      if (d != null) {
+        n = d.isGenerated() ? getSpecification().getDefaultNumberOfItems() : d.list()
+            .size();
+      }
     }
 
 
@@ -583,118 +603,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   }
 
-  /*private <D> void processRelations(DataKey<D> key) {
-    // prevent infinite loop
-    if (!isCurrentlyProcessingRelationOfThisKey(key)) {
-      LOG.trace("lookup relations of [{}]", key);
-      try {
-        pushOnCallStack(key);
-        Iterable<DataKey<?>> relations = computeRelationsOf(key);
-
-        for (DataKey<?> relationKey : relations) {
-          LOG.trace("{} is related to {} and must be generated first", relationKey, key);
-          // call "get" on the returned dataset so it triggers data generation
-          // which is what we want since this dataset is a relation to the one
-          // we are looking for
-          // and must be generated before that one
-          if(!isCurrentlyGeneratingThisDataSet(relationKey)){
-            doGet(relationKey).get();
-          }
-        }
-
-        executeProcessorsFor(key);
-
-      } finally {
-        popFromCallStack();
-
-      }
-    }
-  }*/
-
-  /*private <D> boolean isCurrentlyProcessingRelationOfThisKey(DataKey<D> key) {
-    return currentCallStack.get() != null && currentCallStack.get().contains(key);
-  }
-
-  private void pushOnCallStack(DataKey<?> key) {
-    if (currentCallStack.get() == null) {
-      currentCallStack.set(new Stack<DataKey<?>>());
-    }
-    currentCallStack.get().push(key);
-  }
-
-  private void popFromCallStack() {
-    currentCallStack.get().pop();
-  }
-
-  private <D> boolean isCurrentlyGeneratingThisDataSet(DataKey<D> key) {
-    return generationCallStack.get() != null && generationCallStack.get().contains(key);
-  }*/
-
-  /*public void pushOnGenerationCallStack(DataKey<?> key) {
-    if (generationCallStack.get() == null) {
-      generationCallStack.set(new Stack<DataKey<?>>());
-    }
-
-    if(generationCallStack.get().contains(key)){
-      throw new CycleDetectedInGenerationException("Infinite loop detected for generation of key " + displayGenerationCallStack(key));
-    }
-
-    generationCallStack.get().push(key);
-  }
-
-  public void popFromGenerationCallStack() {
-    if(!generationCallStack.get().isEmpty()) {
-      generationCallStack.get().pop();
-    }else{
-      LOG.warn("Attempt to pop from the get call stack but it is empty");
-    }
-  }*/
-
-  /*private String displayGenerationCallStack(DataKey<?> current) {
-    StringBuilder sb = new StringBuilder("Stack:\n");
-    sb.append(current).append('\n');
-    for(DataKey<?> key:generationCallStack.get()){
-      sb.append(key).append('\n');
-    }
-    return sb.toString();
-  }*/
 
 
-
-
-  /*private <D> Collection<DataKey<?>> computeRelationsOf(DataKey<D> key) {
-
-
-
-      GenerationStrategy<?, ?> gs = strategy(key);
-      if (gs != null) {
-        return Lists.newArrayList(gs.getTriggeredGeneratedDataKeys());
-      }
-
-    return Collections.emptyList();
-
-
-
-  }*/
-
-  /*private void executeProcessorsFor(final DataKey<?> key) {
-    Iterable<Processor<S>> matchingProcessor = Iterables.filter(processors, new Predicate<Processor<S>>() {
-
-      @Override
-      public boolean apply(Processor<S> input) {
-        if (input.getAffectedDataSetKeys().contains(key)) {
-          return true;
-        }
-        return false;
-      }
-
-    });
-
-    for (Processor<S> p : matchingProcessor) {
-      LOG.trace("processing {} with {}", key, p);
-      p.process(FixtureFactory.this);
-    }
-  }*/
 
   private <D> DataSet<D> doGetFromThisDomain(DataKey<D> key) {
     @SuppressWarnings("unchecked")
@@ -712,14 +622,27 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return ds;
   }
 
-  private <D> DataSet<D> regenerateData(DataKey<D> key, DataSet<D> ds) {
+  private <D> DataSet<D> regenerateData(final DataKey<D> key, DataSet<D> ds) {
     LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", FixtureFactory.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
       DataSet<D> gd=  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
 
       if (ds.isPersistent()) {
-        ds = new PersistentDataSet<D>(gd, this.dataStoreProvider.get(key), this.getRandomizer());
+        ds = new PersistentDataSet<D>(gd, new Supplier<DataStore<D>>(){
+
+          @SuppressWarnings("unchecked")
+          @Override
+          public DataStore<D> get() {
+            if(FixtureFactory.this.isPersistent()){
+              return FixtureFactory.this.getDataStoreProvider().get(key);
+            }else{
+              return (DataStore<D>) DataStore.IDENTITY;
+            }
+
+          }
+
+        }, this.getRandomizer());
       } else {
         ds = gd;
       }
@@ -1162,7 +1085,22 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
     private void addToDataDomain(DataSet<D> dataset) {
       if (persistent) {
-        dataset = new PersistentDataSet<>(dataset, FixtureFactory.this.getDataStoreProvider().get(originalKey), randomizer);
+        dataset = new PersistentDataSet<>(dataset, new Supplier<DataStore<D>>(){
+
+          @SuppressWarnings("unchecked")
+          @Override
+          public DataStore<D> get() {
+            //If this fixture factory is not persistent, we return a transient datastore but we
+            //need to keep the persistent nature of the dataset since another fixture factory inheriting from
+            //this factory may be persistent
+            if(FixtureFactory.this.isPersistent()){
+              return FixtureFactory.this.getDataStoreProvider().get(originalKey);
+            }else{
+              return (DataStore<D>) DataStore.IDENTITY;
+            }
+          }
+
+        }, randomizer);
       }
       FixtureFactory.this.put(originalKey, dataset);
     }

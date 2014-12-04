@@ -36,7 +36,7 @@ public class MixedIterable<D> implements Iterable<D> {
       this.iterators = Lists.newArrayList();
 
       for (Iterable<? extends D> it : iterables) {
-        if (!Iterables.isEmpty(iterables)) {
+        if (!Iterables.isEmpty(it)) {
           iterators.add(it.iterator());
         }
       }

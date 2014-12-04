@@ -7,10 +7,9 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.Fixture;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
-import org.magenta.generators.TransformedStrategy;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -54,7 +53,7 @@ public class TransformedStrategyTest {
 		String[] expected = new String[] { "1", "3" };
 
 		// exercise sut
-		Iterable<String> actual = sut.generate(2, dataDomain);
+		Iterable<String> actual = sut.generate(3, dataDomain);
 
 		// verify outcome
 		assertThat(actual).containsExactly(expected);

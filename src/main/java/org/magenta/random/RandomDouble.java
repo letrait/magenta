@@ -6,7 +6,8 @@ import com.google.common.collect.BoundType;
 import com.google.common.collect.Range;
 
 /**
- * Helper class that generates randomly selected double.
+ * Helper class that generates randomly selected double.  The algorithm is weak when generating high values, as they tend to the
+ * upper limit, that is why the default "all" range is limited between -1.0E7 and 1.0E7.
  *
  * @author ngagnon
  *
@@ -14,7 +15,7 @@ import com.google.common.collect.Range;
 public class RandomDouble {
 
   public static final int DEFAULT_NUMBER_OF_DECIMAL_PLACES = 10;
-  private static final int SCALE = 10;
+  private static final double SCALE = 10D;
 
   private Random random;
   private double scale;
@@ -61,7 +62,7 @@ public class RandomDouble {
     this.random = random;
     this.constraint = constraint;
     this.scale = (Math.pow(SCALE, numberOfDecimalPlaces));
-    this.lowestIncrement = 1 / scale;
+    this.lowestIncrement = 1.0D / scale;
 
   }
 
@@ -81,15 +82,23 @@ public class RandomDouble {
           "The intersection of the passed in range %s and this class constrained range %s result in a empty range", range, constraint));
     }
 
-    double upperBound = r.hasUpperBound() ? r.upperEndpoint() : Double.MAX_VALUE;
-    double lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Double.MIN_VALUE;
+    double upperBound = r.hasUpperBound() ? r.upperEndpoint() : 1.0E7D;
+    double lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : -1.0E7D;
 
-    if (BoundType.CLOSED == r.upperBoundType()) {
+    if (r.hasUpperBound() && BoundType.CLOSED == r.upperBoundType()) {
       upperBound = upperBound + lowestIncrement;
     }
 
-    if (BoundType.OPEN == r.lowerBoundType()) {
+    if (r.hasLowerBound() && BoundType.OPEN == r.lowerBoundType()) {
       lowerBound = lowerBound + lowestIncrement;
+    }
+
+    if(Double.isInfinite(lowerBound * scale)){
+      lowerBound = lowerBound / scale;
+    }
+
+    if(Double.isInfinite(upperBound * scale)){
+      upperBound = upperBound / scale;
     }
 
     double anyDoubleRange;

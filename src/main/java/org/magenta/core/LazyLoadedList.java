@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.magenta.DataStore;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
@@ -19,7 +20,7 @@ import com.google.common.collect.Lists;
 public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
 
   private final Supplier<? extends Iterable<D>> generator;
-  private final DataStore<D> store;
+  private final Supplier<DataStore<D>> store;
 
   private transient volatile List<D> generated;
   private transient boolean[] persistenceFlags;
@@ -32,15 +33,19 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
    * @param repo
    *          the datasource to which persist data
    */
-  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, DataStore<D> store) {
+  public LazyLoadedList(Supplier<? extends Iterable<D>> generator, Supplier<DataStore<D>> store) {
     this.generator = generator;
     this.store = store;
   }
 
   private List<D> getGenerated() {
     if (generated == null) {
-      generated = Lists.newArrayList(generator.get());
-      persistenceFlags = new boolean[generated.size()];
+      List<D> g = Lists.newArrayList(generator.get());
+      if(generated == null){
+        generated = g;
+        persistenceFlags = new boolean[generated.size()];
+      }
+
     }
     return generated;
   }
@@ -65,12 +70,28 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
     D target = getGenerated().get(index);
     boolean persisted = persistenceFlags[index];
     D result;
-    if (!persisted) {
-      result = store.persist(target);
-      persistenceFlags[index] = true;
-    } else {
-      result = store.retrieve(target);
-    }
+
+    DataStore<D> s = Preconditions.checkNotNull(store.get());
+
+ 
+      if (!persisted) {
+        result = s.persist(target);
+        persistenceFlags[index] = true;
+      } else {
+        result = s.retrieve(target);
+      }
+
+      getGenerated().set(index, result);
+
+    
+
+
     return result;
+  }
+
+  public void flagAllAsNotPersisted(){
+    if(generated != null ) {
+      persistenceFlags = new boolean[generated.size()];
+    }
   }
 }

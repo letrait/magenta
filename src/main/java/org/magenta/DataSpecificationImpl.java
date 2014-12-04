@@ -6,7 +6,7 @@ package org.magenta;
  * @author ngagnon
  *
  */
-public class DataSpecificationImpl<C extends DataSpecificationImpl<C>> implements DataSpecification {
+public class DataSpecificationImpl<C> implements DataSpecification {
 
   private static final int DEFAULT_NUMBER_OF_ITEMS = 10;
   private int defaultNumberOfItems;
