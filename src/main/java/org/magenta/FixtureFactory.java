@@ -100,14 +100,14 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @param datastoreProvider
    *          the datasource provider for persitent DataSet.
    */
-  private FixtureFactory(String name, Fixture<S> parent, S specification, FluentRandom randomizer, DataStoreProvider datastoreProvider,
+  private FixtureFactory(String name, Fixture<S> parent, S specification, boolean persistent, FluentRandom randomizer, DataStoreProvider datastoreProvider,
       ThreadLocalDataDomainSupplier<S> fixtureSupplier) {
     this.name = name;
     this.parent = parent;
     this.specification = specification;
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
-    this.persistent = datastoreProvider!=null;
+    this.persistent = persistent;
     this.currentFixtureSupplier = fixtureSupplier;
     this.eventBus = new EventBus(name);
 
@@ -146,7 +146,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory}
    */
   public static <S extends DataSpecification> FixtureFactory<S> newRoot(String name, S specification, FluentRandom randomizer) {
-    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, randomizer, null, new ThreadLocalDataDomainSupplier()/*, new ThreadLocal<Stack<DataKey<?>>>()*/);
+    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, false, randomizer, null, new ThreadLocalDataDomainSupplier());
 
     fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
 
@@ -163,7 +163,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory} child of this one.
    */
   public FixtureFactory<S> newNode(String name) {
-    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
 
     child.getEventBus().register(this);
 
@@ -187,7 +187,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   public <X extends S> FixtureFactory<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
+    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
        this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -207,7 +207,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public FixtureFactory<S> newNode(Fixture<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
          this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -215,9 +215,9 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return child;
   }
 
-  public FixtureFactory<S> setDataStoreProvider(DataStoreProvider provider) {
+  public FixtureFactory<S> setDataStoreProvider(DataStoreProvider provider, boolean enablePersistence) {
    this.dataStoreProvider = provider;
-   this.persistent = this.dataStoreProvider!=null;
+   this.persistent = enablePersistence;
    return this;
   }
 
@@ -597,9 +597,6 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       if (ds == null) {
         throw new DataSetNotFoundException("No dataset found for key " + key);
       } else {
-        if(isTransient()){
-          ds = ds.toTransient();
-        }
         LOG.trace("FOUND [{}] as a [{}] in [{}] domain", new Object[]{key, ds.toString(), FixtureFactory.this.getName()});
         return ds;
       }
@@ -634,9 +631,15 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       if (ds.isPersistent()) {
         ds = new PersistentDataSet<D>(gd, new Supplier<DataStore<D>>(){
 
+          @SuppressWarnings("unchecked")
           @Override
           public DataStore<D> get() {
-            return FixtureFactory.this.getDataStoreProvider().get(key);
+            if(FixtureFactory.this.isPersistent()){
+              return FixtureFactory.this.getDataStoreProvider().get(key);
+            }else{
+              return (DataStore<D>) DataStore.IDENTITY;
+            }
+
           }
 
         }, this.getRandomizer());
@@ -1084,9 +1087,17 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       if (persistent) {
         dataset = new PersistentDataSet<>(dataset, new Supplier<DataStore<D>>(){
 
+          @SuppressWarnings("unchecked")
           @Override
           public DataStore<D> get() {
-            return FixtureFactory.this.getDataStoreProvider().get(originalKey);
+            //If this fixture factory is not persistent, we return a transient datastore but we
+            //need to keep the persistent nature of the dataset since another fixture factory inheriting from
+            //this factory may be persistent
+            if(FixtureFactory.this.isPersistent()){
+              return FixtureFactory.this.getDataStoreProvider().get(originalKey);
+            }else{
+              return (DataStore<D>) DataStore.IDENTITY;
+            }
           }
 
         }, randomizer);

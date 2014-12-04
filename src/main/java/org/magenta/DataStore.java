@@ -25,4 +25,21 @@ public interface DataStore<D> {
    */
   public D persist(D transientEntity);
 
+  /**
+   * Return a
+   */
+  public static DataStore<Object> IDENTITY = new DataStore<Object>(){
+
+    @Override
+    public Object retrieve(Object detachedEntity) {
+     return detachedEntity;
+    }
+
+    @Override
+    public Object persist(Object transientEntity) {
+      return transientEntity;
+    }
+
+  };
+
 }

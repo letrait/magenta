@@ -30,6 +30,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
   public PersistentDataSet(DataSet<D> dataset, Supplier<DataStore<D>> store, FluentRandom randomizer) {
     super(dataset.getType(), randomizer);
     this.source = dataset;
+    this.store = store;
     this.persistedData = new LazyLoadedList<>(dataset, store);
   }
 
@@ -55,7 +56,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
 
   @Override
   public PersistentDataSet<D> persist() {
-    this.persistedData = new LazyLoadedList<>(source, store);
+    this.persistedData.flagAllAsNotPersisted();
     return this;
   }
 

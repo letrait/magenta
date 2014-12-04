@@ -3,12 +3,11 @@ package org.magenta.random;
 import java.util.List;
 import java.util.Random;
 
-import org.assertj.core.util.Lists;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
 /**

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.magenta.DataStore;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
@@ -39,8 +40,12 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
 
   private List<D> getGenerated() {
     if (generated == null) {
-      generated = Lists.newArrayList(generator.get());
-      persistenceFlags = new boolean[generated.size()];
+      List<D> g = Lists.newArrayList(generator.get());
+      if(generated == null){
+        generated = g;
+        persistenceFlags = new boolean[generated.size()];
+      }
+
     }
     return generated;
   }
@@ -65,12 +70,28 @@ public class LazyLoadedList<D> extends AbstractList<D> implements List<D> {
     D target = getGenerated().get(index);
     boolean persisted = persistenceFlags[index];
     D result;
-    if (!persisted) {
-      result = store.get().persist(target);
-      persistenceFlags[index] = true;
-    } else {
-      result = store.get().retrieve(target);
-    }
+
+    DataStore<D> s = Preconditions.checkNotNull(store.get());
+
+ 
+      if (!persisted) {
+        result = s.persist(target);
+        persistenceFlags[index] = true;
+      } else {
+        result = s.retrieve(target);
+      }
+
+      getGenerated().set(index, result);
+
+    
+
+
     return result;
+  }
+
+  public void flagAllAsNotPersisted(){
+    if(generated != null ) {
+      persistenceFlags = new boolean[generated.size()];
+    }
   }
 }

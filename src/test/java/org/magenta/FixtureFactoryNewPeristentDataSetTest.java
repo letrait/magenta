@@ -37,7 +37,7 @@ public class FixtureFactoryNewPeristentDataSetTest extends FixtureFactoryTestSup
     });
 
     FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
-    sut.setDataStoreProvider(provider);
+    sut.setDataStoreProvider(provider, true);
 
     sut.newDataSet(String.class).persistent().composedOf("a","b","c");
 
@@ -67,7 +67,8 @@ public class FixtureFactoryNewPeristentDataSetTest extends FixtureFactoryTestSup
     });
 
     FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
-    sut.setDataStoreProvider(provider);
+    sut.setDataStoreProvider(provider, true);
+
 
     sut.newDataSet(String.class).persistent().composedOf("a","b","c");
 
@@ -97,7 +98,7 @@ public class FixtureFactoryNewPeristentDataSetTest extends FixtureFactoryTestSup
     });
 
     FixtureFactory<SimpleDataSpecification> sut = createAnonymousFixtureFactory();
-    sut.setDataStoreProvider(provider);
+    sut.setDataStoreProvider(provider, true);
 
     sut.newDataSet(Integer.class).composedOf(1,2,3);
     sut.newDataSet(String.class).persistent().composedOf("a","b","c");
