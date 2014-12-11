@@ -14,7 +14,8 @@ import org.magenta.example.domain.Trip;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
-import com.google.inject.internal.Lists;
+import com.google.common.collect.Lists;
+
 
 public class TripGenerator implements Supplier<Iterable<Trip>> {
 

@@ -3,13 +3,14 @@ package org.magenta.core;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.magenta.FixtureFactory;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.FixtureFactory;
 import org.magenta.QualifiedDataSet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
 /**
@@ -62,10 +63,10 @@ public class RestrictionHelper {
    *          an array of object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static void applyRestrictions(FixtureFactory<?> domain, Object... objects) {
+  public static void applyRestrictions(FixtureFactory<?> domain, Object first, Object... rest) {
     Multimap<DataKey<?>, Object> multimap = ArrayListMultimap.create();
 
-    normalize(domain, Arrays.asList(objects), multimap);
+    normalize(domain, Lists.asList(first, rest), multimap);
 
     for (DataKey key : multimap.keySet()) {
 

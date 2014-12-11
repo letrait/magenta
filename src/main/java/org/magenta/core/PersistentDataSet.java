@@ -6,6 +6,7 @@ import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Supplier;
+import com.google.inject.internal.Preconditions;
 
 /**
  * Implementation of {@link DataSet} that persist data.
@@ -29,6 +30,7 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
    */
   public PersistentDataSet(DataSet<D> dataset, Supplier<DataStore<D>> store, FluentRandom randomizer) {
     super(dataset.getType(), randomizer);
+    Preconditions.checkArgument(dataset.isConstant(),"Persistent dataset does not support non constant dataset");
     this.source = dataset;
     this.store = store;
     this.persistedData = new LazyLoadedList<>(dataset, store);
@@ -46,6 +48,11 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
 
   @Override
   public boolean isPersistent() {
+    return true;
+  }
+
+  @Override
+  public boolean isConstant() {
     return true;
   }
 

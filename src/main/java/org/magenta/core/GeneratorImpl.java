@@ -228,6 +228,11 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
   }
 
   @Override
+  public boolean isConstant() {
+    return false;
+  }
+
+  @Override
   public DataSet<T> toTransient() {
     return this;
   }

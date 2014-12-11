@@ -192,6 +192,11 @@ public class ForwardingDataSet<D> implements DataSet<D> {
     return delegate.get().isEmpty();
   }
 
+  @Override
+  public boolean isConstant() {
+    return delegate.get().isConstant();
+  }
+
   /*
    * @Override public DataSet<D> process(Function<? super D, Void> processor) {
    * return delegate.process(processor); }

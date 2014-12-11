@@ -20,6 +20,11 @@ import com.google.common.base.Supplier;
 public interface DataSet<D> extends Supplier<Iterable<D>> {
 
   /**
+   * @return true if this dataset content is constant, meaning that each call to get() will return an iterable having the same content.
+   */
+  public boolean isConstant();
+
+  /**
    * @return true if this dataset is generated or false if it is fixed.
    */
   public boolean isGenerated();
