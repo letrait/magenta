@@ -1,9 +1,9 @@
 package org.magenta.core;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 import org.magenta.events.PostDataSetGenerated;
 import org.slf4j.Logger;
@@ -88,6 +88,11 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
   @Override
   public boolean isPersistent() {
     return false;
+  }
+
+  @Override
+  public boolean isConstant() {
+    return true;
   }
 
   @Override

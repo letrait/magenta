@@ -320,16 +320,16 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * Assert.assertEquals(paris, monument.getCity());
    *
    * </pre>
-   *
-   * @param objects
+   * @param first the first object of the array
+   * @param rest
    *          an array of object from which the dataset will be created
    * @return this FixturesManager
    */
-  public FixtureFactory<S> restrictTo(Object... objects) {
+  public FixtureFactory<S> restrictTo(Object first,Object... rest) {
 
     FixtureFactory<S> child = newNode("restricted " + this.getName());
 
-    RestrictionHelper.applyRestrictions(child, objects);
+    RestrictionHelper.applyRestrictions(child, first, rest);
 
     return child;
   }
@@ -626,7 +626,12 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", FixtureFactory.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
-      DataSet<D> gd=  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
+      DataSet<D> gd = null;
+      if(ds.isConstant()) {
+        gd =  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
+      }else{
+        gd = new GeneratorImpl<D, S>(FixtureFactory.this, s, key.getType());
+      }
 
       if (ds.isPersistent()) {
         ds = new PersistentDataSet<D>(gd, new Supplier<DataStore<D>>(){

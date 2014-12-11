@@ -65,6 +65,11 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
   }
 
   @Override
+  public boolean isConstant() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return Objects.toStringHelper(this).add("type", getType()).toString();
   }

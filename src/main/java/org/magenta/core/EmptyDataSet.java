@@ -53,6 +53,11 @@ public class EmptyDataSet<D> implements DataSet<D> {
   }
 
   @Override
+  public boolean isConstant() {
+    return true;
+  }
+
+  @Override
   public Iterable<D> get() {
     return Collections.emptyList();
   }
@@ -194,6 +199,8 @@ public class EmptyDataSet<D> implements DataSet<D> {
 
     return this;
   }
+
+
 
 
 
