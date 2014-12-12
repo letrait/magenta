@@ -11,6 +11,7 @@ import org.magenta.FixtureFactory;
 import org.magenta.SimpleDataSpecification;
 import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Employee;
+import org.magenta.testing.domain.Occupation;
 import org.magenta.testing.domain.generators.EmployeeGenerator;
 
 public class RestrictionHelperTest {
@@ -172,7 +173,7 @@ public class RestrictionHelperTest {
 		Employee e=new Employee();
 		e.setEmployeeId(1234L);
 		e.setName(name);
-		e.setOccupation("TESTER");
+		e.setOccupation(Occupation.TESTER);
 		return e;
 	}
 

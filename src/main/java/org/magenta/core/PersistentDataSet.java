@@ -5,8 +5,9 @@ import org.magenta.DataStore;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Objects;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-import com.google.inject.internal.Preconditions;
+
 
 /**
  * Implementation of {@link DataSet} that persist data.
