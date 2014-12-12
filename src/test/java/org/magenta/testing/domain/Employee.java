@@ -4,7 +4,7 @@ public class Employee {
 
 	private long employeeId;
 	private String name;
-	private String occupation;
+	private Occupation occupation;
 
   public long getEmployeeId() {
     return employeeId;
@@ -18,10 +18,10 @@ public class Employee {
   public void setName(String name) {
     this.name = name;
   }
-  public String getOccupation() {
+  public Occupation getOccupation() {
     return occupation;
   }
-  public void setOccupation(String occupation) {
+  public void setOccupation(Occupation occupation) {
     this.occupation = occupation;
   }
   @Override
