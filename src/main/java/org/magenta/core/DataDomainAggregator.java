@@ -13,6 +13,7 @@ import org.magenta.GeneratorNotFoundException;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
@@ -48,7 +49,14 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   public <D> DataSet<D> dataset(Class<D> clazz) {
     Preconditions.checkNotNull(clazz);
     try {
-      return delegate.dataset(clazz);
+      DataSet<D> ds = delegate.dataset(clazz);
+      if (ds.isGenerated()) {
+        // this trick replace all generated dataset by fixed one which will
+        // prevent regeneration of data
+        return new GenericDataSet<D>(ds, clazz, derivePickStrategy(ds), delegate.getRandomizer());
+      }else{
+        return ds;
+      }
     } catch (DataSetNotFoundException dsnfe) {
       return parent.dataset(clazz);
     }
@@ -58,7 +66,14 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   public <D> DataSet<D> dataset(DataKey<D> key) {
     Preconditions.checkNotNull(key);
     try {
-      return delegate.dataset(key);
+      DataSet<D> ds = delegate.dataset(key);
+      if (ds.isGenerated()) {
+        // this trick replace all generated dataset by fixed one which will
+        // prevent regeneration of data
+        return new GenericDataSet<D>(ds, key.getType(), derivePickStrategy(ds), delegate.getRandomizer());
+      }else{
+        return ds;
+      }
     } catch (DataSetNotFoundException dsnfe) {
       return parent.dataset(key);
     }
@@ -161,6 +176,23 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   @Override
   public Integer sizeOf(Class<?> clazz) {
     return delegate.sizeOf(clazz);
+  }
+
+  private PickStrategy derivePickStrategy(DataSet<?> ds){
+    if(ds instanceof AbstractDataSet){
+      PickStrategy ps = ((AbstractDataSet)ds).getPickingStrategy();
+      if(ps instanceof RandomPickStrategy){
+        return RandomPickStrategy.supplier(getRandomizer()).get();
+      }else {
+        return ps;
+      }
+    }
+    return getPickingStrategy().get();
+  }
+
+  @Override
+  public Supplier<? extends PickStrategy> getPickingStrategy() {
+    return parent.getPickingStrategy();
   }
 
 }

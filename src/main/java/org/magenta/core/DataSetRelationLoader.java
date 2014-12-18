@@ -41,6 +41,9 @@ public class DataSetRelationLoader {
             // ignore
             // the key is already being loaded elsewhere
             // cdge.printStackTrace();
+          } catch(Exception e){
+            LOG.error("Error while loading relation {} of {} : {}",new Object[]{k,key,e});
+            throw e;
           }
         }
       }
