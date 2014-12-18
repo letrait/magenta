@@ -13,7 +13,6 @@ import org.magenta.GeneratorNotFoundException;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
@@ -53,7 +52,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
       if (ds.isGenerated()) {
         // this trick replace all generated dataset by fixed one which will
         // prevent regeneration of data
-        return new GenericDataSet<D>(ds, clazz, derivePickStrategy(ds), delegate.getRandomizer());
+        return new GenericDataSet<D>(ds, clazz, /*derivePickStrategy(ds)*/ delegate.getRandomizer());
       }else{
         return ds;
       }
@@ -70,7 +69,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
       if (ds.isGenerated()) {
         // this trick replace all generated dataset by fixed one which will
         // prevent regeneration of data
-        return new GenericDataSet<D>(ds, key.getType(), derivePickStrategy(ds), delegate.getRandomizer());
+        return new GenericDataSet<D>(ds, key.getType(), /*derivePickStrategy(ds),*/ delegate.getRandomizer());
       }else{
         return ds;
       }
@@ -178,7 +177,7 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
     return delegate.sizeOf(clazz);
   }
 
-  private PickStrategy derivePickStrategy(DataSet<?> ds){
+  /*private PickStrategy derivePickStrategy(DataSet<?> ds){
     if(ds instanceof AbstractDataSet){
       PickStrategy ps = ((AbstractDataSet)ds).getPickingStrategy();
       if(ps instanceof RandomPickStrategy){
@@ -193,6 +192,6 @@ public class DataDomainAggregator<S extends DataSpecification> implements Fixtur
   @Override
   public Supplier<? extends PickStrategy> getPickingStrategy() {
     return parent.getPickingStrategy();
-  }
+  }*/
 
 }
