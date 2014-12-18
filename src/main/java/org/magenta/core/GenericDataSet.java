@@ -28,8 +28,8 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
    * @param random
    *          the random
    */
-  public GenericDataSet(Iterable<D> data, Class<D> type, FluentRandom random) {
-    super(type, random);
+  public GenericDataSet(Iterable<D> data, Class<D> type, PickStrategy picker, FluentRandom random ) {
+    super(type, picker, random);
     this.delegate = Suppliers.ofInstance(data);
   }
 
@@ -44,8 +44,8 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
    *          the random
    *
    */
-  public GenericDataSet(Supplier<? extends Iterable<D>> delegate, Class<D> type, FluentRandom random) {
-    super(type, random);
+  public GenericDataSet(Supplier<? extends Iterable<D>> delegate, Class<D> type, PickStrategy picker, FluentRandom random) {
+    super(type, picker, random);
     this.delegate = delegate;
   }
 

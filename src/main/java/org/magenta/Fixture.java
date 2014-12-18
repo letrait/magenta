@@ -2,8 +2,10 @@ package org.magenta;
 
 import java.util.Set;
 
+import org.magenta.core.PickStrategy;
 import org.magenta.random.FluentRandom;
 
+import com.google.common.base.Supplier;
 import com.google.common.eventbus.EventBus;
 
 /**
@@ -169,5 +171,7 @@ public interface Fixture<S extends DataSpecification> {
    * @return the event bus linked to this Fixture.
    */
   public EventBus getEventBus();
+
+  public Supplier<? extends PickStrategy> getPickingStrategy();
 
 }

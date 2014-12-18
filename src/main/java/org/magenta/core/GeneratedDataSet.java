@@ -46,8 +46,8 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
    * @param <S>
    *          the data specification type
    */
-  public  GeneratedDataSet(final Fixture<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, EventBus eventBus) {
-    super(key.getType(), domain.getRandomizer());
+  public  GeneratedDataSet(final Fixture<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, PickStrategy picker, EventBus eventBus) {
+    super(key.getType(), picker,domain.getRandomizer());
     this.strategy = (GenerationStrategy)strategy;
     this.domain = domain;
     this.key = key;

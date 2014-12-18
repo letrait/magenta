@@ -7,6 +7,7 @@ import java.util.Arrays;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.core.ForwardingDataSet;
 import org.magenta.core.GenericDataSet;
+import org.magenta.core.RandomPickStrategy;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
@@ -115,7 +116,7 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(FluentRandom randomizer, D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
+    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, RandomPickStrategy.supplier(randomizer).get(), randomizer));
   }
 
   /**
@@ -130,7 +131,7 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
+    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, RandomPickStrategy.supplier(FluentRandom.singleton()).get(), FluentRandom.singleton()));
   }
 
   /**

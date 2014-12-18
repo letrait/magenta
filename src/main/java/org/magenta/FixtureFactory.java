@@ -8,6 +8,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import org.magenta.core.AbstractDataSet;
 import org.magenta.core.DataDomainAggregator;
 import org.magenta.core.DataSetRelationLoader;
 import org.magenta.core.EmptyDataSet;
@@ -15,7 +16,10 @@ import org.magenta.core.GeneratedDataSet;
 import org.magenta.core.GeneratorImpl;
 import org.magenta.core.GenericDataSet;
 import org.magenta.core.PersistentDataSet;
+import org.magenta.core.PickStrategy;
+import org.magenta.core.RandomPickStrategy;
 import org.magenta.core.RestrictionHelper;
+import org.magenta.core.RoundRobinPickStrategy;
 import org.magenta.core.injection.DataSetFieldHandler;
 import org.magenta.core.injection.DataSpecificationFieldHandler;
 import org.magenta.core.injection.FieldInjectionChainProcessor;
@@ -63,6 +67,9 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   private final Fixture<S> parent;
 
   private boolean persistent;
+
+  private Supplier<? extends PickStrategy> picker;
+
   private DataStoreProvider dataStoreProvider;
 
   private final FluentRandom randomizer;
@@ -83,8 +90,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   private int version = 1;
 
-
   private final String name;
+
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------
   //
@@ -100,7 +107,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @param datastoreProvider
    *          the datasource provider for persitent DataSet.
    */
-  private FixtureFactory(String name, Fixture<S> parent, S specification, boolean persistent, FluentRandom randomizer, DataStoreProvider datastoreProvider,
+  private FixtureFactory(String name, Fixture<S> parent, S specification, boolean persistent, FluentRandom randomizer,
+      DataStoreProvider datastoreProvider, Supplier<? extends PickStrategy> picker,
       ThreadLocalDataDomainSupplier<S> fixtureSupplier) {
     this.name = name;
     this.parent = parent;
@@ -108,6 +116,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     this.randomizer = randomizer;
     this.dataStoreProvider = datastoreProvider;
     this.persistent = persistent;
+    this.picker = picker;
     this.currentFixtureSupplier = fixtureSupplier;
     this.eventBus = new EventBus(name);
 
@@ -146,7 +155,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory}
    */
   public static <S extends DataSpecification> FixtureFactory<S> newRoot(String name, S specification, FluentRandom randomizer) {
-    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, false, randomizer, null, new ThreadLocalDataDomainSupplier());
+    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, false, randomizer, null, RandomPickStrategy.supplier(randomizer), new ThreadLocalDataDomainSupplier());
 
     fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
 
@@ -163,7 +172,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory} child of this one.
    */
   public FixtureFactory<S> newNode(String name) {
-    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.picker, this.currentFixtureSupplier/*,this.generationCallStack*/);
 
     child.getEventBus().register(this);
 
@@ -187,8 +196,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
   public <X extends S> FixtureFactory<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
-       this.generationCallStack*/);
+    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, this.picker, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier);
 
     child.getEventBus().register(this);
 
@@ -207,8 +215,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public FixtureFactory<S> newNode(Fixture<? super S> dataDomain) {
     DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
-         this.generationCallStack*/);
+    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.picker, this.currentFixtureSupplier);
 
     child.getEventBus().register(this);
 
@@ -270,6 +277,20 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
   public FixtureFactory<S> persistent(boolean persistent){
     this.persistent = persistent;
+    return this;
+  }
+
+  public Supplier<? extends PickStrategy> getPickingStrategy(){
+    return this.picker;
+  }
+
+  public  FixtureFactory<S> roundRobinPicking(){
+    this.picker = RoundRobinPickStrategy.supplier();
+    return this;
+  }
+
+  public  FixtureFactory<S> random(){
+    this.picker = RoundRobinPickStrategy.supplier();
     return this;
   }
 
@@ -622,13 +643,25 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     return ds;
   }
 
+  private PickStrategy derivePickStrategy(DataSet<?> ds){
+    if(ds instanceof AbstractDataSet){
+      PickStrategy ps = ((AbstractDataSet)ds).getPickingStrategy();
+      if(ps instanceof RandomPickStrategy){
+        return RandomPickStrategy.supplier(getRandomizer()).get();
+      }else {
+        return ps;
+      }
+    }
+    throw new IllegalStateException("It is implied that the passed in dataset is an AbstractDataSet");
+  }
+
   private <D> DataSet<D> regenerateData(final DataKey<D> key, DataSet<D> ds) {
     LOG.trace("found the generated dataset in the parent domain, regenerating it for {} domain", FixtureFactory.this.getName());
     GenerationStrategy<D, ? super S> s = strategy(key);
     if (s != null) {
       DataSet<D> gd = null;
       if(ds.isConstant()) {
-        gd =  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
+        gd =  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key,derivePickStrategy(ds), eventBus);
       }else{
         gd = new GeneratorImpl<D, S>(FixtureFactory.this, s, key.getType());
       }
@@ -647,7 +680,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
           }
 
-        }, this.getRandomizer());
+        }, derivePickStrategy(ds), this.getRandomizer());
       } else {
         ds = gd;
       }
@@ -826,11 +859,33 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     private Predicate<? super T> filter;
     private final Function<? super T, D> converter;
     private boolean persistent;
+    private Supplier<? extends PickStrategy> picker;
 
     DataSetBuilder(DataKey<D> originalQualifier, Predicate<? super T> filter, Function<? super T, D> converter) {
       this.filter = filter;
       this.converter = converter;
       this.originalKey = originalQualifier;
+      this.picker = getPickingStrategy();
+    }
+
+    /**
+     * Make this {@link DataSet} persistent, generated data will be persisted.
+     *
+     * @return this builder
+     */
+    public final DataSetBuilder<D, T> roundRobinPicking() {
+      this.picker = RoundRobinPickStrategy.supplier();
+      return this;
+    }
+
+    /**
+     * Make this {@link DataSet} persistent, generated data will be persisted.
+     *
+     * @return this builder
+     */
+    public final DataSetBuilder<D, T> randomPicking() {
+      this.picker = RandomPickStrategy.supplier(getRandomizer());
+      return this;
     }
 
     /**
@@ -889,7 +944,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     @SafeVarargs
     public final DataSet<D> composedOf(T... elements) {
       Iterable<T> items = Iterables.filter(Arrays.asList(elements), filter);
-      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), this.picker.get(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -902,7 +957,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final DataSet<D> composedOf(Iterable<? extends T> elements) {
       Iterable<? extends T> items = Iterables.filter(elements, filter);
-      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), this.picker.get(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -928,7 +983,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       };
 
       Iterable<D> items = FluentIterable.from(datasetList).transformAndConcat(toIterable).filter(filter).transform(converter);
-      DataSet<D> dataset = new GenericDataSet<D>(Suppliers.ofInstance(items), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<D>(Suppliers.ofInstance(items), originalKey.getType(), this.picker.get(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -1032,7 +1087,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter,
           converter), originalKey, currentFixtureSupplier);
 
-      GeneratedDataSet<D, S> dataset = new GeneratedDataSet<D, S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      GeneratedDataSet<D, S> dataset = new GeneratedDataSet<D, S>(FixtureFactory.this, derivedStrategy, originalKey, picker.get(), eventBus);
       FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1081,7 +1136,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final DataSet<D> materalizedFrom(final Iterable<DataKey<? extends T>> keys) {
       GenerationStrategy<D, S> derivedStrategy = new TransformedStrategy<D, T, S>(new DataSetAggregationStrategy<T, S>(keys), filter, converter);
-      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(FixtureFactory.this, derivedStrategy, originalKey, picker.get(), eventBus);
       FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1105,7 +1160,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
             }
           }
 
-        }, randomizer);
+        }, derivePickStrategy(dataset), randomizer);
       }
       FixtureFactory.this.put(originalKey, dataset);
     }

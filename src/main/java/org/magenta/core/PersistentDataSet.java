@@ -29,8 +29,8 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
    * @param store the store to use for persistence
    * @param randomizer the randomizer
    */
-  public PersistentDataSet(DataSet<D> dataset, Supplier<DataStore<D>> store, FluentRandom randomizer) {
-    super(dataset.getType(), randomizer);
+  public PersistentDataSet(DataSet<D> dataset, Supplier<DataStore<D>> store, PickStrategy picker, FluentRandom randomizer) {
+    super(dataset.getType(), picker, randomizer);
     Preconditions.checkArgument(dataset.isConstant(),"Persistent dataset does not support non constant dataset");
     this.source = dataset;
     this.store = store;

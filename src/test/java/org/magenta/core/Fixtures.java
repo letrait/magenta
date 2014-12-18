@@ -21,6 +21,6 @@ public class Fixtures {
   }
 
   public static <D> GenericDataSet<D> createDataSetOf(D... elements) {
-    return new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(elements)), (Class<D>) elements[0].getClass(),randomizer());
+    return new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(elements)), (Class<D>) elements[0].getClass(),RandomPickStrategy.supplier(randomizer()).get(),randomizer());
   }
 }

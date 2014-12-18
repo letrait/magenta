@@ -119,7 +119,7 @@ public class RestrictionHelperTest {
 		Employee candidate4=createAnonymousEmployee("candidate4");
 		Employee candidate5=createAnonymousEmployee("candidate5");
 
-		DataSet<Employee> employees = new GenericDataSet<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), Employee.class, sut.getRandomizer());
+		DataSet<Employee> employees = new GenericDataSet<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), Employee.class, sut.getPickingStrategy().get(), sut.getRandomizer());
 
 		//exercise sut
 		RestrictionHelper.applyRestrictions(sut, employees);

@@ -9,6 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.core.GenericDataSet;
+import org.magenta.core.RandomPickStrategy;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
@@ -135,7 +136,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 		//setup fixtures
 		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
-		DataSet<String> expectedColors = new GenericDataSet<>(Arrays.asList("red","blue","green"), String.class, domain.getRandomizer());
+		DataSet<String> expectedColors = new GenericDataSet<>(Arrays.asList("red","blue","green"), String.class, RandomPickStrategy.supplier(domain.getRandomizer()).get(), domain.getRandomizer());
 
 		//exercise sut
 		DataSet<String> colors = domain.newDataSet(String.class).composedOf(expectedColors);

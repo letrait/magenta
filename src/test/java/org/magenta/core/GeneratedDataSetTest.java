@@ -8,10 +8,10 @@ import static org.mockito.Mockito.when;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.Fixture;
-import org.magenta.FixtureFactory;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
+import org.magenta.FixtureFactory;
 import org.magenta.GenerationStrategy;
 import org.mockito.Mockito;
 
@@ -30,7 +30,7 @@ public class GeneratedDataSetTest {
 		FixtureFactory<DataSpecification> domain=mock(FixtureFactory.class);
 		GenerationStrategy<Integer, DataSpecification> strategy=mock(GenerationStrategy.class);
 
-		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
+		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(PickStrategy.class), mock(EventBus.class));
 
 		//exercise sut
 
@@ -52,7 +52,7 @@ public class GeneratedDataSetTest {
 
 		when(strategy.generate(Mockito.any(Fixture.class))).thenReturn(Arrays.asList(expected));
 
-		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(EventBus.class));
+		GeneratedDataSet<Integer,DataSpecification> sut=new GeneratedDataSet<>(domain, strategy, DataKey.makeDefault(Integer.class), mock(PickStrategy.class), mock(EventBus.class));
 
 		//exercise sut
 		Iterable<Integer> actual=sut.get();

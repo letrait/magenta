@@ -30,7 +30,8 @@ public class GenericDataSetTest {
 		List<Integer> expectedData=Arrays.asList(1,3,5);
 		Class<Integer> expectedType=Integer.class;
 		FluentRandom expectedRandomizer=FluentRandom.singleton();
-		GenericDataSet<Integer> sut=new GenericDataSet<>(Arrays.asList(1,3,5), expectedType, expectedRandomizer);
+		PickStrategy picker = RandomPickStrategy.supplier(expectedRandomizer).get();
+		GenericDataSet<Integer> sut=new GenericDataSet<>(Arrays.asList(1,3,5), expectedType, picker, expectedRandomizer);
 
 		//exercise sut
 		sut.toString();
@@ -40,7 +41,7 @@ public class GenericDataSetTest {
 		assertThat(sut.isGenerated()).overridingErrorMessage("Expecting the <%s> to be not generated as it should always be the case", sut.toString()).isFalse();
 		assertThat(sut.list()).isEqualTo(expectedData);
 		assertThat(sut.getType()).isEqualTo(expectedType);
-		assertThat(sut.getRandomizer()).isEqualTo(expectedRandomizer);
+		assertThat(sut.getFluentRandom()).isEqualTo(expectedRandomizer);
 
 	}
 
@@ -48,7 +49,7 @@ public class GenericDataSetTest {
 	public void testEmpty() {
 
 		// setup fixtures
-		GenericDataSet<String> sut = new GenericDataSet<>(Collections.EMPTY_LIST, String.class,FluentRandom.singleton());
+		GenericDataSet<String> sut = new GenericDataSet<>(Collections.EMPTY_LIST, String.class, RandomPickStrategy.singleton(), FluentRandom.singleton());
 
 		// exercise sut
 		boolean actual = sut.isEmpty();
@@ -298,7 +299,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list()), String.class,FluentRandom.singleton());
+    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list()), String.class,RandomPickStrategy.singleton(), FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isEqualTo(ds1);
@@ -318,7 +319,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list(4)), String.class,FluentRandom.singleton());
+    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list(4)), String.class,RandomPickStrategy.singleton(),FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isNotEqualTo(ds2);
@@ -330,7 +331,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     GenericDataSet<String> sut = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> expected = new GenericDataSet<String>(Suppliers.ofInstance(sut.list(3)), String.class,FluentRandom.singleton());
+    DataSet<String> expected = new GenericDataSet<String>(Suppliers.ofInstance(sut.list(3)), String.class,RandomPickStrategy.singleton(),FluentRandom.singleton());
 
     // exercise SUT
     DataSet<String> actual = sut.subset(3);

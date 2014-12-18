@@ -152,7 +152,7 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
       public Iterable<T> get() {
         return strategy.generate(size, dataSetMap);
       }
-    }), this.type, dataSetMap.getRandomizer());
+    }), this.type, RandomPickStrategy.supplier(dataSetMap.getRandomizer()).get(), dataSetMap.getRandomizer());
   }
 
   @Override

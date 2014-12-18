@@ -13,6 +13,8 @@ import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.core.GenericDataSet;
+import org.magenta.core.PickStrategy;
+import org.magenta.core.RandomPickStrategy;
 import org.magenta.random.FluentRandom;
 import org.mockito.Mockito;
 
@@ -31,15 +33,16 @@ public class DataSetAggregationGenerationStrategyTest {
 		when(random.nextInt(Mockito.anyInt())).thenReturn(0,1,0,2,0,0,0,0,0);
 
 		FluentRandom randomizer = FluentRandom.get(random);
+		PickStrategy picker = RandomPickStrategy.supplier(randomizer).get();
 
 		//keys
 		DataKey<Integer> integersKey=DataKey.makeDefault(Integer.class);
 		DataKey<Double> doublesKey=DataKey.makeDefault(Double.class);
 		DataKey<Long> longsKey=DataKey.makeDefault(Long.class);
 
-		DataSet<Integer> integers = new GenericDataSet<>(Arrays.asList(1,2,3,4), Integer.class, randomizer);
-		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, randomizer);
-		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, randomizer);
+		DataSet<Integer> integers = new GenericDataSet<>(Arrays.asList(1,2,3,4), Integer.class, picker, randomizer);
+		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, picker, randomizer);
+		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, picker, randomizer);
 
 		Fixture<DataSpecification> domain = mock(Fixture.class);
 
@@ -69,15 +72,16 @@ public class DataSetAggregationGenerationStrategyTest {
 		when(random.nextInt(Mockito.anyInt())).thenReturn(0,1,0,2,0,0,0,0,0);
 
 		FluentRandom randomizer = FluentRandom.get(random);
+	  PickStrategy picker = RandomPickStrategy.supplier(randomizer).get();
 
 		//keys
 		DataKey<Integer> integersKey=DataKey.makeDefault(Integer.class);
 		DataKey<Double> doublesKey=DataKey.makeDefault(Double.class);
 		DataKey<Long> longsKey=DataKey.makeDefault(Long.class);
 
-		DataSet<Integer> integers = new GenericDataSet<>(Arrays.asList(1,2,3,4), Integer.class, randomizer);
-		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, randomizer);
-		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, randomizer);
+		DataSet<Integer> integers = new GenericDataSet<>(Arrays.asList(1,2,3,4), Integer.class, picker, randomizer);
+		DataSet<Double> doubles = new GenericDataSet<>(Arrays.asList(5d,6d), Double.class, picker, randomizer);
+		DataSet<Long> longs = new GenericDataSet<>(Arrays.asList(7L,8L,9L), Long.class, picker, randomizer);
 
 		Fixture<DataSpecification> domain = mock(Fixture.class);
 

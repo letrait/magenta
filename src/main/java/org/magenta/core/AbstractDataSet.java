@@ -35,7 +35,9 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   private final Class<D> type;
 
-  private final FluentRandom randomizer;
+  private final FluentRandom fluentRandom;
+
+  private final PickStrategy picker;
 
   /**
    * Construct a new dataset using the provided supplier as source.
@@ -45,10 +47,11 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
    * @param randomizer
    *          the java random to use for shuffling and by the "any()" method
    */
-  public AbstractDataSet(Class<D> type, FluentRandom randomizer) {
+  public AbstractDataSet(Class<D> type, PickStrategy picker, FluentRandom fluentRandom) {
     this.links = new LinkedHashMap<Object, D>();
     this.type = type;
-    this.randomizer = randomizer;
+    this.fluentRandom = fluentRandom;
+    this.picker = picker;
   }
 
   @Override
@@ -65,17 +68,17 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public DataSet<D> subset(int size) {
-    return new GenericDataSet<D>(Iterables.limit(get(), size), this.type, getRandomizer());
+    return new GenericDataSet<D>(Iterables.limit(get(), size), this.type, this.picker, getFluentRandom());
   }
 
   @Override
   public DataSet<D> filter(Predicate<? super D> filter) {
-    return new GenericDataSet<D>(Iterables.filter(get(), filter), this.type, getRandomizer());
+    return new GenericDataSet<D>(Iterables.filter(get(), filter), this.type, this.picker, getFluentRandom());
   }
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> newType) {
-    return new GenericDataSet<X>(Iterables.transform(get(), function), newType, getRandomizer());
+    return new GenericDataSet<X>(Iterables.transform(get(), function), newType, this.picker, getFluentRandom());
   }
 
   @Override
@@ -157,12 +160,12 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public List<D> randomList() {
-    return getRandomizer().iterable(get()).shuffle().list();
+    return getFluentRandom().iterable(get()).shuffle().list();
   }
 
   @Override
   public List<D> randomList(int size) {
-    return Lists.newArrayList(Iterables.limit(getRandomizer().iterable(get()).shuffle().list(), size));
+    return Lists.newArrayList(Iterables.limit(getFluentRandom().iterable(get()).shuffle().list(), size));
   }
 
   @Override
@@ -177,12 +180,13 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public D any() {
-    return getRandomizer().iterable(get()).any();
+    return picker.pick(get());
   }
+
 
   @Override
   public D any(Predicate<? super D> filter) {
-    return getRandomizer().iterable(Iterables.filter(get(), filter)).any();
+    return picker.pick(Iterables.filter(get(), filter));
   }
 
   @Override
@@ -231,8 +235,12 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
   /**
    * @return this data set randomizer
    */
-  protected FluentRandom getRandomizer() {
-    return randomizer;
+  protected FluentRandom getFluentRandom() {
+    return fluentRandom;
+  }
+
+  public PickStrategy getPickingStrategy(){
+    return this.picker;
   }
 
   @Override
