@@ -63,4 +63,32 @@ public class FixtureFactoryTest extends FixtureFactoryTestSupport {
     Mockito.verify(gen, times(NUMBER_OF_EMPLOYEES))
         .get();
   }
+
+  @Test
+  public void testRestrictionOnAnAggregatedFixtureFactory(){
+    Supplier<Employee> gen = new EmployeeGenerator();
+
+    FixtureFactory<SimpleDataSpecification> company = createAnonymousFixtureFactory();
+    company.newGenerator(Employee.class).generatedBy(gen, 5);
+    company.newDataSet(Occupation.class).composedOf(Occupation.ENGINEER);
+
+    FixtureFactory<SimpleDataSpecification> master = createAnonymousFixtureFactory();
+    master.newDataSet(String.class).composedOf("a","b","c");
+    master.newDataSet(Occupation.class).composedOf(Occupation.MANAGEMENT);
+
+
+
+    FixtureFactory<SimpleDataSpecification> fixtures = master.newNode(company);
+    fixtures.newDataSet(Occupation.class).composedOf(Occupation.TECHNICIAN);
+
+    Employee e = fixtures.dataset(Employee.class).any();
+
+    assertThat(e.getOccupation()).isEqualTo(Occupation.ENGINEER);
+
+    e = fixtures.restrictTo(Occupation.MANAGEMENT).dataset(Employee.class).any();
+
+    assertThat(e.getOccupation()).isEqualTo(Occupation.ENGINEER);
+
+
+  }
 }
