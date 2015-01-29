@@ -101,20 +101,9 @@ public class RandomDouble {
       upperBound = upperBound / scale;
     }
 
-    double anyDoubleRange;
+    double delta = Math.abs(upperBound - lowerBound);
 
-    if (lowerBound < 0 && upperBound > 0) {
-      // special case
-      double lowerRandomDouble = (Math.floor(this.random.nextDouble() * (-lowerBound) * scale) / scale) + lowerBound;
-      double upperRandomDouble = (Math.floor(this.random.nextDouble() * upperBound * scale) / scale);
-      anyDoubleRange = lowerRandomDouble + upperRandomDouble;
-
-    } else {
-      double delta = Math.abs(upperBound - lowerBound);
-
-      anyDoubleRange = (Math.floor(this.random.nextDouble() * delta * scale) / scale) + lowerBound;
-
-    }
+    double anyDoubleRange = (Math.floor((this.random.nextDouble() * delta * scale) + (lowerBound * scale)) / scale);
 
     return anyDoubleRange;
   }
