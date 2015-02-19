@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 
 /**
@@ -205,9 +204,7 @@ public class FluentRandom {
    * @return a list picker
    */
   public <E> RandomList<E> iterable(Iterable<E> values) {
-    List<E> l = values instanceof List?(List<E>)values:Lists.newArrayList(values);
-
-    return new RandomList<>(random, integers(), l);
+    return new RandomList<>(random, integers(), values);
   }
 
   /**
@@ -217,7 +214,7 @@ public class FluentRandom {
    * @param <E> the type of value
    * @return a mixed iterable
    */
-  public <E> Iterable<E> mix(Iterable<Iterable<? extends E>> iterables) {
+  public <E> Iterable<E> mix(Iterable<? extends Iterable<? extends E>> iterables) {
     return new MixedIterable<>(iterables, this);
   }
 
