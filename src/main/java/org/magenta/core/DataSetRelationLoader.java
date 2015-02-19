@@ -21,28 +21,28 @@ public class DataSetRelationLoader {
   public void onGenerationEvent(PostDataSetGenerated event){
 
     Fixture<? extends DataSpecification> fixture= event.getFixture();
-    DataKey<?> key = event.getKey();
+    DataKey<?> generatedDataSetKey = event.getKey();
 
   //cache the computation of key to load and use a guava event to know when to flush the cache
     for (DataKey k : fixture.strategyKeys()) {
-      if (!k.equals(key)) {
+      if (!k.equals(generatedDataSetKey)) {
         GenerationStrategy s = fixture.strategy(k);
-        if (Iterables.contains(s.getModifiedDataSet(), key)) {
+        if (Iterables.contains(s.getModifiedDataSet(), generatedDataSetKey)) {
           try {
-            LOG.trace("DataSet [{}] is modified by dataset [{}], tiggering generation...",key, k);
+            LOG.trace("DataSet [{}] is modified by dataset [{}], tiggering generation...",generatedDataSetKey, k);
             fixture.dataset(k).toTransient().get();
 
             //The dataset identified by key must be persisted again
-            DataSet modified = fixture.dataset(key);
+            DataSet modified = fixture.dataset(generatedDataSetKey);
             if(modified.isPersistent()){
-              fixture.dataset(key).persist();
+              fixture.dataset(generatedDataSetKey).persist();
             }
           } catch (CycleDetectedInGenerationException cdge) {
             // ignore
             // the key is already being loaded elsewhere
             // cdge.printStackTrace();
           } catch(Exception e){
-            LOG.error("Error while loading relation {} of {} : {}",new Object[]{k,key,e});
+            LOG.error("Error while loading relation {} of {} : {}",new Object[]{k,generatedDataSetKey,e});
             throw e;
           }
         }

@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
@@ -17,7 +19,7 @@ import com.google.common.collect.Lists;
  */
 public class RandomList<E> {
 
-  private final List<E> values;
+  private final Iterable<E> values;
   private final RandomInteger integers;
   private final Random random;
 
@@ -28,7 +30,7 @@ public class RandomList<E> {
    * @param integers the {@code RandomInteger} to use (for picks)
    * @param values the list from which to pick values
    */
-  public RandomList(Random random, RandomInteger integers, List<E> values) {
+  public RandomList(Random random, RandomInteger integers, Iterable<E> values) {
     this.integers = integers;
     this.values = values;
     this.random = random;
@@ -40,8 +42,8 @@ public class RandomList<E> {
    * @return a randomly picked value
    */
   public E any() {
-    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
-    return values.get(integers.anyPositive(values.size()));
+    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
+    return Iterables.get(values, integers.anyPositive(Iterables.size(values)));
   }
 
   /**
@@ -63,8 +65,8 @@ public class RandomList<E> {
    * @return a of random size list of values randomly picked from this instance own values.
    */
   public List<E> some() {
-    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
-    int numberOfItemsToPick = integers.anyPositive(values.size());
+    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
+    int numberOfItemsToPick = integers.anyPositive(Iterables.size(values));
 
     return shuffle().list().subList(0, numberOfItemsToPick);
   }
@@ -77,8 +79,8 @@ public class RandomList<E> {
    */
   @SafeVarargs
   public final List<E> someBut(E... thoseOnes) {
-    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
-    int numberOfItemsToPick = integers.anyPositive(values.size());
+    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
+    int numberOfItemsToPick = integers.anyPositive(Iterables.size(values));
     List<E> l = Lists.newArrayList(values);
     l.removeAll(Arrays.asList(thoseOnes));
 
@@ -93,8 +95,8 @@ public class RandomList<E> {
    * @return a list of values randomly picked from this instance own values.
    */
   public List<E> some(int numberOfItemsToPick) {
-    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
-    Preconditions.checkState(values.size() > numberOfItemsToPick, "The number Of items to pick is greater than the number of items in the list");
+    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
+    Preconditions.checkState(Iterables.size(values) > numberOfItemsToPick, "The number Of items to pick is greater than the number of items in the list");
 
     return shuffle().list().subList(0, numberOfItemsToPick);
   }
@@ -105,7 +107,7 @@ public class RandomList<E> {
    * @return this instance
    */
   public RandomList<E> shuffle() {
-    Collections.shuffle(values, random);
+    Collections.shuffle(Lists.newArrayList(values), random);
     return this;
   }
 
@@ -115,6 +117,6 @@ public class RandomList<E> {
    * @return the values
    */
   public List<E> list() {
-    return this.values;
+    return ImmutableList.copyOf(this.values);
   }
 }
