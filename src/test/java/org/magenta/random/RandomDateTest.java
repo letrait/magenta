@@ -12,7 +12,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.base.Ticker;
 import com.google.common.collect.Range;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -21,8 +20,6 @@ public class RandomDateTest {
 	@Mock
 	private Random random;
 
-	@Mock
-	private Ticker ticker;
 
 	@Test
 	public void testAny() {
@@ -42,7 +39,7 @@ public class RandomDateTest {
 
 	private RandomDate createSimpleRandomDate() {
 		RandomDate sut = new RandomDate(1L, Range.closedOpen(new Date(0), new Date(System.currentTimeMillis() + (1000L * 60L * 60L * 24L * 365L * 100L))),
-				new RandomLong(random), ticker);
+				new RandomLong(random));
 		return sut;
 	}
 
@@ -54,7 +51,6 @@ public class RandomDateTest {
 		Long current = System.currentTimeMillis();
 		Date expected = new Date(current + twoHours);
 		when(random.nextLong()).thenReturn(twoHours);
-		when(ticker.read()).thenReturn(TimeUnit.MILLISECONDS.toNanos(current));
 
 		// exercise SUT
 		Date actual = sut.anyInTheFuture(1, TimeUnit.DAYS);
@@ -74,8 +70,6 @@ public class RandomDateTest {
 		Long current = System.currentTimeMillis();
 		Date expected = new Date(current - aDay + twoHours);
 		when(random.nextLong()).thenReturn(twoHours);
-		when(ticker.read()).thenReturn(TimeUnit.MILLISECONDS.toNanos(current));
-
 		// exercise SUT
 		Date actual = sut.anyInThePast(1, TimeUnit.DAYS);
 
@@ -92,7 +86,6 @@ public class RandomDateTest {
 		Long aDay = 1000L * 60L * 60L * 24L;
 		Date expected = new Date(current - aDay + twoHours);
 		when(random.nextLong()).thenReturn(twoHours);
-		when(ticker.read()).thenReturn(TimeUnit.MILLISECONDS.toNanos(current));
 
 		// exercise SUT
 		Date actual = sut.anyInTheLast(new Date(current), 1, TimeUnit.DAYS);
@@ -109,7 +102,6 @@ public class RandomDateTest {
 		Long twoHours = 1000L * 60L * 60L * 2;
 		Date expected = new Date(current + twoHours);
 		when(random.nextLong()).thenReturn(twoHours);
-		when(ticker.read()).thenReturn(TimeUnit.MILLISECONDS.toNanos(current));
 
 		// exercise SUT
 		Date actual = sut.anyInTheNext(new Date(current), 1, TimeUnit.DAYS);
