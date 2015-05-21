@@ -85,20 +85,35 @@ public class RandomIntegerTest {
 	}
 
 	@Test
-	public void testAnyIntegerNegative() {
-
+	public void testAnyIntegerInANegativePositiveRange() {
+	  for(int i = 0 ;i<10000 ;i ++){
 		// setup fixtures
-		RandomInteger sut = newConstrainedInstance(ZERO_TO_UPPER_BOUND);
-		int expected = 0;
+		RandomInteger sut = new RandomInteger(new Random());
 
 		// exercise SUT
-		int actual = sut.anyNegative();
+		int actual = sut.resolution(2).any(Range.closed(-1000, 1000));
 
 		// verify outcome
-		assertThat(actual).isLessThanOrEqualTo(0)
-				.isEqualTo(expected);
-
+		assertThat(actual).isBetween(-1000, 1000);
+	  }
 	}
+
+
+	 @Test
+	  public void testAnyIntegerNegative() {
+
+	    // setup fixtures
+	    RandomInteger sut = newConstrainedInstance(ZERO_TO_UPPER_BOUND);
+	    int expected = 0;
+
+	    // exercise SUT
+	    int actual = sut.anyNegative();
+
+	    // verify outcome
+	    assertThat(actual).isLessThanOrEqualTo(0)
+	        .isEqualTo(expected);
+
+	  }
 
 	@Test
 	public void testAnyIntegerPositiveButZero() {
@@ -148,7 +163,8 @@ public class RandomIntegerTest {
 
 	@Test(expected = IllegalStateException.class)
 	public void testIllegalState() {
-		// setup fixtures
+
+	  // setup fixtures
 		RandomInteger sut = newConstrainedInstance(Range.greaterThan(0));
 
 		// exercise SUT

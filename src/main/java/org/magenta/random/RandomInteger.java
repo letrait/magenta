@@ -86,21 +86,11 @@ public class RandomInteger {
       lowerBound++;
     }
 
-    int randomInt;
+    int delta = Math.abs(upperBound - lowerBound);
 
-    if (lowerBound < 0 && upperBound > 0) {
-      // special case
-      int lowerRandomInt = (((this.random.nextInt((-lowerBound) / resolution))) * resolution) + lowerBound;
-      int upperRandomInt = (((this.random.nextInt((upperBound) / resolution))) * resolution);
-      randomInt = lowerRandomInt + upperRandomInt;
+    int anyIntegerRange = (this.random.nextInt(delta / resolution) * resolution) + lowerBound ;
 
-    } else {
-      int delta = Math.abs(upperBound - lowerBound);
-
-      randomInt = (this.random.nextInt(delta / resolution) * resolution) + lowerBound;
-    }
-
-    return randomInt;
+    return anyIntegerRange;
   }
 
   /**

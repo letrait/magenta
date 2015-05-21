@@ -3,7 +3,6 @@ package org.magenta.random;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Ticker;
 import com.google.common.collect.Range;
 
 /**
@@ -23,8 +22,6 @@ public class RandomDate {
 
   private Range<Date> constraint;
 
-  private Ticker ticker;
-
   /**
    * Constructs an instance using a resolution of 1 millis and a date range
    * between 1970 and 2070.
@@ -33,7 +30,7 @@ public class RandomDate {
    *          from which moment will be randomly selected.
    */
   public RandomDate(RandomLong longs) {
-    this(1L, FROM_1970_TO_2070, longs, Ticker.systemTicker());
+    this(1L, FROM_1970_TO_2070, longs);
   }
 
   /**
@@ -48,11 +45,11 @@ public class RandomDate {
    * @param ticker
    *          a ticker to read the current time
    */
-  public RandomDate(long resolutionInMillis, Range<Date> constraint, RandomLong longs, Ticker ticker) {
+  public RandomDate(long resolutionInMillis, Range<Date> constraint, RandomLong longs) {
     this.resolutionInMillis = resolutionInMillis;
     this.constraint = constraint;
     this.longs = longs;
-    this.ticker = ticker;
+
   }
 
   /**
@@ -111,7 +108,7 @@ public class RandomDate {
    * @return a randomly generated date
    */
   public Date anyInTheFuture(long period, TimeUnit unit) {
-    Date today = new Date(TimeUnit.MILLISECONDS.convert(ticker.read(), TimeUnit.NANOSECONDS));
+    Date today = new Date();
     Date after = new Date(today.getTime() + (TimeUnit.MILLISECONDS.convert(period, unit)));
     Range<Date> range = Range.closed(today, after);
     return any(range);
@@ -128,7 +125,7 @@ public class RandomDate {
    * @return a randomly generated date
    */
   public Date anyInThePast(long period, TimeUnit unit) {
-    Date today = new Date(TimeUnit.MILLISECONDS.convert(ticker.read(), TimeUnit.NANOSECONDS));
+    Date today = new Date();
     Date before = new Date(today.getTime() - (TimeUnit.MILLISECONDS.convert(period, unit)));
     Range<Date> range = Range.closed(before, today);
     return any(range);
@@ -179,7 +176,7 @@ public class RandomDate {
    * @return this instance
    */
   public RandomDate resolution(long resolutionInMillis) {
-    return new RandomDate(resolutionInMillis, constraint, longs, ticker);
+    return new RandomDate(resolutionInMillis, constraint, longs);
   }
 
   /**
@@ -189,7 +186,7 @@ public class RandomDate {
    * @return this instance
    */
   public RandomDate constraint(Range<Date> constraint) {
-    return new RandomDate(resolutionInMillis, this.constraint.intersection(constraint), longs, ticker);
+    return new RandomDate(resolutionInMillis, this.constraint.intersection(constraint), longs);
   }
 
 }

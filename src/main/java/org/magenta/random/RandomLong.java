@@ -72,19 +72,10 @@ public class RandomLong {
       lowerBound++;
     }
 
-    long randomLong;
+    long delta = Math.abs(upperBound - lowerBound);
 
-    if (lowerBound < 0 && upperBound > 0) {
-      // special case
-      long lowerRandomLong = (((this.random.nextLong() % ((-lowerBound) / resolution))) * resolution) + lowerBound;
-      long upperRandomLong = (((this.random.nextLong() % ((upperBound) / resolution))) * resolution);
-      randomLong = lowerRandomLong + upperRandomLong;
+    long randomLong = ((( Math.abs(this.random.nextLong()) % (delta / resolution))) * resolution) + lowerBound ;
 
-    } else {
-      long delta = Math.abs(upperBound - lowerBound);
-
-      randomLong = (((this.random.nextLong() % (delta / resolution))) * resolution) + lowerBound;
-    }
     return randomLong;
   }
 
