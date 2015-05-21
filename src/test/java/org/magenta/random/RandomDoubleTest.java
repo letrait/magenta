@@ -3,6 +3,7 @@ package org.magenta.random;
 import java.util.Random;
 
 import org.junit.Test;
+import org.magenta.random.RandomDouble;
 
 import com.google.common.collect.Range;
 
@@ -17,7 +18,7 @@ public class RandomDoubleTest {
 		//exercise SUT
 		for(int x=0;x<50;x++){
 			double actual=sut.any();
-			System.out.println(actual);
+
 		}
 
 	}

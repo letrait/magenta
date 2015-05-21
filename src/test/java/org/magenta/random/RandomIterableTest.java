@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
+import org.magenta.random.FluentRandom;
+import org.magenta.random.MixedIterable;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;

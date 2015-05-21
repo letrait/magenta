@@ -6,44 +6,8 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 
-/**
- * A DataSet is a collection of item of the same type. This class provides
- * utility methods to manipulate data in the context of test fixture setup.
- *
- * @author ngagnon
- *
- * @param <D>
- *          the type of data wrapped by this instance
- */
-public interface DataSet<D> extends Supplier<Iterable<D>> {
-
-  /**
-   * @return true if this dataset content is constant, meaning that each call to get() will return an iterable having the same content.
-   */
-  public boolean isConstant();
-
-  /**
-   * @return true if this dataset is generated or false if it is fixed.
-   */
-  public boolean isGenerated();
-
-  /**
-   * @return true if this dataset is persistent or false if it is transient.
-   */
-  public boolean isPersistent();
-
-  /**
-   * @return a transient dataset if this dataset is persistent, no effect if this dataset is already transient
-   */
-  public DataSet<D> toTransient();
-
-
-  /**
-   * @return this dataset type
-   */
-  public Class<D> getType();
+public interface DataSet<D> extends DataSupplier<D>{
 
   /**
    * return this dataset as an array.
@@ -132,7 +96,7 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
    *          the size of the sub set.
    * @return a sub {@link DataSet}
    */
-  public DataSet<D> subset(int size);
+  DataSet<D> resize(int size);
 
   /**
    * Return a new {@link DataSet} having the same data has this one but without
@@ -179,14 +143,6 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
    */
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> transformedType);
 
-  /**
-   * Process each item of this dataset using the passed in processor.
-   *
-   * @param function
-   *          the processing function
-   * @return this dataset
-   */
-  // public DataSet<D> process(Function<? super D,Void> processor);
 
   /**
    * Return a randomly selected item from this dataset.
@@ -206,37 +162,30 @@ public interface DataSet<D> extends Supplier<Iterable<D>> {
   public D any(Predicate<? super D> filter);
 
   /**
-   * Link an object to a randomly selected item in this data set. This can be
-   * useful to built consistent fixtures such as query result.
+   * TODO: put in an "inner" interface, do not expose
    *
-   * @param o
-   *          the object to which link the item
-   * @return the item linked to the specified object or a randomly selected one
-   *         if it wasn't yet linked.
+   * @param filter
+   *          the filter
+   * @return a randomly selected item
    */
-  public D link(Object o);
+  @Override
+  public D get(int position);
 
   /**
-   * Return an iterable of all objets linked to the specified item.
+   * Return the first element of this dataset.
    *
-   * @param type
-   *          the type of object
-   * @param referred
-   *          the item to which objets may have been linked.
-   * @param <L>
-   *          the type of object.
-   * @return an iterable of all objects
+   * @return the first item
    */
-  public <L> Iterable<L> reverseLink(Class<L> type, D referred);
+  public D first();
+
+
+
 
   /**
    * @return true if this dataset is empty
    */
+  @Override
   public boolean isEmpty();
-
-  public DataSet<D> persist();
-
-  public DataSet<D> load();
 
 
 

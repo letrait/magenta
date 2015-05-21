@@ -1,195 +1,55 @@
 package org.magenta;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.reflect.TypeToken;
 
-import java.util.Arrays;
-
-import org.magenta.core.EmptyDataSet;
-import org.magenta.core.ForwardingDataSet;
-import org.magenta.core.GenericDataSet;
-import org.magenta.random.FluentRandom;
-
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
-
-/**
- * A DataKey is used to reference a {@link DataSet}, {@link Generator} or a
- * {@link GenerationStrategy}. There are two types of key : default and
- * qualified. A default key is one created with just a class name, so it will be
- * considered as the "default" key for this class. A qualified key add a
- * qualifier to the key type so two keys referring to the same type can be
- * distinguished.
- *
- * @author ngagnon
- *
- * @param <D>
- *          the data type of the referenced dataset, generator or generation
- *          strategy.
- */
 public class DataKey<D> {
-
-  public static final String DEFAULT_QUALIFIER = "default";
+public final static String DEFAULT = "default";
+  private final TypeToken<D> type;
   private final String qualifier;
-  private final Class<D> type;
 
-  DataKey(String qualifier, Class<D> type) {
-    this.qualifier = checkNotNull(qualifier);
-    this.type = checkNotNull(type);
+  private  DataKey(TypeToken<D> type, String qualifier){
+    this.type = type;
+    this.qualifier = qualifier;
   }
 
-  /**
-   * Make a new key for the given qualifier and the class.
-   *
-   * @param qualifier
-   *          a string that disambiguate this key from another that is of the
-   *          same type.
-   * @param type
-   *          the type of data
-   * @param <D>
-   *          the type of data
-   * @return a new key
-   */
-  public static <D> DataKey<D> makeQualified(String qualifier, Class<D> type) {
-    DataKey<D> ref = new DataKey<D>(qualifier, type);
-    return ref;
+  public static <D> DataKey<D> of(Class<D> type){
+    return new DataKey<D>(TypeToken.of(type),DEFAULT);
   }
 
-  /**
-   * Make a new key for the given class using the default qualifier key.
-   *
-   * @param type
-   *          the type of data
-   * @param <D>
-   *          the type of data
-   * @return a new key
-   */
-  public static <D> DataKey<D> makeDefault(Class<D> type) {
-    DataKey<D> ref = new DataKey<D>(DEFAULT_QUALIFIER, type);
-    return ref;
+  public static <D> DataKey<D> of(String qualifier, Class<D> type){
+    return new DataKey<D>(TypeToken.of(type), qualifier);
   }
 
-  /**
-   * Return true if this key is the default for this key type.
-   *
-   * @return true if it is a default key.
-   */
-  public boolean isDefault() {
-    return DEFAULT_QUALIFIER.equals(qualifier);
+  public static <D> DataKey<D> of(TypeToken<D> type){
+    return new DataKey<D>(type,DEFAULT);
   }
 
-  /**
-   * @return the category
-   */
-  public String getQualifier() {
-    return this.qualifier;
+  public TypeToken<D> getType() {
+   return type;
   }
 
-  /**
-   * @return the type
-   */
-  public Class<D> getType() {
-    return this.type;
+  public String getQualifier(){
+    return qualifier;
   }
 
-  /**
-   * Get the {@link DataSet} in the <code>domain</code> identified by this key.
-   *
-   *
-   * @param domain the domain
-   * @return the matching data set
-   */
-  public DataSet<D> getDataSetFrom(Fixture<?> domain) {
-    return domain.dataset(this);
-  }
-
-  /**
-   * Return a {@link Qualified} dataset.
-   *
-   * @param randomizer
-   *          the randomizer to use
-   * @param data
-   *          the data composing the qualified data set.
-   * @return a new QualifiedDataSet
-   */
-
-  @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> datasetOf(FluentRandom randomizer, D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
-  }
-
-  /**
-   * Return a {@link Qualified} dataset.
-   *
-   * @param randomizer
-   *          the randomizer to use
-   * @param data
-   *          the data composing the qualified data set.
-   * @return a new QualifiedDataSet
-   */
-
-  @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> datasetOf(D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
-  }
-
-  /**
-   * Return a {@link Qualified} dataset.
-   *
-   * @param dataset
-   *          the dataset to qualify.
-   * @return a new QualifiedDataSet
-   */
-
-  @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> qualify(DataSet<D> dataset) {
-    return new QualifiedDataSetImpl<D>(this, dataset);
-  }
-
-  /**
-   * Return a {@link Qualified} dataset.
-   *
-   * @param dataset
-   *          the dataset to qualify.
-   * @return a new QualifiedDataSet
-   */
-
-  @SuppressWarnings("unchecked")
-  public QualifiedDataSet<D> qualify(Supplier<DataSet<D>> dataset) {
-    return new QualifiedDataSetImpl<D>(this, dataset);
-  }
-
-  /**
-   *
-   * @return an empty data set for this key
-   */
-  public EmptyDataSet<D> asEmptyDataSet() {
-    return EmptyDataSet.ofType(getType());
-  }
-
-  /*
-   * (non-Javadoc)
-   *
+  /* (non-Javadoc)
    * @see java.lang.Object#hashCode()
    */
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (type.hashCode());
-    result = prime * result + (qualifier.hashCode());
+    result = prime * result + ((qualifier == null) ? 0 : qualifier.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
-  /*
-   * (non-Javadoc)
-   *
+  /* (non-Javadoc)
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
   public boolean equals(Object obj) {
     if (this == obj) {
-
       return true;
     }
     if (obj == null) {
@@ -198,70 +58,31 @@ public class DataKey<D> {
     if (!(obj instanceof DataKey)) {
       return false;
     }
-    DataKey<?> other = (DataKey<?>) obj;
-    if (!type.equals(other.getType())) {
+    DataKey other = (DataKey) obj;
+    if (qualifier == null) {
+      if (other.qualifier != null) {
+        return false;
+      }
+    } else if (!qualifier.equals(other.qualifier)) {
       return false;
     }
-    if (!qualifier.equals(other.getQualifier())) {
-
+    if (type == null) {
+      if (other.type != null) {
+        return false;
+      }
+    } else if (!type.equals(other.type)) {
       return false;
     }
     return true;
   }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
-    builder.append(getType().getName()).append(':').append(getQualifier());
+    builder.append(getType()).append(':').append(getQualifier());
     return builder.toString();
   }
 
-  static class QualifiedDataSetImpl<D2> extends ForwardingDataSet<D2> implements QualifiedDataSet<D2> {
 
-    private final DataKey<D2> key;
-
-    private QualifiedDataSetImpl(DataKey<D2> qualifier, DataSet<D2> delegate) {
-      super(Suppliers.ofInstance(delegate));
-      this.key = qualifier;
-    }
-
-
-
-    public QualifiedDataSetImpl(DataKey<D2> key, Supplier<DataSet<D2>> delegate) {
-      super(delegate);
-      this.key = key;
-    }
-
-
-
-    @Override
-    public DataKey<D2> getKey() {
-      return key;
-    }
-
-  }
-
-  /**
-   * Utility function that creates a default {@link DataKey} for a given class.
-   *
-   * @return the function
-   */
-  @SuppressWarnings("rawtypes")
-  public static Function<Class, DataKey> classToKey() {
-    return new Function<Class, DataKey>() {
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public DataKey apply(Class input) {
-        return DataKey.makeDefault(input);
-      }
-
-    };
-  }
 
 }

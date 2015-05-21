@@ -5,11 +5,11 @@ import java.util.Collection;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.Fixture;
 import org.magenta.FixtureFactory;
-import org.magenta.QualifiedDataSet;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 
@@ -63,13 +63,12 @@ public class RestrictionHelper {
    *          an array of object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public static void applyRestrictions(FixtureFactory<?> domain, Object first, Object... rest) {
-    Multimap<DataKey<?>, Object> multimap = ArrayListMultimap.create();
+  public static void applyRestrictions(FixtureFactory domain, Object first, Object... rest) {
+    Multimap<DataKey<?>, Object> multimap = LinkedHashMultimap.create();
 
     normalize(domain, Lists.asList(first, rest), multimap);
 
     for (DataKey key : multimap.keySet()) {
-
       Collection<Object> objs = multimap.get(key);
       if (objs.size() == 1 && objs.iterator()
           .next() == EMPTY) {
@@ -84,9 +83,9 @@ public class RestrictionHelper {
   }
 
   @VisibleForTesting
-  static void normalize(FixtureFactory<?> domain, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap) {
+  static void normalize(Fixture domain, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap) {
     for (Object o : objects) {
-      if (o instanceof QualifiedDataSet) {
+      /*if (o instanceof QualifiedDataSet) {
         QualifiedDataSet<?> qDataSetItem = (QualifiedDataSet<?>) o;
         if (!qDataSetItem.isEmpty()) {
           multimap.putAll(qDataSetItem.getKey(), qDataSetItem.get());
@@ -100,11 +99,11 @@ public class RestrictionHelper {
 
         }
 
-      } else if (o instanceof DataSet) {
+      } else */if (o instanceof DataSet) {
         DataSet<?> dataSetItem = (DataSet<?>) o;
-        DataKey<?> key = DataKey.makeDefault(dataSetItem.getType());
+        DataKey<?> key = DataKey.of(dataSetItem.getType());
         if (!dataSetItem.isEmpty()) {
-          multimap.putAll(key, dataSetItem.get());
+          multimap.putAll(key, dataSetItem);
         } else {
           if (!multimap.containsKey(key)) {
             multimap.put(key, EMPTY);
@@ -129,16 +128,16 @@ public class RestrictionHelper {
   }
 
   @VisibleForTesting
-  static DataKey<?> findKeyForClass(FixtureFactory<?> domain, Class<? extends Object> clazz) {
-    DataKey<?> key = DataKey.makeDefault(clazz);
-    if (domain.datasetKeys()
+  static DataKey<?> findKeyForClass(Fixture fixture, Class<? extends Object> clazz) {
+    DataKey<?> key = DataKey.of(clazz);
+    if (fixture.keys()
         .contains(key)) {
       return key;
     }
 
     Class<?>[] interfaces = clazz.getInterfaces();
     for (Class<?> i : interfaces) {
-      key = findKeyForClass(domain, i);
+      key = findKeyForClass(fixture, i);
       if (key != null) {
         return key;
       }
@@ -146,7 +145,7 @@ public class RestrictionHelper {
 
     Class<?> parent = clazz.getSuperclass();
     if (parent != null) {
-      return findKeyForClass(domain, parent);
+      return findKeyForClass(fixture, parent);
     }
 
     return null;

@@ -8,11 +8,18 @@ import org.junit.Test;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.FixtureFactory;
-import org.magenta.SimpleDataSpecification;
+import org.magenta.Magenta;
+import org.magenta.core.DataSetImpl;
+import org.magenta.core.RestrictionHelper;
+import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Employee;
+import org.magenta.testing.domain.EmployeeGenerator;
 import org.magenta.testing.domain.Occupation;
-import org.magenta.testing.domain.generators.EmployeeGenerator;
+
+import com.google.common.base.Suppliers;
+import com.google.common.reflect.TypeToken;
+
 
 public class RestrictionHelperTest {
 
@@ -20,7 +27,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_with_non_existing_dataset(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 
 
 		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
@@ -37,7 +44,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_single_item(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
@@ -53,7 +60,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_item_lists(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -71,7 +78,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_item_array(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -89,7 +96,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_mix_of_array_and_list(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -110,7 +117,7 @@ public class RestrictionHelperTest {
 	public void testApplyRestrictions_using_a_dataset(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -119,7 +126,7 @@ public class RestrictionHelperTest {
 		Employee candidate4=createAnonymousEmployee("candidate4");
 		Employee candidate5=createAnonymousEmployee("candidate5");
 
-		DataSet<Employee> employees = new GenericDataSet<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), Employee.class, sut.getRandomizer());
+		DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)), Suppliers.ofInstance(sut.getFluentRandom()));
 
 		//exercise sut
 		RestrictionHelper.applyRestrictions(sut, employees);
@@ -129,10 +136,46 @@ public class RestrictionHelperTest {
 	}
 
 	@Test
+	public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order(){
+	  //setup fixtures
+	  FixtureFactory parent=createFixtureFactory();
+
+	  parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
+	  parent.newDataSet(String.class).composedOf("a","b","c","d");
+
+	  FixtureFactory sut = parent.newChild();
+
+	  //exercise sut
+	  RestrictionHelper.applyRestrictions(sut, 9, "z");
+
+	  //verify outcome
+	  assertThat(sut.keys()).containsExactly(DataKey.of(Integer.class), DataKey.of(String.class));
+
+	}
+
+	 @Test
+	  public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order_opposite_case(){
+	    //setup fixtures
+	    FixtureFactory parent=createFixtureFactory();
+
+	    parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
+	    parent.newDataSet(String.class).composedOf("a","b","c","d");
+
+	    FixtureFactory sut = parent.newChild();
+
+	    //exercise sut
+	    RestrictionHelper.applyRestrictions(sut, "z", 9);
+
+	    //verify outcome
+	    assertThat(sut.keys()).containsExactly( DataKey.of(String.class), DataKey.of(Integer.class));
+
+	  }
+
+	/*@Test
 	public void testApplyRestrictions_using_a_qualified_dataset(){
 
 		//setup fixtures
-		FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+		FixtureFactory sut=createFixtureFactory();
 		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 		Employee candidate1=createAnonymousEmployee("candidate1");
@@ -141,22 +184,22 @@ public class RestrictionHelperTest {
 		Employee candidate4=createAnonymousEmployee("candidate4");
 		Employee candidate5=createAnonymousEmployee("candidate5");
 
-		DataKey<Employee> key = DataKey.makeDefault(Employee.class);
+		DataKey<Employee> key = DataKey.of(Employee.class);
 
-		DataSet<Employee> employees = key.datasetOf(sut.getRandomizer(), candidate1,candidate2,candidate3,candidate4,candidate5);
+		DataSet<Employee> employees = key.datasetOf(sut.getFluentRandom(), candidate1,candidate2,candidate3,candidate4,candidate5);
 
 		//exercise sut
 		RestrictionHelper.applyRestrictions(sut, employees);
 
 		//verify outcome
 		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
-	}
+	}*/
 
-	 @Test
+	 /*@Test
 	  public void testApplyRestrictions_using_an_empty_dataset(){
 
 	    //setup fixtures
-	    FixtureFactory<SimpleDataSpecification> sut=createDataDomainManager();
+	    FixtureFactory sut=createFixtureFactory();
 	    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
 	    DataKey<Employee> key = DataKey.makeDefault(Employee.class);
@@ -167,7 +210,7 @@ public class RestrictionHelperTest {
 
 	    //verify outcome
 	    assertThat(sut.dataset(Employee.class).list()).isEmpty();
-	  }
+	  }*/
 
 	private Employee createAnonymousEmployee(String name) {
 		Employee e=new Employee();
@@ -177,7 +220,7 @@ public class RestrictionHelperTest {
 		return e;
 	}
 
-	private FixtureFactory<SimpleDataSpecification> createDataDomainManager() {
-		return FixtureFactory.newRoot("RestrictionHelperTest",SimpleDataSpecification.create(),FluentRandom.singleton());
+	private FixtureFactory createFixtureFactory() {
+		return Magenta.newFixture(FluentRandom.singleton());
 	}
 }

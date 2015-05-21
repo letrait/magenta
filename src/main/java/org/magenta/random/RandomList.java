@@ -107,7 +107,10 @@ public class RandomList<E> {
    * @return this instance
    */
   public RandomList<E> shuffle() {
-    Collections.shuffle(Lists.newArrayList(values), random);
+
+    List<E> l = Lists.newArrayList(values);
+
+    Collections.shuffle(l, random);
     return this;
   }
 
