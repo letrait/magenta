@@ -13,9 +13,6 @@ import org.magenta.DataKey;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.Sequence;
-import org.magenta.core.sequence.SequenceIndexMap;
-import org.magenta.core.sequence.SequenceProvider;
-import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
@@ -24,7 +21,7 @@ import com.google.common.collect.Maps;
 public class SequenceProviderTest {
 
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.singleton());
+    return Magenta.newFixture();
   }
 
   @Test

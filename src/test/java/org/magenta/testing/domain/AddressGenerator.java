@@ -11,7 +11,7 @@ public class AddressGenerator implements Supplier<Address> {
   @Override
   public Address get() {
     Address address = new Address();
-    address.setCity((counter++) + "-" + FluentRandom.singleton().strings().charabia(15));
+    address.setCity((counter++) + "-" + FluentRandom.strings().charabia(15));
     return address;
   }
 

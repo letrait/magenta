@@ -12,10 +12,10 @@ import com.google.common.collect.Range;
  */
 public class RandomShort {
 
-  private Random random;
+  private final Random random;
 
-  private Range<Short> constraint;
-  private short resolution;
+  private final Range<Short> constraint;
+  private final short resolution;
 
   private static final Range<Short> ALL = Range.all();
   private static final Range<Short> EVERY_POSITIVE_BUT_ZERO = Range.greaterThan((short) 0);

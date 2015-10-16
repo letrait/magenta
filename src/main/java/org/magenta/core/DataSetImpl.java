@@ -36,9 +36,6 @@ import com.google.common.reflect.TypeToken;
  */
 public class DataSetImpl<D> implements DataSet<D> {
 
-
-  protected final Supplier<FluentRandom> randomizer;
-
   protected final DataSupplier<D> supplier;
 
   /**
@@ -49,9 +46,8 @@ public class DataSetImpl<D> implements DataSet<D> {
    * @param random
    *          the java random to use for shuffling and by the "any()" method
    */
-  public DataSetImpl(DataSupplier<D> datasetSupplier, Supplier<FluentRandom> random) {
+  public DataSetImpl(DataSupplier<D> datasetSupplier) {
     this.supplier = datasetSupplier;
-    this.randomizer = random;
   }
 
   @Override
@@ -105,28 +101,28 @@ public class DataSetImpl<D> implements DataSet<D> {
     if(this.isGenerated() && !this.isConstant()){
      return get(0);
     }else{
-      return getRandomizer().iterable(this).any();
+      return FluentRandom.iterable(this).any();
     }
   }
 
   @Override
   public D any(Predicate<? super D> filter) {
-    return getRandomizer().iterable(Iterables.filter(this, filter)).any();
+    return FluentRandom.iterable(Iterables.filter(this, filter)).any();
   }
 
   @Override
   public DataSet<D> resize(int size) {
-    return new DataSetImpl<D>(new ResizedDataSupplierDecorator<D>(this.supplier,size), this.randomizer);
+    return new DataSetImpl<D>(new ResizedDataSupplierDecorator<D>(this.supplier,size));
   }
 
   @Override
   public DataSet<D> filter(Predicate<? super D> filter) {
-    return new DataSetImpl<D>(new FilteredDataSupplierDecorator<D>(this.supplier,filter),this.randomizer);
+    return new DataSetImpl<D>(new FilteredDataSupplierDecorator<D>(this.supplier,filter));
   }
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> newType) {
-    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function),this.randomizer);
+    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function));
   }
 
   @Override
@@ -186,7 +182,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public List<D> randomList() {
-    return getRandomizer().iterable(this).shuffle().list();
+    return FluentRandom.iterable(this).shuffle().list();
   }
 
   @Override
@@ -208,12 +204,6 @@ public class DataSetImpl<D> implements DataSet<D> {
     return this.supplier;
   }
 
-  /**
-   * @return this data set randomizer
-   */
-  protected FluentRandom getRandomizer() {
-    return randomizer.get();
-  }
 
   @Override
   public int hashCode() {

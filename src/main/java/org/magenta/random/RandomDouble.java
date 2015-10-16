@@ -17,11 +17,11 @@ public class RandomDouble {
   public static final int DEFAULT_NUMBER_OF_DECIMAL_PLACES = 10;
   private static final double SCALE = 10D;
 
-  private Random random;
-  private double scale;
-  private double lowestIncrement;
-  private int numberOfDecimalPlaces;
-  private Range<Double> constraint;
+  private final Random random;
+  private final double scale;
+  private final double lowestIncrement;
+  private final int numberOfDecimalPlaces;
+  private final Range<Double> constraint;
 
   private static final Range<Double> ALL = Range.all();
   private static final Range<Double> EVERY_POSITIVE_BUT_ZERO = Range.greaterThan(0D);

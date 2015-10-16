@@ -9,10 +9,7 @@ import org.magenta.DataSet;
 import org.magenta.DataSupplier;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.data.supplier.StaticDataSupplier;
-import org.magenta.core.sequence.OrderedSequence;
-import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Suppliers;
 import com.google.common.reflect.TypeToken;
 
 public class OrderedSequenceTest {
@@ -21,7 +18,7 @@ public class OrderedSequenceTest {
   public void test(){
 
     //setup fixture
-    DataSet<Integer> dataset = new DataSetImpl<Integer>(staticData(1,2,3,4), Suppliers.ofInstance(FluentRandom.singleton()));
+    DataSet<Integer> dataset = new DataSetImpl<Integer>(staticData(1,2,3,4));
     OrderedSequence<Integer> sut = OrderedSequence.from(dataset);
 
     //exercise sut / verify outcome

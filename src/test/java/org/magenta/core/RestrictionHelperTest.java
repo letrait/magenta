@@ -9,15 +9,11 @@ import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
-import org.magenta.core.DataSetImpl;
-import org.magenta.core.RestrictionHelper;
 import org.magenta.core.data.supplier.StaticDataSupplier;
-import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Employee;
 import org.magenta.testing.domain.EmployeeGenerator;
 import org.magenta.testing.domain.Occupation;
 
-import com.google.common.base.Suppliers;
 import com.google.common.reflect.TypeToken;
 
 
@@ -126,7 +122,7 @@ public class RestrictionHelperTest {
 		Employee candidate4=createAnonymousEmployee("candidate4");
 		Employee candidate5=createAnonymousEmployee("candidate5");
 
-		DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)), Suppliers.ofInstance(sut.getFluentRandom()));
+		DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)));
 
 		//exercise sut
 		RestrictionHelper.applyRestrictions(sut, employees);
@@ -221,6 +217,6 @@ public class RestrictionHelperTest {
 	}
 
 	private FixtureFactory createFixtureFactory() {
-		return Magenta.newFixture(FluentRandom.singleton());
+		return Magenta.newFixture();
 	}
 }

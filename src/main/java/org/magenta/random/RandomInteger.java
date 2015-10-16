@@ -17,10 +17,10 @@ import com.google.common.collect.Range;
  */
 public class RandomInteger {
 
-  private Random random;
+  private final Random random;
 
-  private Range<Integer> constraint;
-  private int resolution;
+  private final Range<Integer> constraint;
+  private final int resolution;
 
   private static final Range<Integer> ALL = Range.all();
   private static final Range<Integer> EVERY_POSITIVE_BUT_ZERO = Range.greaterThan(0);

@@ -16,11 +16,9 @@ import com.google.common.collect.Lists;
 public class MixedIterable<D> implements Iterable<D> {
 
   private final Iterable<? extends Iterable<? extends D>> iterables;
-  private final FluentRandom randomizer;
 
-  MixedIterable(Iterable<? extends Iterable<? extends D>> iterables, FluentRandom randomizer) {
+  MixedIterable(Iterable<? extends Iterable<? extends D>> iterables) {
     this.iterables = iterables;
-    this.randomizer = randomizer;
   }
 
   @Override
@@ -50,7 +48,7 @@ public class MixedIterable<D> implements Iterable<D> {
     @Override
     public D next() {
 
-      Iterator<? extends D> iterator = randomizer.iterable(iterators).any();
+      Iterator<? extends D> iterator = FluentRandom.iterable(iterators).any();
 
       D e = iterator.next();
 

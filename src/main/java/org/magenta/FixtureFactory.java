@@ -12,15 +12,13 @@ import org.magenta.core.RestrictionHelper;
 import org.magenta.core.automagic.generation.GeneratorFactory;
 import org.magenta.core.data.supplier.GeneratorDataSupplier;
 import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
-import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.core.data.supplier.SequenceWithFixtureContextManagementDecorator;
+import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.core.sequence.SupplierSequenceAdapter;
-import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
 import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableList;
@@ -30,15 +28,13 @@ import com.google.common.reflect.TypeToken;
 public class FixtureFactory implements Fixture {
 
   private FixtureFactory parent;
-  private FluentRandom random;
   private DataSetFunctionRegistry registry;
   private Injector injector;
   private GeneratorFactory generatorFactory;
   private FixtureContext context;
 
-  FixtureFactory(FixtureFactory parent, FluentRandom random, Injector injector, GeneratorFactory generatorFactory,FixtureContext context) {
+  FixtureFactory(FixtureFactory parent, Injector injector, GeneratorFactory generatorFactory,FixtureContext context) {
     this.parent = parent;
-    this.random = random;
     this.injector = injector;
     this.context = context;
     this.registry = new DataSetFunctionRegistry();
@@ -46,7 +42,7 @@ public class FixtureFactory implements Fixture {
   }
 
   public FixtureFactory newChild() {
-    return new FixtureFactory(this, random, injector, generatorFactory, context);
+    return new FixtureFactory(this, injector, generatorFactory, context);
   }
 
   @Override
@@ -73,11 +69,6 @@ public class FixtureFactory implements Fixture {
   }
 
   @Override
-  public FluentRandom getFluentRandom() {
-    return this.random;
-  }
-
-  @Override
   public Set<DataKey<?>> keys() {
     return parent == null ? registry.keys() : Sets.union(registry.keys(), this.parent.keys());
   }
@@ -88,6 +79,11 @@ public class FixtureFactory implements Fixture {
 
   public <D> DataSetBuilder<D> newDataSet(Class<D> key) {
     return new DataSetBuilder<D>(DataKey.of(key));
+  }
+
+  public <D> GeneratorBuilder<D> newGenerator(DataKey<D> key) {
+
+    return new GeneratorBuilder<D>(key);
   }
 
   public <D> GeneratorBuilder<D> newGenerator(Class<D> key) {
@@ -122,7 +118,7 @@ public class FixtureFactory implements Fixture {
     }
 
     private void composedOf(ImmutableList<D> items) {
-      DataSet<D> dataset = new DataSetImpl<D>(new StaticDataSupplier<D>(items, key.getType()), Suppliers.ofInstance(random));
+      DataSet<D> dataset = new DataSetImpl<D>(new StaticDataSupplier<D>(items, key.getType()));
       registry.register(key, Functions.constant(dataset));
 
     }
@@ -162,7 +158,7 @@ public class FixtureFactory implements Fixture {
         public DataSet<D> apply(Fixture fixture) {
 
           return new DataSetImpl<D>(new LazyGeneratedDataSupplier<>(contextualizeToFixture(fixture, generator), key.getType(),
-              numberOfItems, Integer.MAX_VALUE), Suppliers.ofInstance(random));
+              numberOfItems, Integer.MAX_VALUE));
         }
 
       };
@@ -179,7 +175,7 @@ public class FixtureFactory implements Fixture {
 
     private Supplier<D> buildGenerator(TypeToken<D> type) {
 
-      return generatorFactory.buildGeneratorOf(type);
+      return generatorFactory.buildGeneratorOf(type, FixtureFactory.this);
     }
 
 
@@ -212,7 +208,7 @@ public class FixtureFactory implements Fixture {
         @Override
         public DataSet<D> apply(Fixture fixture) {
           return new DataSetImpl<D>(new GeneratorDataSupplier<>(contextualizeGeneratorToFixture(fixture, adaptToSequence(generator)), key.getType(), numberOfItems,
-              Integer.MAX_VALUE), Suppliers.ofInstance(random));
+              Integer.MAX_VALUE));
         }
 
       };

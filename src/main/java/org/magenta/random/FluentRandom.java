@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Range;
 
 /**
@@ -23,6 +21,8 @@ public class FluentRandom {
 
   private static final int DEFAULT_DOUBLE_NUMBER_OF_DECIMAL_PLACES = 8;
 
+  private static FluentRandom INSTANCE = new FluentRandom(Helper.initWithDefaultRandom());
+
   private Random random;
   private RandomInteger integers;
   private RandomShort shorts;
@@ -31,139 +31,111 @@ public class FluentRandom {
   private RandomString strings;
   private RandomDate dates;
 
-  FluentRandom(){
-    //for cglib
-  }
 
-  FluentRandom(Random random) {
-    // use suppliers?
+  private FluentRandom(Random random){
     this.random = random;
+    this.integers= new RandomInteger(random);
+    this.shorts= new RandomShort(random);
+    this.doubles=new RandomDouble(random, DEFAULT_DOUBLE_NUMBER_OF_DECIMAL_PLACES);
     this.longs = new RandomLong(random);
-    this.integers = new RandomInteger(random);
-    this.shorts = new RandomShort(random);
-    this.doubles = new RandomDouble(random, DEFAULT_DOUBLE_NUMBER_OF_DECIMAL_PLACES);
-    this.strings = strings("qwertyuiopasdfghjklzxcvbnm0123456789");
-    this.dates = new RandomDate(longs);
+    this.strings = new RandomString("qwertyuiopasdfghjklzxcvbnm0123456789",  new RandomInteger(random));
+    this.dates = new RandomDate(new RandomLong(random));
   }
-
-  private static final Supplier<FluentRandom> SINGLETON = Suppliers.memoize(new Supplier<FluentRandom>() {
-
-    @Override
-    public FluentRandom get() {
-      return new FluentRandom(Helper.initWithDefaultRandom());
-    }
-
-  });
-
-  /**
-   * @return the singleton
-   */
-  public static FluentRandom singleton() {
-    return SINGLETON.get();
-  }
-
-  /**
-   * Return a new instance of {@code Randoms} using the specified {@code random}.
-   *
-   * @param random the random
-   * @return a new instance
-   */
-  public static FluentRandom get(Random random) {
-    return new FluentRandom(random);
-  }
-
 
 
   /**
    * Get the random.
    * @return the random
    */
-  public Random getRandom() {
-    return this.random;
+  public static Random getRandom() {
+    return INSTANCE.random;
   }
 
+  public static void setRandom(Random r){
 
+    INSTANCE = new FluentRandom(r);
+  }
 
   /**
    * @return date generator
    */
-  public RandomDate dates() {
-    return this.dates;
+  public static RandomDate dates() {
+    return INSTANCE.dates;
   }
 
   /**
    * @return string generator
    */
-  public RandomString strings() {
-    return this.strings;
+  public static RandomString strings() {
+    return INSTANCE.strings;
   }
 
   /**
    * @param alphabet the alphabet from which to generate strings
    * @return string generator
    */
-  public RandomString strings(String alphabet) {
-    return new RandomString(alphabet, integers);
+  public static RandomString strings(String alphabet) {
+    return new RandomString(alphabet, INSTANCE.integers);
   }
 
   /**
    * @return a integer generator
    */
-  public RandomInteger integers() {
-    return this.integers;
+  public static RandomInteger integers() {
+    return INSTANCE.integers;
   }
 
   /**
    * @param constrained the range of possible values.
    * @return a integer generator
    */
-  public RandomInteger integers(Range<Integer> constrained) {
-    return new RandomInteger(random, constrained, 1);
+  public static RandomInteger integers(Range<Integer> constrained) {
+    return new RandomInteger(INSTANCE.random, constrained, 1);
   }
 
   /**
    * @return a long generator.
    */
-  public RandomLong longs() {
-    return this.longs;
+  public static RandomLong longs() {
+    return INSTANCE.longs;
   }
 
   /**
    * @param constrained the range of possible values
    * @return a long generator
    */
-  public RandomLong longs(Range<Long> constrained) {
-    return new RandomLong(random, constrained, 1);
+  public static RandomLong longs(Range<Long> constrained) {
+    return new RandomLong(INSTANCE.random, constrained, 1);
   }
 
   /**
    * @return a short generator
    */
-  public RandomShort shorts() {
-    return this.shorts;
+  public static RandomShort shorts() {
+    return INSTANCE.shorts;
   }
 
   /**
    * @param constrained the range of possible values
    * @return a short generators
    */
-  public RandomShort shorts(Range<Short> constrained) {
-    return new RandomShort(random, constrained, (short) 1);
+  public static RandomShort shorts(Range<Short> constrained) {
+    return new RandomShort(INSTANCE.random, constrained, (short) 1);
   }
 
   /**
    * @return a double generator.
    */
-  public RandomDouble doubles() {
-    return this.doubles;
+  public static RandomDouble doubles() {
+    return INSTANCE.doubles;
   }
 
   /**
    * @param numberOfDecimalPlaces number of decimal places in the generated numbers
    * @return a double generator
    */
-  public RandomDouble doubles(int numberOfDecimalPlaces) {
-    return new RandomDouble(random, numberOfDecimalPlaces);
+  public static RandomDouble doubles(int numberOfDecimalPlaces) {
+    return new RandomDouble(INSTANCE.random, numberOfDecimalPlaces);
   }
 
   /**
@@ -171,8 +143,8 @@ public class FluentRandom {
    * @param constrained the range of possible values
    * @return a double generator
    */
-  public RandomDouble doubles(int numberOfDecimalPlaces, Range<Double> constrained) {
-    return new RandomDouble(random, numberOfDecimalPlaces, constrained);
+  public static RandomDouble doubles(int numberOfDecimalPlaces, Range<Double> constrained) {
+    return new RandomDouble(INSTANCE.random, numberOfDecimalPlaces, constrained);
   }
 
   /**
@@ -182,8 +154,8 @@ public class FluentRandom {
    *
    */
   @SafeVarargs
-  public final <E> RandomList<E> array(E... values) {
-    return new RandomList<>(random, integers(), Arrays.asList(values));
+  public final static <E> RandomList<E> array(E... values) {
+    return new RandomList<>(INSTANCE.random, integers(), Arrays.asList(values));
   }
 
   /**
@@ -191,11 +163,11 @@ public class FluentRandom {
    * @param <E> type of enum
    * @return a enum picker
    */
-  public final <E extends Enum<E>> RandomList<E> enums(Class<E> clazz) {
+  public final static <E extends Enum<E>> RandomList<E> enums(Class<E> clazz) {
 
     List<E> enums = Arrays.asList(clazz.getEnumConstants());
 
-    return new RandomList<>(random, integers(), enums);
+    return new RandomList<>(INSTANCE.random, integers(), enums);
   }
 
   /**
@@ -203,8 +175,8 @@ public class FluentRandom {
    * @param <E> the type of value
    * @return a list picker
    */
-  public <E> RandomList<E> iterable(Iterable<E> values) {
-    return new RandomList<>(random, integers(), values);
+  public static <E> RandomList<E> iterable(Iterable<E> values) {
+    return new RandomList<>(INSTANCE.random, integers(), values);
   }
 
   /**
@@ -214,8 +186,8 @@ public class FluentRandom {
    * @param <E> the type of value
    * @return a mixed iterable
    */
-  public <E> Iterable<E> mix(Iterable<? extends Iterable<? extends E>> iterables) {
-    return new MixedIterable<>(iterables, this);
+  public static <E> Iterable<E> mix(Iterable<? extends Iterable<? extends E>> iterables) {
+    return new MixedIterable<>(iterables);
   }
 
   private static class Helper {
@@ -253,24 +225,20 @@ public class FluentRandom {
       if (seedValue != null) {
         try {
 
-          LOG.info("The seed value read from the system property {} is {}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seedValue);
+          LOG.info("The seed value read from the system property {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seedValue);
           seed = Long.parseLong(seedValue);
 
         } catch (Throwable t) {
           // ignore;
           LOG.info("cannot parse this value to a valid long");
         }
-      } else {
-        LOG.info(
-            "No seed found in system properties, a new one will be generated. You can set a fixed seed for Random by setting the System Property \"{}\" to the desired value.",
-            RANDOM_SEED_SYSTEM_PROPERTY_KEY);
       }
 
       if (seed == null) {
         seed = seedUniquifier() ^ System.nanoTime();
       }
 
-      LOG.info("The seed used by magenta for random is {}", seed);
+      LOG.info("The seed used by magenta for random is {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seed);
       LOG.info("------------------------------------------------------------------------");
       Random random = new Random(seed);
 

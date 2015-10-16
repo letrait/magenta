@@ -16,11 +16,11 @@ public class RandomDate {
   private static final Range<Date> ALL = Range.all();
   private static final Range<Date> FROM_1970_TO_2070 = Range.closed(new Date(0), new Date(1000L * 60 * 60 * 24 * 365 * 100));
 
-  private RandomLong longs;
+  private final RandomLong longs;
 
-  private long resolutionInMillis;
+  private final long resolutionInMillis;
 
-  private Range<Date> constraint;
+  private final Range<Date> constraint;
 
   /**
    * Constructs an instance using a resolution of 1 millis and a date range

@@ -8,23 +8,39 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.magenta.random.FluentRandom;
-import org.magenta.random.MixedIterable;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Lists;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RandomIterableTest {
+
+  @Mock
+  private Random random;
+
+  private Random previous;
+
+  @Before
+  public void configureFluentRandom(){
+    this.previous = FluentRandom.getRandom();
+    FluentRandom.setRandom(random);
+  }
+
+  @After
+  public void configureFluentRandomBack(){
+    FluentRandom.setRandom(previous);
+  }
 
 	@Test
 	public void testTraversal_mocked_case_1(){
 
 		//setup fixtures
-		Random random=mock(Random.class);
-
-
-		FluentRandom randomizer=FluentRandom.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);
@@ -37,7 +53,7 @@ public class RandomIterableTest {
 
 		List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
 
-		MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+		MixedIterable<Integer> sut=new MixedIterable<>(integerLists);
 
 		//exercise sut
 		List<Integer> actual=Lists.newArrayList(sut);
@@ -51,9 +67,8 @@ public class RandomIterableTest {
 
 		//setup fixtures
 		Random random=mock(Random.class);
+	  FluentRandom.setRandom(random);
 
-
-		FluentRandom randomizer=FluentRandom.get(random);
 
 		List<Integer> list1=Arrays.asList(1,2,3);
 		List<Integer> list2=Arrays.asList(4,5,6);
@@ -66,7 +81,7 @@ public class RandomIterableTest {
 
 		List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
 
-		MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+		MixedIterable<Integer> sut=new MixedIterable<>(integerLists);
 
 		//exercise sut
 		List<Integer> actual=Lists.newArrayList(sut);
@@ -79,7 +94,6 @@ public class RandomIterableTest {
 	public void testTraversalWhenOneOfTheListIsEmpty(){
 
 	  //setup fixtures
-	  FluentRandom randomizer=FluentRandom.get(new Random());
 
     List<Integer> list1=Arrays.asList(1,2,3);
     List<Integer> list2=Arrays.asList(4,5,6);
@@ -89,7 +103,7 @@ public class RandomIterableTest {
 
     List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
 
-    MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+    MixedIterable<Integer> sut=new MixedIterable<>(integerLists);
 
     //exercise sut (should not throw error)
     List<Integer> actual=Lists.newArrayList(sut);
@@ -102,8 +116,6 @@ public class RandomIterableTest {
 	  public void testTraversalWhenAllListAreEmpty(){
 
 	    //setup fixtures
-	    FluentRandom randomizer=FluentRandom.get(new Random());
-
 	    List<Integer> list1=Arrays.asList();
 	    List<Integer> list2=Arrays.asList();
 	    List<Integer> list3=Arrays.asList();
@@ -112,7 +124,7 @@ public class RandomIterableTest {
 
 	    List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
 
-	    MixedIterable<Integer> sut=new MixedIterable<>(integerLists, randomizer);
+	    MixedIterable<Integer> sut=new MixedIterable<>(integerLists);
 
 	    //exercise sut (should not throw error)
 	    List<Integer> actual=Lists.newArrayList(sut);

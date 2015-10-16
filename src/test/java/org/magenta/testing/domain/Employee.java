@@ -10,7 +10,7 @@ public class Employee {
 	private String name;
 	private Occupation occupation;
 	private Address address;
-	private Set<PhoneNumber> phoneNumbers = Sets.newHashSet();;
+	private Set<PhoneNumber> phoneNumbers = Sets.newHashSet();
 
   public long getEmployeeId() {
     return employeeId;

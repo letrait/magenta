@@ -1,33 +1,27 @@
 package org.magenta.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.magenta.DataSet;
 import org.magenta.DataSupplier;
-import org.magenta.core.DataSetImpl;
 import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.random.FluentRandom;
-import org.magenta.random.RandomList;
-import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.common.base.Suppliers;
 import com.google.common.reflect.TypeToken;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DataSetTest {
 
-  @Mock()
-  private FluentRandom fluentRandom;
+
 
   @Test
   public void testBasicState(){
@@ -37,7 +31,6 @@ public class DataSetTest {
     DataSetImpl<Integer> sut = createDataSetFrom(expected);
 
     //verify outcome
-    assertThat(sut.getRandomizer()).isEqualTo(fluentRandom);
     assertThat(sut.getSize()).isEqualTo(expected.length);
     assertThat(sut.getMaximumSize()).isEqualTo(expected.length);
     assertThat(sut.getType()).isEqualTo(TypeToken.of(Integer.class));
@@ -62,11 +55,10 @@ public class DataSetTest {
   @Test
   public void testAny(){
     //setup fixtures
-    int expected = 7;
+    FluentRandom.setRandom(new Random(1));
+    int expected = 6;
     Integer[] integers = new Integer[]{1,2,3,4,5,6,7,8,9,10};
     DataSetImpl<Integer> sut = createDataSetFrom(integers);
-    when(fluentRandom.iterable(sut)).thenReturn(mock(RandomList.class));
-    when(fluentRandom.iterable(sut).any()).thenReturn(expected);
     //exercise sut
     Integer actual = sut.any();
 
@@ -196,6 +188,6 @@ public class DataSetTest {
 
 
   private <D> DataSetImpl<D> createDataSetFrom(DataSupplier<D> supplier) {
-    return new DataSetImpl<D>(supplier, Suppliers.ofInstance(fluentRandom));
+    return new DataSetImpl<D>(supplier);
   }
 }

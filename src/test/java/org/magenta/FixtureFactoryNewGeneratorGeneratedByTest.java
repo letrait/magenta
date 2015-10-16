@@ -5,10 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.DataSet;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.PhoneNumber;
 import org.magenta.testing.domain.PhoneNumberGenerator;
 
@@ -42,6 +38,6 @@ public class FixtureFactoryNewGeneratorGeneratedByTest {
   }
 
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.singleton());
+    return Magenta.newFixture();
   }
 }

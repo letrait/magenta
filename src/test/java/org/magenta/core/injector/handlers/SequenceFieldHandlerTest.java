@@ -13,8 +13,6 @@ import org.magenta.Magenta;
 import org.magenta.Sequence;
 import org.magenta.annotation.InjectSequence;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
-import org.magenta.core.injector.handlers.SequenceFieldHandler;
-import org.magenta.random.FluentRandom;
 import org.mockito.Mockito;
 
 import com.google.common.base.Suppliers;
@@ -49,7 +47,7 @@ public class SequenceFieldHandlerTest {
     //setup fixtures
     Integer[] expected = new Integer[]{1,2,3,4,5,6};
 
-    FixtureFactory fixture = Magenta.newFixture(FluentRandom.singleton());
+    FixtureFactory fixture = Magenta.newFixture();
 
     fixture.newDataSet(Integer.class).composedOf(1,2,3,4,5,6);
 
@@ -74,7 +72,7 @@ public class SequenceFieldHandlerTest {
 
     //setup fixtures
 
-    FixtureFactory fixture = Magenta.newFixture(FluentRandom.singleton());
+    FixtureFactory fixture = Magenta.newFixture();
 
     fixture.newDataSet(Integer.class).composedOf(1,2,3);
 

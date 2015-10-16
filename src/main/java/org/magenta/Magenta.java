@@ -3,8 +3,10 @@ package org.magenta;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.FixtureContext;
 import org.magenta.core.Injector;
+import org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunction;
 import org.magenta.core.automagic.generation.GeneratorFactory;
 import org.magenta.core.automagic.generation.ReflexionBasedGeneratorFactory;
 import org.magenta.core.context.ThreadLocalFixtureContext;
@@ -14,18 +16,17 @@ import org.magenta.core.injector.FieldsExtractor;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 import org.magenta.core.injector.handlers.DataSetFieldHandler;
 import org.magenta.core.injector.handlers.SequenceFieldHandler;
-import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
 public class Magenta {
 
-  public static FixtureFactory newFixture(FluentRandom random) {
-    return dependencies.get().fixtureFactory(random);
+  public static FixtureFactory newFixture() {
+    return dependencies.get().fixtureFactory();
   }
 
-  static final Supplier<Dependencies> dependencies = Suppliers.memoize(new Supplier<Dependencies>(){
+  public static final Supplier<Dependencies> dependencies = Suppliers.memoize(new Supplier<Dependencies>(){
 
     @Override
     public Dependencies get() {
@@ -34,16 +35,20 @@ public class Magenta {
 
   });
 
-  static class Dependencies {
+  public static class Dependencies {
 
-    public FixtureFactory fixtureFactory(FluentRandom random){
+    public FixtureFactory fixtureFactory(){
       FixtureContext fixtureContext = fixtureContext();
-      GeneratorFactory generatorFactory = generatorFactory(random);
-      return new FixtureFactory(null, random, injector(fixtureContext), generatorFactory, fixtureContext);
+      GeneratorFactory generatorFactory = generatorFactory(fixtureContext);
+      return new FixtureFactory(null, injector(fixtureContext), generatorFactory, fixtureContext);
     }
 
-    private GeneratorFactory generatorFactory(FluentRandom random) {
-      return new ReflexionBasedGeneratorFactory(random, fieldExtractor());
+    public GeneratorFactory generatorFactory(FixtureContext context) {
+      return new ReflexionBasedGeneratorFactory(context, dataKeyMapBuilder(), fieldExtractor());
+    }
+
+    public DataKeyMapBuilder dataKeyMapBuilder() {
+      return new DataKeyMapBuilder(new DataKeyDeterminedFromFieldTypeMappingFunction());
     }
 
     public Injector injector(Supplier<Fixture> supplier){

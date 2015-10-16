@@ -6,11 +6,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.DataKey;
-import org.magenta.DataSet;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 
 import com.google.common.reflect.TypeToken;
 
@@ -70,6 +65,6 @@ public class FixtureFactoryComposedOfTest {
   }
 
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.singleton());
+    return Magenta.newFixture();
   }
 }

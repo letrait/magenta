@@ -7,7 +7,6 @@ import java.util.Set;
 import org.junit.Test;
 import org.magenta.DataSupplier;
 import org.magenta.Sequence;
-import org.magenta.core.data.supplier.GeneratorDataSupplier;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.collect.Sets;
@@ -80,7 +79,7 @@ public class GeneratorDataSupplierTest {
 
       @Override
       public String get() {
-        return FluentRandom.singleton().strings().charabia(25);
+        return FluentRandom.strings().charabia(25);
       }
 
       @Override

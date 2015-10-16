@@ -4,12 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.magenta.DataGenerationException;
-import org.magenta.DataSet;
-import org.magenta.DataSetNotFoundException;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Address;
 import org.magenta.testing.domain.AddressGenerator;
 import org.magenta.testing.domain.Employee;
@@ -129,6 +123,6 @@ public class FixtureFactoryGeneratedByTest {
   }
 
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.singleton());
+    return Magenta.newFixture();
   }
 }

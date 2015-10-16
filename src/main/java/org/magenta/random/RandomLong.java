@@ -12,10 +12,10 @@ import com.google.common.collect.Range;
  */
 public class RandomLong {
 
-  private Random random;
+  private final Random random;
 
-  private Range<Long> constraint;
-  private long resolution;
+  private final Range<Long> constraint;
+  private final long resolution;
 
   private static final Range<Long> ALL = Range.all();
   private static final Range<Long> EVERY_POSITIVE_BUT_ZERO = Range.greaterThan(0L);

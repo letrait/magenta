@@ -2,6 +2,7 @@ package org.magenta.core.sequence;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Set;
 
 import org.magenta.Sequence;
 
@@ -22,6 +23,10 @@ public class SequenceIndexMap {
 
   public boolean isEmpty() {
     return map.isEmpty();
+  }
+
+  public Set<Field> fields() {
+    return map.keySet();
   }
 
 }

@@ -42,10 +42,10 @@ public class RandomString {
       + " laoreet, erat tortor dignissim tellus, non venenatis erat lorem eu quam. Etiam hendrerit magna"
       + " augue. Suspendisse iaculis scelerisque augue ut pretium. Fusce nec dignissim sapien. Maecenas" + " lacinia luctus ante tincidunt varius.";
 
-  private String alphabet;
-  private String letters;
-  private String numbers;
-  private RandomInteger integers;
+  private final String alphabet;
+  private final String letters;
+  private final String numbers;
+  private final RandomInteger integers;
 
   /**
    * Default constructor.

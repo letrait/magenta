@@ -2,37 +2,50 @@ package org.magenta.core.sequence;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
+import org.magenta.DataSetNotFoundException;
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
 public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
 
   private Map<Field, DataKey<?>> keyMap;
-
   public SequenceProvider(Map<Field, DataKey<?>> keyMap) {
     this.keyMap = keyMap;
   }
 
   @Override
-  public SequenceIndexMap apply(Fixture input) {
+  public SequenceIndexMap apply(Fixture fixture) {
 
     SequenceIndexMap map = new SequenceIndexMap();
 
     SequenceCoordinator coordinator = new SequenceCoordinator();
 
-    FieldDataKeyMapEntryComparator comparator = new FieldDataKeyMapEntryComparator(input.keys(), keyMap.keySet());
+    List<DataKey<?>> keys= Lists.newArrayList(fixture.keys());
+
+    if(!keys.containsAll(keyMap.values())){
+      throw new DataSetNotFoundException(String.format("fixture is missing some or all of the following keys %s", keyMap.values()));
+    }
+
+    //TODO : transformer les data key du map en les sortant et en changeant les cles a partir du fixture...
+
+    FieldDataKeyMapEntryComparator comparator = new FieldDataKeyMapEntryComparator(keys, keyMap.keySet());
 
     for (Map.Entry<Field, DataKey<?>> e : Ordering.from(comparator).immutableSortedCopy(keyMap.entrySet())) {
-      DataSet<?> dataset = input.dataset(e.getValue());
+
+      DataKey<?> datakey = generalize(e.getValue(), keys);
+
+      DataSet<?> dataset = fixture.dataset(datakey);
       if (!dataset.isConstant()) {
         map.put(e.getKey(), nonDeterministicSequence(dataset));
       } else {
@@ -44,6 +57,27 @@ public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
     }
 
     return map;
+  }
+
+  /**
+   * Takes the generalized version (a datakey without qualifier) of a given datakey if that generalized version is placed before this given key in the
+   * complete list of data keys.
+   *
+   *
+   * @param datakey
+   * @param keys
+   * @return
+   */
+  private DataKey<?> generalize(DataKey<?> datakey, List<DataKey<?>> keys) {
+    if (!datakey.isGeneralized() && datakey.isGeneralizable()) {
+      int i1 = keys.indexOf(datakey);
+      int i2 = keys.indexOf(datakey.generalize());
+
+      if (i2 != -1 && i2 < i1) {
+        datakey = datakey.generalize();
+      }
+    }
+    return datakey;
   }
 
   private <D> CoordinatedSequence<D> combinatorySequence(DataSet<D> dataset, SequenceCoordinator coordinator) {

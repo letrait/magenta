@@ -3,12 +3,8 @@ package org.magenta;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Test;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 
 public class FixtureFactoryAutoMagicallyGeneratePrimitiveTest {
 
@@ -47,6 +43,6 @@ public class FixtureFactoryAutoMagicallyGeneratePrimitiveTest {
 
 
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.get(new Random(1)));
+    return Magenta.newFixture();
   }
 }

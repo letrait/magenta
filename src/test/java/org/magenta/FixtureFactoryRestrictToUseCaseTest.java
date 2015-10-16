@@ -6,10 +6,6 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.magenta.Fixture;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Address;
 import org.magenta.testing.domain.AddressGenerator;
 import org.magenta.testing.domain.Employee;
@@ -22,7 +18,7 @@ public class FixtureFactoryRestrictToUseCaseTest {
 
   @Before
   public void setupFixtures(){
-    FixtureFactory fixtures = Magenta.newFixture(FluentRandom.singleton());
+    FixtureFactory fixtures = Magenta.newFixture();
     fixtures.newDataSet(Occupation.class).composedOf(Occupation.ENGINEER, Occupation.MANAGEMENT, Occupation.TECHNICIAN, Occupation.TESTER);
     fixtures.newGenerator(Address.class).generatedBy(new AddressGenerator());
     fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator2());
@@ -70,6 +66,40 @@ public class FixtureFactoryRestrictToUseCaseTest {
     assertThat(fixtures.dataset(Occupation.class).list()).containsExactly(Occupation.ENGINEER, Occupation.MANAGEMENT, Occupation.TECHNICIAN, Occupation.TESTER);
     assertThat(employees).extracting("occupation").containsExactly(Occupation.ENGINEER, Occupation.MANAGEMENT, Occupation.TECHNICIAN, Occupation.TESTER);
   }
+
+  @Test
+  public void test_single_restricting_will_alternate_on_addresses() {
+
+    // setup fixtures
+    Address[] addresses = fixtures.dataset(Address.class).array(3);
+
+    // exercise sut
+    List<Employee> employees = fixtures.restrictTo(addresses).dataset(Employee.class).list(6);
+
+    // verify outcome
+    assertThat(employees).extracting("address").containsExactly(addresses[0], addresses[1], addresses[2], addresses[0], addresses[1], addresses[2]);
+
+  }
+
+  @Test
+  public void test_single_restricting_will_alternating_on_occupation() {
+
+    // setup fixtures
+
+    // exercise sut
+    List<Employee> employees = fixtures.restrictTo(Occupation.ENGINEER, Occupation.TECHNICIAN).dataset(Employee.class).list(10);
+
+    // verify outcome
+    assertThat(employees).extracting("occupation").containsExactly(
+        Occupation.ENGINEER, Occupation.TECHNICIAN,
+        Occupation.ENGINEER, Occupation.TECHNICIAN,
+        Occupation.ENGINEER, Occupation.TECHNICIAN,
+        Occupation.ENGINEER, Occupation.TECHNICIAN,
+        Occupation.ENGINEER, Occupation.TECHNICIAN);
+
+
+  }
+
 
   @Test
   public void test_restricting_on_two_types_of_object_will_generate_all_possible_combination_alternating_on_addresses() {

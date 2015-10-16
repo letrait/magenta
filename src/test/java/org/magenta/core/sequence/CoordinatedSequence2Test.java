@@ -11,11 +11,7 @@ import org.magenta.DataSupplier;
 import org.magenta.Sequence;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.data.supplier.StaticDataSupplier;
-import org.magenta.core.sequence.CoordinatedSequence;
-import org.magenta.core.sequence.SequenceCoordinator;
-import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
@@ -162,6 +158,6 @@ public class CoordinatedSequence2Test {
 
 
   private <D> DataSetImpl<D> createDataSetFrom(DataSupplier<D> supplier) {
-    return new DataSetImpl<D>(supplier, Suppliers.ofInstance(FluentRandom.singleton()));
+    return new DataSetImpl<D>(supplier);
   }
 }

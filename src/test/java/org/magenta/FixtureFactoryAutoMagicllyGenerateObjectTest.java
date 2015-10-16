@@ -3,18 +3,15 @@ package org.magenta;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
-import java.util.Random;
 
 import org.junit.Test;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
+import org.magenta.testing.domain.Employee;
 import org.magenta.testing.domain.PhoneNumber;
 
 public class FixtureFactoryAutoMagicllyGenerateObjectTest {
 
   @Test
-  public void auto_magically_generate_phone_numbers(){
+  public void auto_magically_generate_simple_object(){
     //setup fixture
     FixtureFactory sut = createRootFixtureFactory();
 
@@ -30,7 +27,24 @@ public class FixtureFactoryAutoMagicllyGenerateObjectTest {
 
   }
 
+  @Test
+  public void auto_magically_generate_object_graph(){
+    //setup fixture
+    FixtureFactory sut = createRootFixtureFactory();
+
+    //exercise sut
+    sut.newDataSet(Employee.class).autoMagicallyGenerated(5);
+
+    //verify outcome
+    List<Employee> actual = sut.dataset(Employee.class).list();
+
+    System.out.println(actual);
+
+    assertThat(actual).extracting("employeeId").hasSize(5).doesNotContainNull();
+
+  }
+
   private FixtureFactory createRootFixtureFactory() {
-    return Magenta.newFixture(FluentRandom.get(new Random(1)));
+    return Magenta.newFixture();
   }
 }

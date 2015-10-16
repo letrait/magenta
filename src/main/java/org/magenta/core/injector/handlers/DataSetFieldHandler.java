@@ -15,7 +15,6 @@ import org.magenta.core.data.supplier.ForwardingDataSupplier;
 import org.magenta.core.injector.FieldInjectionHandler;
 import org.magenta.core.injector.FieldInjectorUtils;
 import org.magenta.core.injector.FieldsExtractor;
-import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
 
@@ -87,7 +86,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
   }
 
   private <D> DataSet<D> newDataSetProxy(final DataKey<D> key, final Supplier<? extends Fixture> fixture) {
-    return new DataSetImpl<D>(newDataSupplierProxy(key, fixture), supplierOfFluentRandomOfTheCurrentFixture(fixture));
+    return new DataSetImpl<D>(newDataSupplierProxy(key, fixture));
   }
 
   private <D> DataSupplier<D> newDataSupplierProxy(DataKey<D> key, Supplier<? extends Fixture> fixture) {
@@ -96,16 +95,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
 
   }
 
-  private Supplier<FluentRandom> supplierOfFluentRandomOfTheCurrentFixture(final Supplier<? extends Fixture> fixture) {
-    return new Supplier<FluentRandom>(){
 
-      @Override
-      public FluentRandom get() {
-        return fixture.get().getFluentRandom();
-      }
-
-    };
-  }
 
 
 

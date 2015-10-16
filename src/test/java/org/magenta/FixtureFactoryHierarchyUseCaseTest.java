@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.magenta.FixtureFactory;
-import org.magenta.Magenta;
-import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Address;
 import org.magenta.testing.domain.AddressGenerator;
 import org.magenta.testing.domain.Employee;
@@ -19,7 +16,7 @@ public class FixtureFactoryHierarchyUseCaseTest {
 
   @Before
   public void setupFixtures(){
-    FixtureFactory fixtures = Magenta.newFixture(FluentRandom.singleton());
+    FixtureFactory fixtures = Magenta.newFixture();
     fixtures.newDataSet(Occupation.class).composedOf(Occupation.ENGINEER, Occupation.MANAGEMENT, Occupation.TECHNICIAN, Occupation.TESTER);
     fixtures.newGenerator(Address.class).generatedBy(new AddressGenerator());
     fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator2());
