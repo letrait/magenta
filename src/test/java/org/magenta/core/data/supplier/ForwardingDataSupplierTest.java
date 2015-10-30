@@ -21,7 +21,6 @@ public class ForwardingDataSupplierTest {
 
     //exercise sut
     sut.get(expectedIndex);
-    sut.getMaximumSize();
     sut.getSize();
     sut.getType();
     sut.isConstant();
@@ -32,7 +31,6 @@ public class ForwardingDataSupplierTest {
 
     //verify outcome
     verify(delegate).get(expectedIndex);
-    verify(delegate).getMaximumSize();
     verify(delegate).getSize();
     verify(delegate).getType();
     verify(delegate).isConstant();

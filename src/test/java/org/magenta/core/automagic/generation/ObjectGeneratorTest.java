@@ -11,8 +11,8 @@ import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
-import org.magenta.core.sequence.SequenceIndexMap;
-import org.magenta.core.sequence.SequenceProvider;
+import org.magenta.core.sequence.ObjectSequenceMap;
+import org.magenta.core.sequence.ObjectSequenceMapBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.base.Suppliers;
@@ -30,7 +30,7 @@ public class ObjectGeneratorTest {
     TypeToken<DummyObject> type = TypeToken.of(DummyObject.class);
     FixtureFactory fixture = Magenta.newFixture();
 
-    Function<Fixture, SequenceIndexMap> sequenceProvider = createSequenceProviderFrom(type);
+    Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
     ObjectGenerator<DummyObject> sut = new ObjectGenerator<>( type ,Suppliers.ofInstance(fixture), sequenceProvider);
 
@@ -54,7 +54,7 @@ public class ObjectGeneratorTest {
     fixture.newDataSet(DataKey.of("org.magenta.core.automagic.generation.ObjectGeneratorTest$DummyObjectWithEnum.color", DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.RED);
 
 
-    Function<Fixture, SequenceIndexMap> sequenceProvider = createSequenceProviderFrom(type);
+    Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
     ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, Suppliers.ofInstance(fixture), sequenceProvider);
 
@@ -70,10 +70,10 @@ public class ObjectGeneratorTest {
 
   }
 
-  private Function<Fixture, SequenceIndexMap> createSequenceProviderFrom(TypeToken<?> type) {
+  private Function<Fixture, ObjectSequenceMap> createSequenceProviderFrom(TypeToken<?> type) {
 
     return CacheBuilder.newBuilder().build(CacheLoader.from(
-        new SequenceProvider(
+        new ObjectSequenceMapBuilder(
             new DataKeyMapBuilder(
                 new DataKeyDeterminedFromFieldTypeMappingFunction()).buildMapFrom(HiearchicalFieldsExtractor.SINGLETON.extractAll(type.getRawType())))));
   }

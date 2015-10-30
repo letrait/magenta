@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.testing.domain.PhoneNumber;
-import org.magenta.testing.domain.PhoneNumberGenerator;
+import org.magenta.testing.domain.company.PhoneNumber;
+import org.magenta.testing.domain.company.PhoneNumberGenerator;
 
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;

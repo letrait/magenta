@@ -1,5 +1,6 @@
 package org.magenta.core.sequence;
 
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -49,5 +50,13 @@ public class SequenceCoordinator {
 
 
      return toReturn;
+  }
+
+  public Integer numberOfCombination() {
+    int r = 1;
+    for (CoordinatedSequence<?> s : indexMap.keySet()) {
+      r = r * s.size();
+    }
+    return r;
   }
 }

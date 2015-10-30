@@ -11,6 +11,8 @@ import org.junit.Test;
 import org.magenta.Sequence;
 import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
@@ -19,18 +21,19 @@ public class LazyGeneratedDataSupplierTest {
   @Test
   public void testConstruction() {
 
-    final int SIZE = 10;
-    Sequence<Integer> generator = mock(Sequence.class);
+    final int SIZE = 3;
+    Supplier<String> generator = mock(Supplier.class);
+    Supplier<Integer> sizeOf = Suppliers.ofInstance(SIZE);
 
-    when(generator.get()).thenReturn(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    when(generator.get()).thenReturn("a","b","c");
 
-    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<Integer>(generator, TypeToken.of(Integer.class), SIZE, Integer.MAX_VALUE);
+    LazyGeneratedDataSupplier<String> sut = new LazyGeneratedDataSupplier<>(TypeToken.of(String.class), generator, sizeOf);
 
     assertThat(sut.getSize()).isEqualTo(SIZE);
-    assertThat(sut.getType()).isEqualTo(TypeToken.of(Integer.class));
+    assertThat(sut.getType()).isEqualTo(TypeToken.of(String.class));
     assertThat(sut.isConstant()).isEqualTo(true);
     assertThat(sut.isGenerated()).isEqualTo(true);
-    assertThat(sut.iterator()).containsExactly(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+    assertThat(sut.iterator()).containsExactly("a","b","c");
 
   }
 
@@ -38,14 +41,15 @@ public class LazyGeneratedDataSupplierTest {
   public void testGetAtIndex() {
 
     // setup fixtures
-    Integer[] NUMBER_ARRAY = new Integer[] { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+    String[] NUMBER_ARRAY = new String[] { "10","9","8" };
 
     final int SIZE = NUMBER_ARRAY.length;
-    Sequence<Integer> generator = mock(Sequence.class);
+    Supplier<String> generator = mock(Supplier.class);
 
-    when(generator.get()).thenReturn(10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+    when(generator.get()).thenReturn("10", "9", "8");
+    Supplier<Integer> sizeOf = Suppliers.ofInstance(SIZE);
 
-    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<Integer>(generator, TypeToken.of(Integer.class), SIZE, Integer.MAX_VALUE);
+    LazyGeneratedDataSupplier<String> sut = new LazyGeneratedDataSupplier<>(TypeToken.of(String.class), generator, sizeOf);
 
     // exercise sut
     for (int i = 0; i < NUMBER_ARRAY.length; i++) {
@@ -61,11 +65,12 @@ public class LazyGeneratedDataSupplierTest {
     Integer[] NUMBER_ARRAY = new Integer[] { 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
 
     final int SIZE = NUMBER_ARRAY.length;
-    Sequence<Integer> generator = mock(Sequence.class);
+    Supplier<Integer> generator = mock(Supplier.class);
 
     when(generator.get()).thenReturn(10, 9, 8, 7, 6, 5, 4, 3, 2, 1);
+    Supplier<Integer> sizeOf = Suppliers.ofInstance(SIZE);
 
-    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<Integer>(generator, TypeToken.of(Integer.class), SIZE, Integer.MAX_VALUE);
+    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<>(TypeToken.of(Integer.class), generator, sizeOf);
 
     assertThat(sut.iterator()).containsExactly(NUMBER_ARRAY);
 
@@ -89,11 +94,12 @@ public class LazyGeneratedDataSupplierTest {
     Integer[] NUMBER_ARRAY = new Integer[] { null, 1234 };
 
     final int SIZE = NUMBER_ARRAY.length;
-    Sequence<Integer> generator = mock(Sequence.class);
+    Supplier<Integer> generator = mock(Supplier.class);
 
     when(generator.get()).thenReturn(null,1234);
+    Supplier<Integer> sizeOf = Suppliers.ofInstance(SIZE);
 
-    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<Integer>(generator, TypeToken.of(Integer.class), SIZE, Integer.MAX_VALUE);
+    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<>(TypeToken.of(Integer.class), generator, sizeOf);
 
     // exercise sut and verify outcome
     assertThat(sut.iterator()).containsExactly(NUMBER_ARRAY);
@@ -107,19 +113,20 @@ public class LazyGeneratedDataSupplierTest {
   public void testGetAtIndex_when_index_is_greater_than_the_specified_size_should_be_possible(){
 
     // setup fixtures
-    Integer[] NUMBER_ARRAY = new Integer[] { 10,11,12 };
+    String[] LETTER_ARRAY = new String[] { "a","b","c" };
 
     final int SIZE = 1;
-    Sequence<Integer> generator = mock(Sequence.class);
+    Supplier<String> generator = mock(Supplier.class);
 
-    when(generator.get()).thenReturn(10,11,12);
+    when(generator.get()).thenReturn("a","b","c");
+    Supplier<Integer> sizeOf = Suppliers.ofInstance(SIZE);
 
-    LazyGeneratedDataSupplier<Integer> sut = new LazyGeneratedDataSupplier<Integer>(generator, TypeToken.of(Integer.class), SIZE, Integer.MAX_VALUE);
+    LazyGeneratedDataSupplier<String> sut = new LazyGeneratedDataSupplier<String>(TypeToken.of(String.class), generator, sizeOf);
 
     // exercise sut and verify outcome
-    assertThat(sut.iterator()).containsExactly(10);
-    assertThat(sut.get(1)).isEqualTo(11);
-    assertThat(sut.get(2)).isEqualTo(12);
+    assertThat(sut.iterator()).containsExactly("a");
+    assertThat(sut.get(1)).isEqualTo("b");
+    assertThat(sut.get(2)).isEqualTo("c");
 
   }
 

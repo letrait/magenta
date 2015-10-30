@@ -18,7 +18,7 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-public class SequenceProviderTest {
+public class ObjectSequenceMapBuilderTest {
 
   private FixtureFactory createRootFixtureFactory() {
     return Magenta.newFixture();
@@ -30,13 +30,59 @@ public class SequenceProviderTest {
     // setup fixture
     FixtureFactory fixture = createRootFixtureFactory();
 
-    SequenceProvider sut = new SequenceProvider(Maps.<Field, DataKey<?>> newLinkedHashMap());
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Maps.<Field, DataKey<?>> newLinkedHashMap());
 
     // exercise sut
-    SequenceIndexMap actual = sut.apply(fixture);
+    ObjectSequenceMap actual = sut.apply(fixture);
 
     // verify outcome
     assertThat(actual.isEmpty()).isTrue();
+
+  }
+  
+  @Test
+  public void test_when_no_field_exists_then_the_combination_count_is_one() {
+
+    // setup fixture
+    FixtureFactory fixture = createRootFixtureFactory();
+
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Maps.<Field, DataKey<?>> newLinkedHashMap());
+
+    // exercise sut
+    ObjectSequenceMap actual = sut.apply(fixture);
+
+    // verify outcome
+    assertThat(actual.getCombinationCount()).isEqualTo(1);
+
+  }
+  
+  @Test
+  public void test_when_only_one_sequence_exists_then_the_combination_count_is_the_size_of_this_sequence() throws NoSuchFieldException, SecurityException {
+
+    // setup fixture
+    FixtureFactory fixture = createRootFixtureFactory();
+    
+    int dataSetSize = 3;
+
+    //setup a string generator
+    Supplier<String> stringGenerator = mock(Supplier.class);
+
+    fixture.newDataSet(String.class).generatedBy(stringGenerator, dataSetSize);
+
+    //map the field
+    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
+
+    Field stringField = DummyClass.class.getDeclaredField("string");
+    keyMap.put(stringField, DataKey.of(String.class));
+
+    //build sut
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
+
+    // exercise sut
+    ObjectSequenceMap actual = sut.apply(fixture);
+    
+    //verify outcome
+    assertThat(actual.getCombinationCount()).isEqualTo(dataSetSize);
 
   }
 
@@ -61,7 +107,7 @@ public class SequenceProviderTest {
     keyMap.put(stringField, DataKey.of(String.class));
 
     //build sut
-    SequenceProvider sut = new SequenceProvider(keyMap);
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
 
     // exercise sut
     Sequence<?> actual = sut.apply(fixture).get(stringField);
@@ -93,7 +139,7 @@ public class SequenceProviderTest {
     keyMap.put(stringField, DataKey.of(String.class));
 
     //build sut
-    SequenceProvider sut = new SequenceProvider(keyMap);
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
 
     // exercise sut
     Sequence<?> actual = sut.apply(fixture).get(stringField);

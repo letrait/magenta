@@ -76,11 +76,6 @@ public class DataSetImpl<D> implements DataSet<D> {
   }
 
   @Override
-  public int getMaximumSize() {
-    return this.supplier.getMaximumSize();
-  }
-
-  @Override
   public boolean isEmpty() {
     return supplier.isEmpty();
   }

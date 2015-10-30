@@ -4,15 +4,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import org.junit.Test;
-import org.magenta.testing.domain.Address;
-import org.magenta.testing.domain.AddressGenerator;
-import org.magenta.testing.domain.Employee;
-import org.magenta.testing.domain.EmployeeGenerator;
-import org.magenta.testing.domain.EmployeeGenerator2;
-import org.magenta.testing.domain.EmployeeGenerator3;
-import org.magenta.testing.domain.Occupation;
-import org.magenta.testing.domain.PhoneNumber;
-import org.magenta.testing.domain.PhoneNumberGenerator;
+import org.magenta.testing.domain.company.Address;
+import org.magenta.testing.domain.company.AddressGenerator;
+import org.magenta.testing.domain.company.Contract;
+import org.magenta.testing.domain.company.ContractGenerator;
+import org.magenta.testing.domain.company.Employee;
+import org.magenta.testing.domain.company.EmployeeGenerator;
+import org.magenta.testing.domain.company.EmployeeGenerator2;
+import org.magenta.testing.domain.company.EmployeeGenerator3;
+import org.magenta.testing.domain.company.Occupation;
+import org.magenta.testing.domain.company.PhoneNumber;
+import org.magenta.testing.domain.company.PhoneNumberGenerator;
 
 import com.google.common.reflect.TypeToken;
 
@@ -32,7 +34,7 @@ public class FixtureFactoryGeneratedByTest {
       actual.any();
       fail("expecting"+DataGenerationException.class.getName());
     } catch (DataGenerationException dge) {
-      assertThat(dge).hasMessageContaining("Employee").hasMessageContaining("EmployeeGenerator").hasRootCauseInstanceOf(DataSetNotFoundException.class);
+      assertThat(dge).hasMessageContaining("Employee").hasRootCauseInstanceOf(DataSetNotFoundException.class);
     }
 
   }
@@ -120,6 +122,27 @@ public class FixtureFactoryGeneratedByTest {
 
     //verify outcome
     assertThat(actual.list(30)).hasSize(30);
+  }
+  
+  @Test
+  public void testAGeneratorOfIterable(){
+
+    //setup fixtures
+    FixtureFactory fixtures = createRootFixtureFactory();
+    
+    fixtures.newDataSet(Occupation.class).composedOf(Occupation.values());
+    fixtures.newDataSet(Address.class).generatedBy(new AddressGenerator());
+    fixtures.newGenerator(PhoneNumber.class).generatedBy(new PhoneNumberGenerator());
+    fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator3());
+    fixtures.newDataSet(Contract.class).generatedAsIterableBy(new ContractGenerator());
+
+    //exercise sut
+    
+    DataSet<Contract> actual =fixtures.dataset(Contract.class);
+    DataSet<Employee> employees =fixtures.dataset(Employee.class);
+
+    //verify outcome
+    assertThat(actual.list()).extracting("employee").containsOnly(employees.array());
   }
 
   private FixtureFactory createRootFixtureFactory() {

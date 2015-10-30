@@ -12,34 +12,31 @@ import org.magenta.DataSupplier;
 import org.magenta.Sequence;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Supplier;
 import com.google.common.reflect.TypeToken;
 
 public class LazyGeneratedDataSupplier<D> implements DataSupplier<D> {
 
-  public static final int NO_SPECIFIED_DEFAULT_SIZE = -1;
 
-  private final Sequence<D> generator;
+  private final Supplier<D> generator;
+  private final Supplier<Integer> sizeOf;
 
   private final TypeToken<D> type;
-
-  private final int defaultSize;
-  private final int maximumAllowedSize;
 
   private List<Object> generatedData;
   private List<Boolean> generatedFlags;
 
-  public LazyGeneratedDataSupplier(Sequence<D> generator, TypeToken<D> type, int defaultSize, int maximumAllowedSize) {
+  public LazyGeneratedDataSupplier(TypeToken<D> type, Supplier<D> generator, Supplier<Integer> sizeOf) {
     super();
     this.generator = checkNotNull(generator);
+    this.sizeOf = checkNotNull(sizeOf);
     this.type = checkNotNull(type);
-    Preconditions.checkArgument(defaultSize >= NO_SPECIFIED_DEFAULT_SIZE, "the size must not be negative");
-    Preconditions.checkArgument(maximumAllowedSize >= defaultSize, "the maximum allowed size must  greater or equals to the specified default size.");
-    this.defaultSize = defaultSize;
-    this.maximumAllowedSize = maximumAllowedSize;
 
     this.generatedData = new ArrayList<Object>();
     this.generatedFlags = new ArrayList<Boolean>();
   }
+  
+
 
   @Override
   public Iterator<D> iterator() {
@@ -116,17 +113,19 @@ public class LazyGeneratedDataSupplier<D> implements DataSupplier<D> {
 
   @Override
   public boolean isEmpty() {
-    return this.defaultSize == NO_SPECIFIED_DEFAULT_SIZE? this.generator.size() == 0 : this.defaultSize == 0;
+    return this.sizeOf.get() == 0 ;
   }
 
   @Override
   public int getSize() {
-    return this.defaultSize == NO_SPECIFIED_DEFAULT_SIZE? this.generator.size() : this.defaultSize;
+    try{
+    return this.sizeOf.get() ;
+    }catch(RuntimeException e){
+      throw new DataGenerationException(String.format("Error while computing the size of the generator of %s", type),e);
+    }
   }
-
-  @Override
-  public int getMaximumSize() {
-    return this.maximumAllowedSize;
-  }
+  
+  
+  
 
 }

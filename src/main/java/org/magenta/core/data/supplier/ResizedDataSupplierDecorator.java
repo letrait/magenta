@@ -12,8 +12,6 @@ public class ResizedDataSupplierDecorator<D> extends ForwardingDataSupplier<D> i
 
   public ResizedDataSupplierDecorator(DataSupplier<D> delegate, int size) {
     super(delegate);
-    Preconditions.checkArgument(size <= delegate.getMaximumSize(),
-        "Illegal attempt to resize a DataSupplier [%s] greater than its maximum allowed size : %s > %s", delegate, size, delegate.getMaximumSize());
     this.size = size;
   }
 

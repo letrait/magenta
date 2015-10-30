@@ -1,7 +1,14 @@
 package org.magenta.core;
 
+import java.util.Map;
+
+
 public interface Injector {
 
-  public <O> O inject(O o);
+  public enum Key {
+    NUMBER_OF_COMBINATION_FUNCTION;
+  }
+  
+  public Map<Key,Object> inject(Object o);
 
 }

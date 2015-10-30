@@ -10,9 +10,9 @@ import org.magenta.DataSet;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.data.supplier.StaticDataSupplier;
-import org.magenta.testing.domain.Employee;
-import org.magenta.testing.domain.EmployeeGenerator;
-import org.magenta.testing.domain.Occupation;
+import org.magenta.testing.domain.company.Employee;
+import org.magenta.testing.domain.company.EmployeeGenerator;
+import org.magenta.testing.domain.company.Occupation;
 
 import com.google.common.reflect.TypeToken;
 

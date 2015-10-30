@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.testing.domain.Employee;
-import org.magenta.testing.domain.PhoneNumber;
+import org.magenta.testing.domain.company.Employee;
+import org.magenta.testing.domain.company.PhoneNumber;
 
 public class FixtureFactoryAutoMagicllyGenerateObjectTest {
 

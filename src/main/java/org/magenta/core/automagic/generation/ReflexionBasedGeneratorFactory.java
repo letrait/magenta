@@ -8,8 +8,8 @@ import org.magenta.Fixture;
 import org.magenta.FixtureFactory;
 import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.injector.FieldsExtractor;
-import org.magenta.core.sequence.SequenceIndexMap;
-import org.magenta.core.sequence.SequenceProvider;
+import org.magenta.core.sequence.ObjectSequenceMap;
+import org.magenta.core.sequence.ObjectSequenceMapBuilder;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
@@ -98,7 +98,7 @@ public class ReflexionBasedGeneratorFactory implements GeneratorFactory {
      }
     }
 
-    Function<Fixture, SequenceIndexMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new SequenceProvider(keyMap)));
+    Function<Fixture, ObjectSequenceMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new ObjectSequenceMapBuilder(keyMap)));
 
     return new ObjectGenerator<D>(type, fixtureSupplier, sequenceProvider);
   }

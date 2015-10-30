@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 
 import org.magenta.DataGenerationException;
 import org.magenta.Fixture;
-import org.magenta.core.sequence.SequenceIndexMap;
+import org.magenta.core.sequence.ObjectSequenceMap;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -15,11 +15,11 @@ import com.google.common.reflect.TypeToken;
 public class ObjectGenerator<D> implements Supplier<D>{
 
   private final TypeToken<D> type;
-  private final Function<Fixture, SequenceIndexMap> sequenceProvider;
+  private final Function<Fixture, ObjectSequenceMap> sequenceProvider;
   private final Supplier<? extends Fixture> fixtureSupplier;
 
 
-  public ObjectGenerator(TypeToken<D> type, Supplier<? extends Fixture> fixtureSupplier, Function<Fixture, SequenceIndexMap> sequenceProvider) {
+  public ObjectGenerator(TypeToken<D> type, Supplier<? extends Fixture> fixtureSupplier, Function<Fixture, ObjectSequenceMap> sequenceProvider) {
     this.type = type;
     this.fixtureSupplier = fixtureSupplier;
     this.sequenceProvider = sequenceProvider;
@@ -33,7 +33,7 @@ public class ObjectGenerator<D> implements Supplier<D>{
 
     Fixture current = fixtureSupplier.get();
 
-    SequenceIndexMap sequences = sequenceProvider.apply(current);
+    ObjectSequenceMap sequences = sequenceProvider.apply(current);
 
     for(Field f:sequences.fields()){
       f.setAccessible(true);

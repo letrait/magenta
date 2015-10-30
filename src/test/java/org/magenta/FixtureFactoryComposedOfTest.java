@@ -30,7 +30,6 @@ public class FixtureFactoryComposedOfTest {
     assertThat(actual.isEmpty()).isFalse();
     assertThat(actual.isGenerated()).isFalse();
     assertThat(actual.getSize()).isEqualTo(expectedNumbers.length);
-    assertThat(actual.getMaximumSize()).isEqualTo(expectedNumbers.length);
     assertThat(actual.getType()).isEqualTo(key.getType());
     assertThat(actual.any()).isIn(expectedNumbers);
 
@@ -57,7 +56,6 @@ public class FixtureFactoryComposedOfTest {
     assertThat(actual.isEmpty()).isFalse();
     assertThat(actual.isGenerated()).isFalse();
     assertThat(actual.getSize()).isEqualTo(expectedSets.length);
-    assertThat(actual.getMaximumSize()).isEqualTo(expectedSets.length);
     assertThat(actual.getType()).isEqualTo(key.getType());
     assertThat(actual.any()).isIn(expectedSets);
 

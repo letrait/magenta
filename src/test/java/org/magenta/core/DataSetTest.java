@@ -32,7 +32,6 @@ public class DataSetTest {
 
     //verify outcome
     assertThat(sut.getSize()).isEqualTo(expected.length);
-    assertThat(sut.getMaximumSize()).isEqualTo(expected.length);
     assertThat(sut.getType()).isEqualTo(TypeToken.of(Integer.class));
     assertThat(sut.isConstant()).isTrue();
     assertThat(sut.isGenerated()).isFalse();
@@ -92,7 +91,6 @@ public class DataSetTest {
 
     //verify outcome
     assertThat(sut.getSize()).isEqualTo(expected.length);
-    assertThat(sut.getMaximumSize()).isEqualTo(origin.length);
     assertThat(actual).containsExactly(expected);
   }
 

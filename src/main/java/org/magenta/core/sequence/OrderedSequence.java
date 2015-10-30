@@ -1,5 +1,7 @@
 package org.magenta.core.sequence;
 
+import java.util.Iterator;
+
 import org.magenta.DataSet;
 import org.magenta.Sequence;
 
@@ -32,5 +34,6 @@ public class OrderedSequence<D> implements Sequence<D> {
   public int size(){
     return dataset.getSize();
   }
+  
 
 }

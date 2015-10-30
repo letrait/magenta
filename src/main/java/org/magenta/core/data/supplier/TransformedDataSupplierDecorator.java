@@ -38,12 +38,6 @@ public class TransformedDataSupplierDecorator<S,X> implements DataSupplier<X> {
   }
 
   @Override
-  public int getMaximumSize() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  @Override
   public boolean isEmpty() {
     // TODO Auto-generated method stub
     return false;

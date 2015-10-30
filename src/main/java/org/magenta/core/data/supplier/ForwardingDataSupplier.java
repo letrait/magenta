@@ -61,10 +61,5 @@ public class ForwardingDataSupplier<D> implements DataSupplier<D> {
     return getReference().getSize();
   }
 
-  @Override
-  public int getMaximumSize() {
-   return getReference().getMaximumSize();
-  }
-
 
 }

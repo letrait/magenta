@@ -1,6 +1,6 @@
 package org.magenta;
 
-public interface Sequence<D> {
+public interface Sequence<D>{
 
   D get();
 

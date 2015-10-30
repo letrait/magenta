@@ -29,6 +29,7 @@ public class SequenceCoordinatorTest {
 
     //verify outcome
     assertThat(actual).containsExactly(0,1,2,0,1,2,0);
+    assertThat(sut.numberOfCombination()).isEqualTo(3);
 
   }
 
@@ -46,6 +47,9 @@ public class SequenceCoordinatorTest {
     sut.coordinate(sequence2);
 
     //verify outcome
+    
+    assertThat(sut.numberOfCombination()).isEqualTo(2 * 2);
+    
     assertThat(sut.getIndexFor(sequence1)).isEqualTo(0);
     assertThat(sut.getIndexFor(sequence1)).isEqualTo(0);
     assertThat(sut.getIndexFor(sequence1)).isEqualTo(0);
@@ -84,6 +88,7 @@ public class SequenceCoordinatorTest {
     List<Integer> actual = readIndexFor(sut,6,sequence1,sequence2,sequence3);
 
     //verify outcome
+    assertThat(sut.numberOfCombination()).isEqualTo(2 * 3 * 1);
     assertThat(actual).containsExactly(0,0,0,1,0,0,0,1,0,1,1,0,0,2,0,1,2,0);
 
   }

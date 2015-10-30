@@ -16,23 +16,6 @@ import com.google.common.reflect.TypeToken;
 
 public class ResizedDataSupplierDecoratorTest {
 
-  @Test
-  public void test_a_resize_value_greater_than_the_actual_size_of_a_constant_data_supplier_should_thrown_an_illegal_argument() {
-    // setup fixtures
-    int size = 10;
-    DataSupplier<Integer> delegate = mock(DataSupplier.class);
-    when(delegate.isConstant()).thenReturn(true);
-    when(delegate.getMaximumSize()).thenReturn(size);
-
-    // exercis sut
-    try {
-      ResizedDataSupplierDecorator<Integer> sut = new ResizedDataSupplierDecorator<Integer>(delegate, size + 1);
-      fail("It should not be possible to resize a constant dataset to a value greater than its inital size");
-    } catch (IllegalArgumentException iae) {
-
-    }
-
-  }
 
   @Test
   public void test_resize_should_affect_iteration() {

@@ -1,4 +1,4 @@
-package org.magenta.testing.domain;
+package org.magenta.testing.domain.company;
 
 public enum Occupation {
   TECHNICIAN,ENGINEER,MANAGEMENT, TESTER;

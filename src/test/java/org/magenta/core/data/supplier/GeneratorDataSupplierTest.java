@@ -9,6 +9,8 @@ import org.magenta.DataSupplier;
 import org.magenta.Sequence;
 import org.magenta.random.FluentRandom;
 
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
@@ -19,14 +21,12 @@ public class GeneratorDataSupplierTest {
 
     // setup fixtures
     final int expectedSize = 10;
-    final int maxSize = 1000;
     final TypeToken<String> expectedType = TypeToken.of(String.class);
 
-    DataSupplier<String> sut = new GeneratorDataSupplier<String>(generatorOfStrings(expectedSize), expectedType, GeneratorDataSupplier.NO_SPECIFIED_DEFAULT_SIZE, maxSize);
+    DataSupplier<String> sut = new GeneratorDataSupplier<String>(expectedType, generatorOfStrings(), Suppliers.ofInstance(expectedSize));
 
     // verify outcome
     assertThat(sut.getSize()).as("size").isEqualTo(expectedSize);
-    assertThat(sut.getMaximumSize()).as("maximumSize").isEqualTo(maxSize);
     assertThat(sut.getType()).as("type").isEqualTo(expectedType);
 
     assertThat(sut.isConstant()).as("constant").isFalse();
@@ -40,10 +40,9 @@ public class GeneratorDataSupplierTest {
 
     // setup fixtures
     final int expectedSize = 10;
-    final int maxSize = 1000;
     final TypeToken<String> expectedType = TypeToken.of(String.class);
 
-    DataSupplier<String> sut = new GeneratorDataSupplier<String>(generatorOfStrings(expectedSize), expectedType, GeneratorDataSupplier.NO_SPECIFIED_DEFAULT_SIZE, maxSize);
+    DataSupplier<String> sut = new GeneratorDataSupplier<String>(expectedType, generatorOfStrings(), Suppliers.ofInstance(expectedSize));
 
     // verify outcome
     assertThat(sut.get(0)).overridingErrorMessage("Same data was generated : {0}, was expecting different value  even from the same index",
@@ -56,10 +55,9 @@ public class GeneratorDataSupplierTest {
 
     // setup fixtures
     final int expectedSize = 25;
-    final int maxSize = 1000;
     final TypeToken<String> expectedType = TypeToken.of(String.class);
 
-    DataSupplier<String> sut = new GeneratorDataSupplier<String>(generatorOfStrings(expectedSize), expectedType, GeneratorDataSupplier.NO_SPECIFIED_DEFAULT_SIZE, maxSize);
+    DataSupplier<String> sut = new GeneratorDataSupplier<String>(expectedType, generatorOfStrings(), Suppliers.ofInstance(expectedSize));
 
     // exercise sut
     Set<String> actual = Sets.newHashSet();
@@ -73,18 +71,13 @@ public class GeneratorDataSupplierTest {
 
   }
 
-  private Sequence<String> generatorOfStrings(final int size) {
+  private Supplier<String> generatorOfStrings() {
 
-    return new Sequence<String>() {
+    return new Supplier<String>() {
 
       @Override
       public String get() {
         return FluentRandom.strings().charabia(25);
-      }
-
-      @Override
-      public int size() {
-        return size;
       }
 
     };

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.magenta.Fixture;
@@ -32,10 +33,11 @@ public class InjectorTest {
     DummyObject sut = new DummyObject();
 
     //exercise sut
-    injector.inject(sut);
+    Map<Injector.Key,Object> map = injector.inject(sut);
 
     //verify outcome
     assertThat(sut.getSequence()).isNotNull();
+    assertThat(map).containsKey(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION);
   }
 
   private Injector createInjector(Supplier<Fixture> fixtureReference) {
@@ -47,7 +49,7 @@ public class InjectorTest {
     return new FieldInjectionChainProcessor(handlers, fixtureReference);
   }
 
-  private FieldInjectionHandler sequenceFieldHandler() {
+  private SequenceFieldHandler sequenceFieldHandler() {
      return new SequenceFieldHandler(HiearchicalFieldsExtractor.SINGLETON);
   }
 

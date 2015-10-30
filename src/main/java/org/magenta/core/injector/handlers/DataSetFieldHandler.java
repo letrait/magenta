@@ -3,6 +3,8 @@ package org.magenta.core.injector.handlers;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Map;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
@@ -11,6 +13,7 @@ import org.magenta.Fixture;
 import org.magenta.annotation.InjectDataSet;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.DataSetSupplier;
+import org.magenta.core.Injector;
 import org.magenta.core.data.supplier.ForwardingDataSupplier;
 import org.magenta.core.injector.FieldInjectionHandler;
 import org.magenta.core.injector.FieldInjectorUtils;
@@ -31,7 +34,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
   }
 
   @Override
-  public void injectInto(Object target, Supplier<? extends Fixture> fixture) {
+  public Map<Injector.Key,Object> injectInto(Object target, Supplier<? extends Fixture> fixture) {
     for(FieldAnnotation<InjectDataSet> f:matchingFields(target)){
       if (DataSet.class.equals(f.getField().getType())) {
         injectProxyDataSet(f.getField(), target, fixture, f.getAnnotation());
@@ -40,13 +43,18 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
         throw invalidFieldType(f.getField());
       }
     }
+    return Collections.emptyMap();
   }
 
+  private void injectProxyDataSet(Field f, Object target, final Supplier<? extends Fixture> fixture, InjectDataSet annotation) {
+    final DataKey<?> key = determinDataKeyFromGenericType(f,annotation);
 
-  private IllegalStateException invalidFieldType(Field f) {
-    return new IllegalStateException("Annotation "+InjectDataSet.class.getName()+" is present on field named "+f.getName()+", but this field type is not a "+DataSet.class.getName());
+    DataSet<?> dataset = newDataSetProxy(key, fixture);
+
+    FieldInjectorUtils.injectInto(target, f, dataset);
+
   }
-
+  
   private <T> DataKey<T> determinDataKeyFromGenericType(Field f, InjectDataSet annotation) {
 
     String qualifier = annotation.value();
@@ -76,15 +84,6 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
 
   }
 
-  private void injectProxyDataSet(Field f, Object target, final Supplier<? extends Fixture> fixture, InjectDataSet annotation) {
-    final DataKey<?> key = determinDataKeyFromGenericType(f,annotation);
-
-    DataSet<?> dataset = newDataSetProxy(key, fixture);
-
-    FieldInjectorUtils.injectInto(target, f, dataset);
-
-  }
-
   private <D> DataSet<D> newDataSetProxy(final DataKey<D> key, final Supplier<? extends Fixture> fixture) {
     return new DataSetImpl<D>(newDataSupplierProxy(key, fixture));
   }
@@ -94,16 +93,9 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
     return new ForwardingDataSupplier<D>(DataSetSupplier.forKey(key, fixture));
 
   }
-
-
-
-
-
-
-
-
-
-
-
+  
+  private IllegalStateException invalidFieldType(Field f) {
+    return new IllegalStateException("Annotation "+InjectDataSet.class.getName()+" is present on field named "+f.getName()+", but this field type is not a "+DataSet.class.getName());
+  }
 
 }

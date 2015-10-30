@@ -7,17 +7,18 @@ import java.util.Set;
 import org.magenta.core.DataSetFunctionRegistry;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.FixtureContext;
-import org.magenta.core.Injector;
+import org.magenta.core.GenerationStrategy;
+import org.magenta.core.GenerationStrategyFactory;
 import org.magenta.core.RestrictionHelper;
 import org.magenta.core.automagic.generation.GeneratorFactory;
 import org.magenta.core.data.supplier.GeneratorDataSupplier;
+import org.magenta.core.data.supplier.LazyGeneratedCollectionDataSupplier;
 import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
-import org.magenta.core.data.supplier.SequenceWithFixtureContextManagementDecorator;
 import org.magenta.core.data.supplier.StaticDataSupplier;
-import org.magenta.core.sequence.SupplierSequenceAdapter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -29,20 +30,23 @@ public class FixtureFactory implements Fixture {
 
   private FixtureFactory parent;
   private DataSetFunctionRegistry registry;
-  private Injector injector;
+
+  private GenerationStrategyFactory generationStrategyFactory;
+
   private GeneratorFactory generatorFactory;
   private FixtureContext context;
 
-  FixtureFactory(FixtureFactory parent, Injector injector, GeneratorFactory generatorFactory,FixtureContext context) {
+  FixtureFactory(FixtureFactory parent, GenerationStrategyFactory generationStrategyBuilder, GeneratorFactory generatorFactory,
+      FixtureContext context) {
     this.parent = parent;
-    this.injector = injector;
+    this.generationStrategyFactory = generationStrategyBuilder;
     this.context = context;
     this.registry = new DataSetFunctionRegistry();
     this.generatorFactory = generatorFactory;
   }
 
   public FixtureFactory newChild() {
-    return new FixtureFactory(this, injector, generatorFactory, context);
+    return new FixtureFactory(this, generationStrategyFactory, generatorFactory, context);
   }
 
   @Override
@@ -126,58 +130,54 @@ public class FixtureFactory implements Fixture {
     // --- generated datasets --- //
 
     public void autoMagicallyGenerated(int numberOfItems) {
-      generatedBy(buildGenerator(key.getType()),numberOfItems);
+      generatedBy(buildGenerator(key.getType()), numberOfItems);
 
     }
 
     public void generatedBy(final Supplier<D> generator) {
-      generatedBy(generator, LazyGeneratedDataSupplier.NO_SPECIFIED_DEFAULT_SIZE);
+      generatedBy(generator, Optional.<Integer> absent());
     }
 
-    public void generatedBy(final Supplier<D> generator, final int numberOfItems) {
-      registry.register(key,
-          newLoadingCacheDecorator(
-              newGeneratedDataSetFactory(
-                  newSequenceAdapter(injector.inject(checkNotNull(generator,"generator argument is null"))
-              ), numberOfItems)));
+    public void generatedBy(final Supplier<D> generator, final Integer numberOfItems) {
+      generatedBy(generator, Optional.of(numberOfItems));
 
     }
 
-    private Sequence<D> newSequenceAdapter(Supplier<D> generator) {
-      return new SupplierSequenceAdapter<D>(generator);
-    }
+    protected void generatedBy(final Supplier<D> generator, final Optional<Integer> numberOfItems) {
 
-    private Function<Fixture, DataSet<D>> newLoadingCacheDecorator(Function<Fixture, DataSet<D>> function) {
-      return CacheBuilder.newBuilder().build(CacheLoader.from(function));
-    }
+      checkNotNull(generator, "generator argument is null");
 
-    private Function<Fixture, DataSet<D>> newGeneratedDataSetFactory(final Sequence<D> generator, final int numberOfItems) {
-      return new Function<Fixture, DataSet<D>>() {
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator), numberOfItems)));
 
-        @Override
-        public DataSet<D> apply(Fixture fixture) {
-
-          return new DataSetImpl<D>(new LazyGeneratedDataSupplier<>(contextualizeToFixture(fixture, generator), key.getType(),
-              numberOfItems, Integer.MAX_VALUE));
-        }
-
-      };
+      registry.register(key, getDataset);
 
     }
 
-    private  Sequence<D> contextualizeToFixture(Fixture input, Sequence<D> generator) {
-      // This datasupplier decorator will set the specified fixture as current
-      // when generating data, so the generator will take their data seqence
-      // from
-      // that fixture
-      return new SequenceWithFixtureContextManagementDecorator<D>(generator, input, context);
+    public void generatedAsIterableBy(Supplier<Iterable<D>> generator) {
+      checkNotNull(generator, "generator argument is null");
+
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator))));
+
+      registry.register(key, getDataset);
+    }
+
+    private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<D> strategy, Optional<Integer> numberOfItems) {
+      return fixture -> 
+         new LazyGeneratedDataSupplier<>(
+            key.getType(), 
+            () -> strategy.generate(fixture),
+            () -> numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture)
+        );
+      
+    }
+
+    private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<Iterable<D>> strategy) {
+      return fixture -> new LazyGeneratedCollectionDataSupplier<>(() -> strategy.generate(fixture), key.getType());
     }
 
     private Supplier<D> buildGenerator(TypeToken<D> type) {
-
       return generatorFactory.buildGeneratorOf(type, FixtureFactory.this);
     }
-
 
   }
 
@@ -190,44 +190,49 @@ public class FixtureFactory implements Fixture {
     }
 
     public void generatedBy(final Supplier<D> generator) {
-      generatedBy(generator, GeneratorDataSupplier.NO_SPECIFIED_DEFAULT_SIZE);
+      generatedBy(generator, Optional.<Integer> absent());
     }
 
-    public void generatedBy(Supplier<D> generator, int defaultSize) {
-      registry.register(key, newLoadingCacheDecorator(newParametizedBuilderOfGeneratedDataSet(injector.inject(generator), defaultSize)));
+    public void generatedBy(Supplier<D> generator, Integer defaultSize) {
+
+      generatedBy(generator, Optional.of(defaultSize));
+    }
+
+    private void generatedBy(Supplier<D> generator, Optional<Integer> numberOfItems) {
+
+      checkNotNull(generator, "generator argument is null");
+
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator), numberOfItems)));
+
+      registry.register(key, getDataset);
 
     }
 
-    private Function<Fixture, DataSet<D>> newLoadingCacheDecorator(Function<Fixture, DataSet<D>> function) {
-      return CacheBuilder.newBuilder().build(CacheLoader.from(function));
-    }
+    private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<D> strategy, final Optional<Integer> numberOfItems) {
+      return fixture -> {
 
-    private Function<Fixture, DataSet<D>> newParametizedBuilderOfGeneratedDataSet(final Supplier<D> generator, final int numberOfItems) {
-      return new Function<Fixture, DataSet<D>>() {
-
-        @Override
-        public DataSet<D> apply(Fixture fixture) {
-          return new DataSetImpl<D>(new GeneratorDataSupplier<>(contextualizeGeneratorToFixture(fixture, adaptToSequence(generator)), key.getType(), numberOfItems,
-              Integer.MAX_VALUE));
-        }
-
+        return new GeneratorDataSupplier<>(key.getType(), () -> {
+          return strategy.generate(fixture);
+        } , () -> {
+          return numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture);
+        });
       };
-
-    }
-
-    private Sequence<D> adaptToSequence(Supplier<D> generator) {
-      return new SupplierSequenceAdapter<D>(generator);
-    }
-
-    private Sequence<D> contextualizeGeneratorToFixture(Fixture input, Sequence<D> generator) {
-      // This datasupplier decorator will set the specified fixture as current
-      // when generating data, so the generator will take their data seqence
-      // from
-      // that fixture
-      return new SequenceWithFixtureContextManagementDecorator<D>(generator, input, context);
     }
 
   }
 
+  private <X> Function<Fixture, DataSet<X>> cache(Function<Fixture, DataSet<X>> function) {
+    return CacheBuilder.newBuilder().build(CacheLoader.from(function));
+  }
+
+  private <X> Function<Fixture, DataSet<X>> toDataSet(Function<Fixture, DataSupplier<X>> dataSupplier) {
+    return fixture -> {
+      return new DataSetImpl<>(dataSupplier.apply(fixture));
+    };
+  }
+
+  private <X> GenerationStrategy<X> toGenerationStrategy(Supplier<X> generator) {
+    return generationStrategyFactory.create(generator);
+  }
 
 }

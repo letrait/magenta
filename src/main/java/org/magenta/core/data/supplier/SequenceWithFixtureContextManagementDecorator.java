@@ -1,5 +1,7 @@
 package org.magenta.core.data.supplier;
 
+import java.util.Iterator;
+
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 import org.magenta.core.FixtureContext;
@@ -10,6 +12,7 @@ import org.magenta.core.FixtureContext;
  *
  * @param <D>
  */
+@Deprecated
 public class SequenceWithFixtureContextManagementDecorator<D> implements Sequence<D> {
 
   private final Sequence<D> delegate;
@@ -60,6 +63,8 @@ public class SequenceWithFixtureContextManagementDecorator<D> implements Sequenc
   public String toString(){
     return "FixtureContextManagement decorator of [" + delegate+"]";
   }
+
+
 
 
 

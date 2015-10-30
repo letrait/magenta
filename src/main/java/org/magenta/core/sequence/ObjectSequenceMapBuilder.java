@@ -2,10 +2,12 @@ package org.magenta.core.sequence;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.assertj.core.util.Maps;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSetNotFoundException;
@@ -17,17 +19,17 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 
-public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
+public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenceMap> {
 
   private Map<Field, DataKey<?>> keyMap;
-  public SequenceProvider(Map<Field, DataKey<?>> keyMap) {
+  public ObjectSequenceMapBuilder(Map<Field, DataKey<?>> keyMap) {
     this.keyMap = keyMap;
   }
 
   @Override
-  public SequenceIndexMap apply(Fixture fixture) {
+  public ObjectSequenceMap apply(Fixture fixture) {
 
-    SequenceIndexMap map = new SequenceIndexMap();
+   Map<Field, Sequence<?>> map =Maps.newHashMap();
 
     SequenceCoordinator coordinator = new SequenceCoordinator();
 
@@ -36,8 +38,6 @@ public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
     if(!keys.containsAll(keyMap.values())){
       throw new DataSetNotFoundException(String.format("fixture is missing some or all of the following keys %s", keyMap.values()));
     }
-
-    //TODO : transformer les data key du map en les sortant et en changeant les cles a partir du fixture...
 
     FieldDataKeyMapEntryComparator comparator = new FieldDataKeyMapEntryComparator(keys, keyMap.keySet());
 
@@ -55,8 +55,10 @@ public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
 
       }
     }
+    
+    ObjectSequenceMap sim = new ObjectSequenceMap(map,coordinator.numberOfCombination());
 
-    return map;
+    return sim;
   }
 
   /**
@@ -96,6 +98,7 @@ public class SequenceProvider implements Function<Fixture, SequenceIndexMap> {
       public int size(){
         return 1;
       }
+
 
     };
   }

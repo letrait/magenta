@@ -42,7 +42,7 @@ public class DataSetFieldHandlerTest {
   }
 
   @Test
-  public void testDataSetIsObtainedFromFixtureContext() throws NoSuchFieldException, SecurityException{
+  public void testDataSetIsObtainedLazilyFromFixtureContext() throws NoSuchFieldException, SecurityException{
 
     //setup fixtures
 

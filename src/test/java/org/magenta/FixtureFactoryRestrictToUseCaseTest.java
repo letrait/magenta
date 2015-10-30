@@ -6,11 +6,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.magenta.testing.domain.Address;
-import org.magenta.testing.domain.AddressGenerator;
-import org.magenta.testing.domain.Employee;
-import org.magenta.testing.domain.EmployeeGenerator2;
-import org.magenta.testing.domain.Occupation;
+import org.magenta.testing.domain.company.Address;
+import org.magenta.testing.domain.company.AddressGenerator;
+import org.magenta.testing.domain.company.Employee;
+import org.magenta.testing.domain.company.EmployeeGenerator2;
+import org.magenta.testing.domain.company.Occupation;
 
 public class FixtureFactoryRestrictToUseCaseTest {
 

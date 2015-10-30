@@ -1,9 +1,12 @@
 package org.magenta.core.sequence;
 
+import java.util.Iterator;
+
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 
 import com.google.common.base.Function;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 
 public class SequenceForFixtureAdapter<D> implements Sequence<D> {
@@ -27,16 +30,17 @@ public class SequenceForFixtureAdapter<D> implements Sequence<D> {
   @Override
   public D get() {
 
-    Fixture f = fixtureSupplier.get();
+    Fixture f = Preconditions.checkNotNull(fixtureSupplier.get());
 
     return sequenceProvider.apply(f).get();
   }
 
   @Override
   public int size() {
-    Fixture f = fixtureSupplier.get();
+    Fixture f = Preconditions.checkNotNull(fixtureSupplier.get());
 
     return sequenceProvider.apply(f).size();
   }
+  
 
 }

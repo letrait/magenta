@@ -53,12 +53,4 @@ public class StaticDataSupplier<D> implements DataSupplier<D>{
   public int getSize() {
     return data.size();
   }
-
-  @Override
-  public int getMaximumSize() {
-    return data.size();
-  }
-
-
-
 }

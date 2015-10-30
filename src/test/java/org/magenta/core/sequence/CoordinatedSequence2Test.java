@@ -106,6 +106,7 @@ public class CoordinatedSequence2Test {
      assertThat(actual).containsExactly(1,2,1,2,1);
 
   }
+  
 
   private <D> List<D> readFromSequence(Sequence<D> sequence, int numberOfItems) {
     List<D> values = Lists.newArrayList();

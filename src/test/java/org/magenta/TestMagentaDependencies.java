@@ -16,14 +16,8 @@ import com.google.common.base.Suppliers;
 public class TestMagentaDependencies {
 
   @Test
-  public void testInjector(){
-    assertThat(Magenta.dependencies.get().injector(Suppliers.ofInstance(Mockito.mock(Fixture.class)))).isNotNull();
-  }
-
-  @Test
-  public void testFieldInjectionHandlers(){
-    List<FieldInjectionHandler> handlers = Magenta.dependencies.get().fieldInjectionHandlers();
-    assertThat(handlers).isNotNull().isNotEmpty();
+  public void testGenerationStrategyBuilder(){
+    assertThat(Magenta.dependencies.get().generationStrategyFactory(Magenta.dependencies.get().fixtureContext())).isNotNull();
   }
 
   @Test

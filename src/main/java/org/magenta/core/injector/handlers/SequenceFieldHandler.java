@@ -9,36 +9,40 @@ import org.magenta.DataKey;
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 import org.magenta.annotation.InjectSequence;
+import org.magenta.core.Injector;
 import org.magenta.core.injector.FieldInjectionHandler;
 import org.magenta.core.injector.FieldInjectorUtils;
 import org.magenta.core.injector.FieldsExtractor;
 import org.magenta.core.sequence.SequenceForFixtureAdapter;
-import org.magenta.core.sequence.SequenceIndexMap;
-import org.magenta.core.sequence.SequenceProvider;
+import org.magenta.core.sequence.ObjectSequenceMap;
+import org.magenta.core.sequence.ObjectSequenceMapBuilder;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectSequence> implements FieldInjectionHandler{
+
 
   public SequenceFieldHandler(FieldsExtractor extractors) {
     super(extractors);
   }
 
-  @Override
   protected Class<InjectSequence> getAnnotationType(){
     return org.magenta.annotation.InjectSequence.class;
   }
 
   @Override
-  public void injectInto(Object target,Supplier<? extends Fixture> fixture) {
+  public Map<Injector.Key,Object> injectInto(Object target,Supplier<? extends Fixture> fixture) {
 
     Map<Field, DataKey<?>> keyMap = Maps.newLinkedHashMap();
-    Function<Fixture, SequenceIndexMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new SequenceProvider(keyMap)));
+    Function<Fixture, ObjectSequenceMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new ObjectSequenceMapBuilder(keyMap)));
 
+    //TODO : store the sequenceProvider somewhere
+    
     for (FieldAnnotation<InjectSequence> f : matchingFields(target)) {
       if (Sequence.class.equals(f.getField().getType())) {
         keyMap.put(f.getField(), determinDataKeyFromGenericType(f.getField(), f.getAnnotation()));
@@ -48,6 +52,14 @@ public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectS
       }
 
     }
+    
+    Function<Fixture,Integer> combinationCountFunction = f -> sequenceProvider.apply(f).getCombinationCount();
+    
+    Map<Injector.Key, Object> injectionResults = ImmutableMap.of(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION, combinationCountFunction);
+    
+    return injectionResults;
+    
+  
   }
 
   private IllegalStateException invalidFieldType(Field f) {
@@ -55,14 +67,14 @@ public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectS
   }
 
 
-  private void injectProxySequence(Field f, final Object target, final Supplier<? extends Fixture> fixtureSupplier,  Function<Fixture, SequenceIndexMap> sequenceProvider) {
+  private void injectProxySequence(Field f, final Object target, final Supplier<? extends Fixture> fixtureSupplier,  Function<Fixture, ObjectSequenceMap> sequenceProvider) {
 
     Sequence<?> sequence = SequenceForFixtureAdapter.from(fixtureSupplier, sequenceForField(f, sequenceProvider) );
 
     FieldInjectorUtils.injectInto(target, f, sequence);
   }
 
-  private <D> Function<Fixture, Sequence<D>> sequenceForField(final Field f, final Function<Fixture, SequenceIndexMap> sequenceProvider) {
+  private <D> Function<Fixture, Sequence<D>> sequenceForField(final Field f, final Function<Fixture, ObjectSequenceMap> sequenceProvider) {
    return new Function<Fixture, Sequence<D>>(){
 
     @Override

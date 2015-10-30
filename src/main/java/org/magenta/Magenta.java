@@ -1,10 +1,11 @@
 package org.magenta;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.assertj.core.util.Lists;
 import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.FixtureContext;
+import org.magenta.core.GenerationStrategyFactory;
 import org.magenta.core.Injector;
 import org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunction;
 import org.magenta.core.automagic.generation.GeneratorFactory;
@@ -26,21 +27,21 @@ public class Magenta {
     return dependencies.get().fixtureFactory();
   }
 
-  public static final Supplier<Dependencies> dependencies = Suppliers.memoize(new Supplier<Dependencies>(){
+  public static final Supplier<Dependencies> dependencies = Suppliers.memoize(new Supplier<Dependencies>() {
 
     @Override
     public Dependencies get() {
-     return new Dependencies();
+      return new Dependencies();
     }
 
   });
 
   public static class Dependencies {
 
-    public FixtureFactory fixtureFactory(){
+    public FixtureFactory fixtureFactory() {
       FixtureContext fixtureContext = fixtureContext();
       GeneratorFactory generatorFactory = generatorFactory(fixtureContext);
-      return new FixtureFactory(null, injector(fixtureContext), generatorFactory, fixtureContext);
+      return new FixtureFactory(null, generationStrategyFactory(fixtureContext), generatorFactory, fixtureContext);
     }
 
     public GeneratorFactory generatorFactory(FixtureContext context) {
@@ -51,35 +52,30 @@ public class Magenta {
       return new DataKeyMapBuilder(new DataKeyDeterminedFromFieldTypeMappingFunction());
     }
 
-    public Injector injector(Supplier<Fixture> supplier){
-      FieldInjectionChainProcessor injector = new FieldInjectionChainProcessor(fieldInjectionHandlers(), supplier);
-      return injector;
-
+    public GenerationStrategyFactory generationStrategyFactory(FixtureContext fixtureContext) {
+      return new GenerationStrategyFactory(fixtureContext, injector(fixtureContext));
     }
-
-    //this could be static, no need to recreated each time
-    List<FieldInjectionHandler> fieldInjectionHandlers(){
-
-      List<FieldInjectionHandler> handlers = new ArrayList<>();
-      handlers.add(sequenceFieldHandler());
-      handlers.add(dataSetFieldHandler());
+    
+    public Injector injector(FixtureContext fixtureContext){
+      return new FieldInjectionChainProcessor(fieldInjectionHandlers(), fixtureContext);
+    }
+    
+    public List<FieldInjectionHandler> fieldInjectionHandlers(){
+      
+      List<FieldInjectionHandler> handlers = Lists.newArrayList();
+      
+      handlers.add(new DataSetFieldHandler(fieldExtractor()));
+      handlers.add(new SequenceFieldHandler(fieldExtractor()));
+      
       return handlers;
+      
     }
 
-
-    private DataSetFieldHandler dataSetFieldHandler() {
-      return new DataSetFieldHandler(fieldExtractor());
-    }
-
-    private SequenceFieldHandler sequenceFieldHandler() {
-      return new SequenceFieldHandler(fieldExtractor());
-    }
-
-    private FieldsExtractor fieldExtractor(){
+    public FieldsExtractor fieldExtractor() {
       return HiearchicalFieldsExtractor.SINGLETON;
     }
 
-    FixtureContext fixtureContext(){
+    public FixtureContext fixtureContext() {
       return new ThreadLocalFixtureContext();
     }
   }
