@@ -1,4 +1,4 @@
-package org.magenta.core.automagic.generation;
+package org.magenta.core.automagic.generation.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -10,6 +10,8 @@ import org.magenta.Fixture;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.DataKeyMapBuilder;
+import org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunction;
+import org.magenta.core.automagic.generation.provider.ObjectGenerator;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 import org.magenta.core.sequence.ObjectSequenceMap;
 import org.magenta.core.sequence.ObjectSequenceMapBuilder;
@@ -32,10 +34,10 @@ public class ObjectGeneratorTest {
 
     Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
-    ObjectGenerator<DummyObject> sut = new ObjectGenerator<>( type ,Suppliers.ofInstance(fixture), sequenceProvider);
+    ObjectGenerator<DummyObject> sut = new ObjectGenerator<>( type , sequenceProvider);
 
     //exercise sut
-    DummyObject actual = sut.get();
+    DummyObject actual = sut.generate(fixture);
 
     //verify outcome
     assertThat(actual).isNotNull();
@@ -51,22 +53,48 @@ public class ObjectGeneratorTest {
     FixtureFactory fixture = Magenta.newFixture();
 
     fixture.newDataSet(DataKey.of(DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.values());
-    fixture.newDataSet(DataKey.of("org.magenta.core.automagic.generation.ObjectGeneratorTest$DummyObjectWithEnum.color", DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.RED);
+    fixture.newDataSet(DataKey.of("org.magenta.core.automagic.generation.provider.ObjectGeneratorTest$DummyObjectWithEnum.color", DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.RED);
 
 
     Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
-    ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, Suppliers.ofInstance(fixture), sequenceProvider);
+    ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, sequenceProvider);
 
     //exercise sut
-    List<DummyObjectWithEnum> actual = read(sut,3);
+    List<DummyObjectWithEnum> actual = read(sut,3, fixture);
 
 
     //verify outcome
+ 
     assertThat(actual).doesNotContainNull().extracting("color").containsExactly(
         DummyObjectWithEnum.Color.RED,
         DummyObjectWithEnum.Color.GREEN,
         DummyObjectWithEnum.Color.BLUE);
+
+  }
+  
+  @Test
+  public void testSizeOfAnObjectWithAnEnum(){
+
+    //setup fixture
+    TypeToken<DummyObjectWithEnum> type = TypeToken.of(DummyObjectWithEnum.class);
+    FixtureFactory fixture = Magenta.newFixture();
+
+    fixture.newDataSet(DataKey.of(DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.values());
+    fixture.newDataSet(DataKey.of("org.magenta.core.automagic.generation.provider.ObjectGeneratorTest$DummyObjectWithEnum.color", DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.RED);
+
+
+    Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
+
+    ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, sequenceProvider);
+
+    //exercise sut
+    Integer actual = sut.size(fixture);
+
+
+    //verify outcome
+ 
+    assertThat(actual).isEqualTo(DummyObjectWithEnum.Color.values().length);
 
   }
 
@@ -78,10 +106,10 @@ public class ObjectGeneratorTest {
                 new DataKeyDeterminedFromFieldTypeMappingFunction()).buildMapFrom(HiearchicalFieldsExtractor.SINGLETON.extractAll(type.getRawType())))));
   }
 
-  private <D> List<D> read(ObjectGenerator<D> sut, int size) {
+  private <D> List<D> read(ObjectGenerator<D> sut, int size,Fixture fixture) {
     List<D> objects = Lists.newArrayList();
     for (int i = 0; i < size; i++) {
-      objects.add(sut.get());
+      objects.add(sut.generate(fixture));
     }
     return objects;
   }

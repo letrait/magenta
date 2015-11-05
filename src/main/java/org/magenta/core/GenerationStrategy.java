@@ -1,28 +1,11 @@
 package org.magenta.core;
 
-
 import org.magenta.Fixture;
 
-import com.google.common.base.Function;
+public interface GenerationStrategy<D> {
 
-public class GenerationStrategy<D> {
+  D generate(Fixture fixture);
 
-  private final Function<Fixture,D> generator;
-  private final Function<Fixture,Integer> sizeOf;
+  Integer size(Fixture fixture);
 
-
-  public GenerationStrategy(Function<Fixture,D> generator, Function<Fixture,Integer> sizeOf) {
-    this.generator = generator;
-    this.sizeOf = sizeOf;
-  }
-
-  public D generate(Fixture fixture) {
-
-    return generator.apply(fixture);
-
-  }
-
-  public Integer size(Fixture fixture) {
-     return sizeOf.apply(fixture);
-  }
 }

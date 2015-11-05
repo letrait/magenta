@@ -1,5 +1,6 @@
 package org.magenta;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.assertj.core.util.Lists;
@@ -8,8 +9,10 @@ import org.magenta.core.FixtureContext;
 import org.magenta.core.GenerationStrategyFactory;
 import org.magenta.core.Injector;
 import org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunction;
-import org.magenta.core.automagic.generation.GeneratorFactory;
-import org.magenta.core.automagic.generation.ReflexionBasedGeneratorFactory;
+import org.magenta.core.automagic.generation.DynamicGeneratorFactory;
+import org.magenta.core.automagic.generation.provider.ObjectGeneratorFactory;
+import org.magenta.core.automagic.generation.provider.PrimitiveDynamicGeneratorFactoryProvider;
+import org.magenta.core.automagic.generation.CompositeGeneratorFactory;
 import org.magenta.core.context.ThreadLocalFixtureContext;
 import org.magenta.core.injector.FieldInjectionChainProcessor;
 import org.magenta.core.injector.FieldInjectionHandler;
@@ -40,12 +43,17 @@ public class Magenta {
 
     public FixtureFactory fixtureFactory() {
       FixtureContext fixtureContext = fixtureContext();
-      GeneratorFactory generatorFactory = generatorFactory(fixtureContext);
+      DynamicGeneratorFactory generatorFactory = generatorFactory(fixtureContext);
       return new FixtureFactory(null, generationStrategyFactory(fixtureContext), generatorFactory, fixtureContext);
     }
 
-    public GeneratorFactory generatorFactory(FixtureContext context) {
-      return new ReflexionBasedGeneratorFactory(context, dataKeyMapBuilder(), fieldExtractor());
+    public DynamicGeneratorFactory generatorFactory(FixtureContext context) {
+      List<DynamicGeneratorFactory> factories = Lists.newArrayList();
+      
+      factories.addAll(PrimitiveDynamicGeneratorFactoryProvider.get());
+      factories.add(new ObjectGeneratorFactory( fieldExtractor(), dataKeyMapBuilder()));
+      
+      return new CompositeGeneratorFactory(factories);
     }
 
     public DataKeyMapBuilder dataKeyMapBuilder() {

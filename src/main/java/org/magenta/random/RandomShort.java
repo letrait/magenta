@@ -68,15 +68,15 @@ public class RandomShort {
           "The intersection of the passed in range %s and this class constrained range %s result in a empty range", range, constraint));
     }
 
-    short upperBound = r.hasUpperBound() ? r.upperEndpoint() : Short.MAX_VALUE;
-    short lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Short.MIN_VALUE;
+    short upperBound = r.hasUpperBound() ? r.upperEndpoint() : Short.MAX_VALUE/2;
+    short lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Short.MIN_VALUE/2;
 
-    if (BoundType.CLOSED == r.upperBoundType()) {
+    if (r.hasUpperBound() && BoundType.CLOSED == r.upperBoundType()) {
       // upperBound is not included in the random.nextInt() method
       upperBound++;
     }
 
-    if (BoundType.OPEN == r.lowerBoundType()) {
+    if (r.hasLowerBound() && BoundType.OPEN == r.lowerBoundType()) {
       // lowerBound is included in the random.nextInt() method
       lowerBound++;
     }
@@ -84,7 +84,7 @@ public class RandomShort {
     short delta = (short) Math.abs(upperBound - lowerBound);
 
     short anyIntRange = (short) ((this.random.nextInt(delta / resolution) * resolution) + lowerBound);
-
+    
     return anyIntRange;
   }
 

@@ -36,7 +36,7 @@ public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectS
   }
 
   @Override
-  public Map<Injector.Key,Object> injectInto(Object target,Supplier<? extends Fixture> fixture) {
+  public Map<Injector.Key<?>,Object> injectInto(Object target,Supplier<? extends Fixture> fixture) {
 
     Map<Field, DataKey<?>> keyMap = Maps.newLinkedHashMap();
     Function<Fixture, ObjectSequenceMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new ObjectSequenceMapBuilder(keyMap)));
@@ -55,7 +55,7 @@ public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectS
     
     Function<Fixture,Integer> combinationCountFunction = f -> sequenceProvider.apply(f).getCombinationCount();
     
-    Map<Injector.Key, Object> injectionResults = ImmutableMap.of(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION, combinationCountFunction);
+    Map<Injector.Key<?>, Object> injectionResults = ImmutableMap.of(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION, combinationCountFunction);
     
     return injectionResults;
     

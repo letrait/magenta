@@ -34,7 +34,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
   }
 
   @Override
-  public Map<Injector.Key,Object> injectInto(Object target, Supplier<? extends Fixture> fixture) {
+  public Map<Injector.Key<?>,Object> injectInto(Object target, Supplier<? extends Fixture> fixture) {
     for(FieldAnnotation<InjectDataSet> f:matchingFields(target)){
       if (DataSet.class.equals(f.getField().getType())) {
         injectProxyDataSet(f.getField(), target, fixture, f.getAnnotation());

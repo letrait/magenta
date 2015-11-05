@@ -22,8 +22,8 @@ public class FieldInjectionChainProcessor implements Injector {
   }
 
   @Override
-  public Map<Injector.Key, Object> inject(Object o) {
-    Map<Injector.Key, Object> injectionResults = Maps.newHashMap();
+  public Map<Injector.Key<?>, Object> inject(Object o) {
+    Map<Injector.Key<?>, Object> injectionResults = Maps.newHashMap();
 
     for (FieldInjectionHandler handler : handlers) {
       injectionResults.putAll(handler.injectInto(o, fixtureReference));

@@ -13,7 +13,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.common.base.Function;
 
 @RunWith(MockitoJUnitRunner.class)
-public class GenerationStrategyTest {
+public class SimpleGenerationStrategyTest {
 
   @Mock
   private Fixture fixture;
@@ -27,7 +27,7 @@ public class GenerationStrategyTest {
     
     when(generator.apply(fixture)).thenReturn("foo");
 
-    GenerationStrategy<String> sut = new GenerationStrategy<String>(generator, sizeCalcualtor);
+    GenerationStrategy<String> sut = new SimpleGenerationStrategy<String>(generator, sizeCalcualtor);
 
     //exercise sut
     String actual = sut.generate(fixture);
@@ -49,7 +49,7 @@ public class GenerationStrategyTest {
     
     when(sizeCalcualtor.apply(fixture)).thenReturn(1234);
 
-    GenerationStrategy<String> sut = new GenerationStrategy<String>(generator, sizeCalcualtor);
+    GenerationStrategy<String> sut = new SimpleGenerationStrategy<String>(generator, sizeCalcualtor);
 
     //exercise sut
     Integer actual = sut.size(fixture);

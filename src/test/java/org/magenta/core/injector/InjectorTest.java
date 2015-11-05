@@ -33,7 +33,7 @@ public class InjectorTest {
     DummyObject sut = new DummyObject();
 
     //exercise sut
-    Map<Injector.Key,Object> map = injector.inject(sut);
+    Map<Injector.Key<?>,Object> map = injector.inject(sut);
 
     //verify outcome
     assertThat(sut.getSequence()).isNotNull();

@@ -62,7 +62,7 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
   }
 
   /**
-   * Takes the generalized version (a datakey without qualifier) of a given datakey if that generalized version is placed before this given key in the
+   * Takes the generalized version (a datakey without qualifier) of a given datakey only if that generalized version is placed before this given key in the
    * complete list of data keys.
    *
    *

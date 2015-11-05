@@ -73,8 +73,8 @@ public class RandomInteger {
           "The intersection of the passed in range %s and this class constrained range %s result in a empty range", range, constraint));
     }
 
-    int upperBound = r.hasUpperBound() ? r.upperEndpoint() : Integer.MAX_VALUE;
-    int lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Integer.MIN_VALUE;
+    int upperBound = r.hasUpperBound() ? r.upperEndpoint() : Integer.MAX_VALUE/2;
+    int lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Integer.MIN_VALUE/2;
 
     if (r.hasUpperBound() && BoundType.CLOSED == r.upperBoundType()) {
       // upperBound is not included in the random.nextInt() method

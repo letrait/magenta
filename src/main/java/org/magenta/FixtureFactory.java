@@ -8,9 +8,10 @@ import org.magenta.core.DataSetFunctionRegistry;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.FixtureContext;
 import org.magenta.core.GenerationStrategy;
+import org.magenta.core.SimpleGenerationStrategy;
 import org.magenta.core.GenerationStrategyFactory;
 import org.magenta.core.RestrictionHelper;
-import org.magenta.core.automagic.generation.GeneratorFactory;
+import org.magenta.core.automagic.generation.DynamicGeneratorFactory;
 import org.magenta.core.data.supplier.GeneratorDataSupplier;
 import org.magenta.core.data.supplier.LazyGeneratedCollectionDataSupplier;
 import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
@@ -32,21 +33,21 @@ public class FixtureFactory implements Fixture {
   private DataSetFunctionRegistry registry;
 
   private GenerationStrategyFactory generationStrategyFactory;
-
-  private GeneratorFactory generatorFactory;
+  private DynamicGeneratorFactory dynamicGeneratorFactory;
+  
   private FixtureContext context;
 
-  FixtureFactory(FixtureFactory parent, GenerationStrategyFactory generationStrategyBuilder, GeneratorFactory generatorFactory,
+  FixtureFactory(FixtureFactory parent, GenerationStrategyFactory generationStrategyBuilder, DynamicGeneratorFactory generatorFactory,
       FixtureContext context) {
     this.parent = parent;
     this.generationStrategyFactory = generationStrategyBuilder;
     this.context = context;
     this.registry = new DataSetFunctionRegistry();
-    this.generatorFactory = generatorFactory;
+    this.dynamicGeneratorFactory = generatorFactory;
   }
 
   public FixtureFactory newChild() {
-    return new FixtureFactory(this, generationStrategyFactory, generatorFactory, context);
+    return new FixtureFactory(this, generationStrategyFactory, dynamicGeneratorFactory, context);
   }
 
   @Override
@@ -55,7 +56,6 @@ public class FixtureFactory implements Fixture {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public <D> DataSet<D> dataset(DataKey<D> key) {
     return doGetDatasetFunction(key).apply(this);
   }
@@ -130,7 +130,10 @@ public class FixtureFactory implements Fixture {
     // --- generated datasets --- //
 
     public void autoMagicallyGenerated(int numberOfItems) {
-      generatedBy(buildGenerator(key.getType()), numberOfItems);
+
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(buildDynamicGenerator(key.getType()), Optional.of(numberOfItems))));
+
+      registry.register(key, getDataset);
 
     }
 
@@ -140,6 +143,15 @@ public class FixtureFactory implements Fixture {
 
     public void generatedBy(final Supplier<D> generator, final Integer numberOfItems) {
       generatedBy(generator, Optional.of(numberOfItems));
+
+    }
+    
+    public void generatedBy(final GenerationStrategy<D> generator) {
+      checkNotNull(generator, "generator argument is null");
+
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(generator,Optional.absent())));
+
+      registry.register(key, getDataset);
 
     }
 
@@ -175,9 +187,7 @@ public class FixtureFactory implements Fixture {
       return fixture -> new LazyGeneratedCollectionDataSupplier<>(() -> strategy.generate(fixture), key.getType());
     }
 
-    private Supplier<D> buildGenerator(TypeToken<D> type) {
-      return generatorFactory.buildGeneratorOf(type, FixtureFactory.this);
-    }
+
 
   }
 
@@ -197,6 +207,15 @@ public class FixtureFactory implements Fixture {
 
       generatedBy(generator, Optional.of(defaultSize));
     }
+    
+    public void generatedBy(final GenerationStrategy<D> generator) {
+      checkNotNull(generator, "generator argument is null");
+
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(generator,Optional.absent())));
+
+      registry.register(key, getDataset);
+
+    }
 
     private void generatedBy(Supplier<D> generator, Optional<Integer> numberOfItems) {
 
@@ -209,14 +228,14 @@ public class FixtureFactory implements Fixture {
     }
 
     private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<D> strategy, final Optional<Integer> numberOfItems) {
-      return fixture -> {
+       return fixture -> 
 
-        return new GeneratorDataSupplier<>(key.getType(), () -> {
-          return strategy.generate(fixture);
-        } , () -> {
-          return numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture);
-        });
-      };
+         new GeneratorDataSupplier<>(
+            key.getType(), 
+            () -> strategy.generate(fixture), 
+            () -> (numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture))
+        );
+      
     }
 
   }
@@ -233,6 +252,10 @@ public class FixtureFactory implements Fixture {
 
   private <X> GenerationStrategy<X> toGenerationStrategy(Supplier<X> generator) {
     return generationStrategyFactory.create(generator);
+  }
+  
+  private <X> GenerationStrategy<X> buildDynamicGenerator(TypeToken<X> type) {
+    return dynamicGeneratorFactory.buildGeneratorOf(type, FixtureFactory.this, dynamicGeneratorFactory).get();
   }
 
 }

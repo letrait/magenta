@@ -9,7 +9,7 @@ import com.google.common.base.Supplier;
 
 public interface FieldInjectionHandler {
 
-  public Map<Injector.Key, Object> injectInto(Object target, Supplier<? extends Fixture> fixture);
+  public Map<Injector.Key<?>, Object> injectInto(Object target, Supplier<? extends Fixture> fixture);
 
 
 }

@@ -23,12 +23,14 @@ public class GenerationStrategyFactory {
   
   public <D> GenerationStrategy<D> create(Supplier<D> generator){
     
-    Map<Injector.Key, Object> injectionResults = injector.inject(generator);
+    Map<Injector.Key<?>, Object> injectionResults = injector.inject(generator);
     
-    final Function<Fixture,Integer> generatorSizeFunction = (Function<Fixture, Integer>) injectionResults.get(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION);
+    final Function<Fixture,Integer> generatorSizeFunction = Injector.Key.NUMBER_OF_COMBINATION_FUNCTION.getFrom(injectionResults);
     
-    return new GenerationStrategy<>(
+    return new SimpleGenerationStrategy<>(
         new ContextualizedSupplierFunctionAdapter<>(generator, fixtureContext), 
         generatorSizeFunction);
   }
+  
+
 }

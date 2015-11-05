@@ -61,8 +61,8 @@ public class RandomLong {
           "The intersection of the passed in range %s and this class constrained range %s result in a empty range", range, constraint));
     }
 
-    long upperBound = r.hasUpperBound() ? r.upperEndpoint() : Long.MAX_VALUE;
-    long lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Long.MIN_VALUE;
+    long upperBound = r.hasUpperBound() ? r.upperEndpoint() : Long.MAX_VALUE/2;
+    long lowerBound = r.hasLowerBound() ? r.lowerEndpoint() : Long.MIN_VALUE/2;
 
     if (r.hasUpperBound() && BoundType.CLOSED == r.upperBoundType()) {
       upperBound++;

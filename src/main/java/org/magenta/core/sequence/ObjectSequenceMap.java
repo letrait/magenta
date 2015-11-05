@@ -7,6 +7,12 @@ import java.util.Set;
 
 import org.magenta.Sequence;
 
+/**
+ * A collection of sequence associated to a given object. Each sequence is mapped to a field of that given object.
+ * 
+ * @author ngagnon
+ *
+ */
 public class ObjectSequenceMap {
 
   private final Map<Field,Sequence<?>> sequenceByField;
