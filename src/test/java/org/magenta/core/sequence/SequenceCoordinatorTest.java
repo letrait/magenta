@@ -7,8 +7,6 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.core.sequence.CoordinatedSequence;
-import org.magenta.core.sequence.SequenceCoordinator;
 
 import com.google.common.collect.Lists;
 

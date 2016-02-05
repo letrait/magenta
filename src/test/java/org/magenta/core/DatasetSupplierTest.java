@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.FixtureFactory;
-import org.magenta.core.DataSetSupplier;
 import org.mockito.Mockito;
 
 import com.google.common.base.Suppliers;

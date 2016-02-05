@@ -8,7 +8,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
-import org.magenta.core.DataSetFunctionRegistry;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;

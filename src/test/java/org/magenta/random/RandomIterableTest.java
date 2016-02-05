@@ -120,7 +120,6 @@ public class RandomIterableTest {
 	    List<Integer> list2=Arrays.asList();
 	    List<Integer> list3=Arrays.asList();
 
-	    Integer[] expected = new Integer[]{};
 
 	    List<List<Integer>> integerLists=Lists.newArrayList(list1,list2,list3);
 

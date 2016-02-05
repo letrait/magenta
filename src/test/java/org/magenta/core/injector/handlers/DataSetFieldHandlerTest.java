@@ -27,7 +27,7 @@ public class DataSetFieldHandlerTest {
 
     FixtureFactory fixture = mock(FixtureFactory.class);
 
-    Field f = DummyGeneratorWithNoInjectedDataSet.class.getDeclaredField("integers");
+   
     DummyGeneratorWithNoInjectedDataSet candidate = new DummyGeneratorWithNoInjectedDataSet();
 
     DataSetFieldHandler sut = new DataSetFieldHandler(HiearchicalFieldsExtractor.SINGLETON);
@@ -48,7 +48,7 @@ public class DataSetFieldHandlerTest {
 
     FixtureFactory fixture = mock(FixtureFactory.class);
 
-    Field f = DummyGenerator.class.getDeclaredField("integers");
+    
     DummyGenerator candidate = new DummyGenerator();
 
     DataSetFieldHandler sut = new DataSetFieldHandler(HiearchicalFieldsExtractor.SINGLETON);
@@ -74,7 +74,6 @@ public class DataSetFieldHandlerTest {
 
     fixture.newDataSet(Integer.class).composedOf(1,2,3,4,5,6);
 
-    Field f = DummyGenerator.class.getDeclaredField("integers");
     DummyGenerator candidate = new DummyGenerator();
 
     DataSetFieldHandler sut = new DataSetFieldHandler(HiearchicalFieldsExtractor.SINGLETON);

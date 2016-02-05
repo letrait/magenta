@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.magenta.DataGenerationException;
 import org.magenta.DataSupplier;
+
 import com.google.common.base.Supplier;
 import com.google.common.reflect.TypeToken;
 

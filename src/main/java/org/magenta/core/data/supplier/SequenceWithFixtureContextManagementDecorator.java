@@ -1,7 +1,5 @@
 package org.magenta.core.data.supplier;
 
-import java.util.Iterator;
-
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 import org.magenta.core.FixtureContext;

@@ -8,8 +8,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.Sequence;
-import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
@@ -113,8 +111,6 @@ public class LazyGeneratedDataSupplierTest {
   public void testGetAtIndex_when_index_is_greater_than_the_specified_size_should_be_possible(){
 
     // setup fixtures
-    String[] LETTER_ARRAY = new String[] { "a","b","c" };
-
     final int SIZE = 1;
     Supplier<String> generator = mock(Supplier.class);
 

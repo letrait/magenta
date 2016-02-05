@@ -1,16 +1,11 @@
 package org.magenta.core.data.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
 
 import org.junit.Test;
 import org.magenta.DataSupplier;
-import org.magenta.core.data.supplier.ResizedDataSupplierDecorator;
-import org.magenta.core.data.supplier.StaticDataSupplier;
 
 import com.google.common.reflect.TypeToken;
 

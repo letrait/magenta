@@ -6,9 +6,10 @@ import java.util.List;
 
 import org.junit.Test;
 import org.magenta.testing.domain.company.Employee;
+import org.magenta.testing.domain.company.Occupation;
 import org.magenta.testing.domain.company.PhoneNumber;
 
-public class FixtureFactoryAutoMagicllyGenerateObjectTest {
+public class FixtureFactoryAutoMagicallyGenerateObjectTest {
 
   @Test
   public void auto_magically_generate_simple_object(){
@@ -20,8 +21,6 @@ public class FixtureFactoryAutoMagicllyGenerateObjectTest {
 
     //verify outcome
     List<PhoneNumber> actual = sut.dataset(PhoneNumber.class).list();
-
-    System.out.println(actual);
 
     assertThat(actual).extracting("phoneNumber").hasSize(5).doesNotContainNull();
 
@@ -38,10 +37,25 @@ public class FixtureFactoryAutoMagicllyGenerateObjectTest {
     //verify outcome
     List<Employee> actual = sut.dataset(Employee.class).list();
 
-    System.out.println(actual);
-
     assertThat(actual).extracting("employeeId").hasSize(5).doesNotContainNull();
+    assertThat(actual).extracting("name").hasSize(5).doesNotContainNull();
+    assertThat(actual).extracting("occupation").hasSize(5).containsExactly(Occupation.TECHNICIAN,Occupation.ENGINEER,Occupation.MANAGEMENT, Occupation.TESTER, Occupation.TECHNICIAN);
+    assertThat(actual).extracting("address").hasSize(5).doesNotContainNull();
+    assertThat(actual).extracting("phoneNumbers").hasSize(5).doesNotContainNull();
+  }
+  
+  @Test
+  public void auto_magically_generate_List(){
+    //setup fixture
+    FixtureFactory sut = createRootFixtureFactory();
 
+    //exercise sut
+    sut.newDataSet(Employee.class).autoMagicallyGenerated(1);
+
+    //verify outcome
+    Employee actual = sut.dataset(Employee.class).first();
+
+    assertThat(actual.getPhoneNumbers()).isNotEmpty();
   }
 
   private FixtureFactory createRootFixtureFactory() {

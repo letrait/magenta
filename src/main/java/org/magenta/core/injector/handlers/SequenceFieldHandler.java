@@ -13,9 +13,9 @@ import org.magenta.core.Injector;
 import org.magenta.core.injector.FieldInjectionHandler;
 import org.magenta.core.injector.FieldInjectorUtils;
 import org.magenta.core.injector.FieldsExtractor;
-import org.magenta.core.sequence.SequenceForFixtureAdapter;
 import org.magenta.core.sequence.ObjectSequenceMap;
 import org.magenta.core.sequence.ObjectSequenceMapBuilder;
+import org.magenta.core.sequence.SequenceForFixtureAdapter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -40,8 +40,6 @@ public class SequenceFieldHandler extends AbstractFieldAnnotationHandler<InjectS
 
     Map<Field, DataKey<?>> keyMap = Maps.newLinkedHashMap();
     Function<Fixture, ObjectSequenceMap> sequenceProvider = CacheBuilder.newBuilder().build(CacheLoader.from(new ObjectSequenceMapBuilder(keyMap)));
-
-    //TODO : store the sequenceProvider somewhere
     
     for (FieldAnnotation<InjectSequence> f : matchingFields(target)) {
       if (Sequence.class.equals(f.getField().getType())) {

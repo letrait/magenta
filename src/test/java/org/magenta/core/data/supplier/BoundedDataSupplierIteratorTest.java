@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 
 import org.junit.Test;
-import org.magenta.core.data.supplier.BoundedDataSupplierIterator;
-import org.magenta.core.data.supplier.StaticDataSupplier;
 
 import com.google.common.reflect.TypeToken;
 

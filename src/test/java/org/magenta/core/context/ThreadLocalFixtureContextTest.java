@@ -5,7 +5,6 @@ import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 import org.magenta.Fixture;
-import org.magenta.core.context.ThreadLocalFixtureContext;
 
 public class ThreadLocalFixtureContextTest {
 

@@ -10,8 +10,6 @@ import java.util.Map;
 import org.junit.Test;
 import org.magenta.Fixture;
 import org.magenta.core.Injector;
-import org.magenta.core.injector.FieldInjectionChainProcessor;
-import org.magenta.core.injector.FieldInjectionHandler;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 

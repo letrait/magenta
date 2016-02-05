@@ -128,7 +128,6 @@ public interface DataSet<D> extends DataSupplier<D>{
    */
   public DataSet<D> filter(Predicate<? super D> filter);
 
-  public <S> DataSet<S> cast(Class<S> superType);
 
   /**
    * Transform this DataSet into another DataSet.
@@ -142,6 +141,9 @@ public interface DataSet<D> extends DataSupplier<D>{
    * @return a transformed dataset.
    */
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> transformedType);
+  
+
+  public <S> DataSet<S> cast(Class<S> superType);
 
 
   /**

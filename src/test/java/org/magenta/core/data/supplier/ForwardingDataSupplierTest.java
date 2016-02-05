@@ -5,7 +5,6 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 import org.magenta.DataSupplier;
-import org.magenta.core.data.supplier.ForwardingDataSupplier;
 import org.mockito.Mockito;
 
 public class ForwardingDataSupplierTest {

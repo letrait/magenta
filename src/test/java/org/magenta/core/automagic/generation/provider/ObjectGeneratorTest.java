@@ -2,6 +2,7 @@ package org.magenta.core.automagic.generation.provider;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -11,13 +12,12 @@ import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunction;
-import org.magenta.core.automagic.generation.provider.ObjectGenerator;
+import org.magenta.core.automagic.generation.provider.fields.mapper.SequenceFieldHydrater;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 import org.magenta.core.sequence.ObjectSequenceMap;
 import org.magenta.core.sequence.ObjectSequenceMapBuilder;
 
 import com.google.common.base.Function;
-import com.google.common.base.Suppliers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Lists;
@@ -34,7 +34,7 @@ public class ObjectGeneratorTest {
 
     Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
-    ObjectGenerator<DummyObject> sut = new ObjectGenerator<>( type , sequenceProvider);
+    ObjectGenerator<DummyObject> sut = newObjectGeneratorFor(type, sequenceProvider);
 
     //exercise sut
     DummyObject actual = sut.generate(fixture);
@@ -42,7 +42,6 @@ public class ObjectGeneratorTest {
     //verify outcome
     assertThat(actual).isNotNull();
   }
-
 
 
   @Test
@@ -58,7 +57,7 @@ public class ObjectGeneratorTest {
 
     Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
-    ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, sequenceProvider);
+    ObjectGenerator<DummyObjectWithEnum> sut = newObjectGeneratorFor(type, sequenceProvider);
 
     //exercise sut
     List<DummyObjectWithEnum> actual = read(sut,3, fixture);
@@ -73,6 +72,7 @@ public class ObjectGeneratorTest {
 
   }
   
+
   @Test
   public void testSizeOfAnObjectWithAnEnum(){
 
@@ -86,7 +86,7 @@ public class ObjectGeneratorTest {
 
     Function<Fixture, ObjectSequenceMap> sequenceProvider = createSequenceProviderFrom(type);
 
-    ObjectGenerator<DummyObjectWithEnum> sut = new ObjectGenerator<>(type, sequenceProvider);
+    ObjectGenerator<DummyObjectWithEnum> sut = newObjectGeneratorFor(type, sequenceProvider);
 
     //exercise sut
     Integer actual = sut.size(fixture);
@@ -112,6 +112,15 @@ public class ObjectGeneratorTest {
       objects.add(sut.generate(fixture));
     }
     return objects;
+  }
+  
+  private <X> ObjectGenerator<X> newObjectGeneratorFor(TypeToken<X> type, Function<Fixture, ObjectSequenceMap> sequenceProvider) {
+    ObjectGenerator<X> sut = new ObjectGenerator<>( type , sequenceProvider, hydraters(sequenceProvider));
+    return sut;
+  }
+  
+  private List<ObjectHydrater> hydraters(Function<Fixture, ObjectSequenceMap> sequenceProvider) {
+   return Arrays.asList(new SequenceFieldHydrater(sequenceProvider));
   }
 
   public static class DummyObject{

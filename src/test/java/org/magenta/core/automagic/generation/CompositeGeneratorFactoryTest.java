@@ -1,7 +1,6 @@
 package org.magenta.core.automagic.generation;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.magenta.FixtureFactory;
 import org.magenta.core.GenerationStrategy;
-import org.magenta.core.SimpleGenerationStrategy;
 import org.magenta.core.automagic.generation.provider.ConditionalGeneratorFactory;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;

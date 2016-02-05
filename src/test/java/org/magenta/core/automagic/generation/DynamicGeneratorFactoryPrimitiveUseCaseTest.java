@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,14 +18,25 @@ import com.google.common.base.Optional;
 import com.google.common.reflect.TypeToken;
 
 @RunWith(Parameterized.class)
-public class DynamicGeneratorFactoryPrimitiveUseCaseTest extends AbstractReflexionBasedGeneratorFactoryTest {
+public class DynamicGeneratorFactoryPrimitiveUseCaseTest extends AbstractDynamicGeneratorFactoryTest {
 
   @Parameters(name = "{index}: for {0}")
   public static Collection<Object[]> data() {
     return Arrays.asList(new Object[][] { 
-      { String.class, String.class }, { Integer.class,Integer.class }, { Double.class, Double.class }, { Short.class, Short.class }, 
-      { Long.class, Long.class }, { Float.class, Float.class },
-        { int.class, Integer.class }, { long.class, Long.class }, { short.class, Short.class }, { double.class, Double.class }, { float.class, Float.class } });
+      { String.class, String.class }, 
+      { Integer.class,Integer.class }, 
+      { Double.class, Double.class }, 
+      { Short.class, Short.class }, 
+      { Long.class, Long.class }, 
+      { Float.class, Float.class },
+      { Boolean.class, Boolean.class },
+      { int.class, Integer.class }, 
+      { long.class, Long.class }, 
+      { short.class, Short.class }, 
+      { double.class, Double.class }, 
+      { float.class, Float.class }, 
+      { boolean.class, Boolean.class },
+      { Date.class, Date.class}});
   }
 
   private Class<?> inputType;
@@ -36,7 +48,7 @@ public class DynamicGeneratorFactoryPrimitiveUseCaseTest extends AbstractReflexi
   }
 
   @Test
-  public void test_a_simple_generator_of_string() {
+  public void test_a_simple_generator() {
 
     // Setup fixture
     FixtureFactory fixture = Magenta.newFixture();

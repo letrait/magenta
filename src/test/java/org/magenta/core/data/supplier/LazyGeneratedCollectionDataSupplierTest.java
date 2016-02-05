@@ -1,15 +1,11 @@
 package org.magenta.core.data.supplier;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.Sequence;
 
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;

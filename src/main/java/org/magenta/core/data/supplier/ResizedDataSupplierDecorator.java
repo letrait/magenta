@@ -4,8 +4,6 @@ import java.util.Iterator;
 
 import org.magenta.DataSupplier;
 
-import com.google.common.base.Preconditions;
-
 public class ResizedDataSupplierDecorator<D> extends ForwardingDataSupplier<D> implements DataSupplier<D> {
 
   private final int size;

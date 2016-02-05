@@ -2,7 +2,6 @@ package org.magenta.core.sequence;
 
 import java.lang.reflect.Field;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,9 +34,9 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
 
     List<DataKey<?>> keys= Lists.newArrayList(fixture.keys());
 
-    if(!keys.containsAll(keyMap.values())){
+    /*if(!keys.containsAll(keyMap.values())){
       throw new DataSetNotFoundException(String.format("fixture is missing some or all of the following keys %s", keyMap.values()));
-    }
+    }*/
 
     FieldDataKeyMapEntryComparator comparator = new FieldDataKeyMapEntryComparator(keys, keyMap.keySet());
 
@@ -75,7 +74,7 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
       int i1 = keys.indexOf(datakey);
       int i2 = keys.indexOf(datakey.generalize());
 
-      if (i2 != -1 && i2 < i1) {
+      if (i2 != -1 && (i1 == -1 || i2 < i1)) {
         datakey = datakey.generalize();
       }
     }

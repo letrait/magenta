@@ -171,6 +171,32 @@ public class DataSetTest {
     //verify outcome
     assertThat(actual).containsExactly(1,2,3,4,5);
   }
+  
+  @Test
+  public void testFilter(){
+    //setup fixtures
+    Integer[] expected = new Integer[]{1,2,3,4,5,6,7,8,9,10};
+    DataSetImpl<Integer> sut = createDataSetFrom(expected);
+
+    //exercise sut
+    List<Integer> actual = sut.filter(integer -> integer % 2 == 0).list(5);
+
+    //verify outcome
+    assertThat(actual).containsExactly(2,4,6,8,10);
+  }
+  
+  @Test
+  public void testTransform(){
+    //setup fixtures
+    Integer[] expected = new Integer[]{1,2,3,4,5,6,7,8,9,10};
+    DataSetImpl<Integer> sut = createDataSetFrom(expected);
+
+    //exercise sut
+    List<String> actual = sut.transform(integer -> integer.toString(), String.class).list();
+
+    //verify outcome
+    assertThat(actual).containsExactly("1","2","3","4","5","6","7","8","9","10");
+  }
 
 
 

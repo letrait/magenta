@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 import org.junit.Before;
@@ -17,14 +16,9 @@ import org.magenta.Magenta;
 import org.magenta.Sequence;
 import org.magenta.annotation.InjectDataSet;
 import org.magenta.annotation.InjectSequence;
-import org.magenta.core.context.ThreadLocalFixtureContext;
-import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
-import org.magenta.core.injector.handlers.DataSetFieldHandler;
-import org.magenta.core.injector.handlers.DataSetFieldHandlerTest.DummyGenerator;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 
 
@@ -36,9 +30,9 @@ public class GenerationStrategyFactoryTest {
   @Before
   public void initInjector(){
     
-    FixtureContext ctx = Magenta.dependencies.get().fixtureContext();
+    FixtureContext ctx = Magenta.modules().fixtureContext();
     
-    this.sut = new GenerationStrategyFactory(ctx, Magenta.dependencies.get().injector(ctx));
+    this.sut = new GenerationStrategyFactory(ctx, Magenta.modules().injector(ctx));
   }
   
   @Test

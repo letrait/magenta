@@ -9,51 +9,53 @@ import com.google.common.reflect.TypeToken;
 
 public class TransformedDataSupplierDecorator<S,X> implements DataSupplier<X> {
 
-  public TransformedDataSupplierDecorator(DataSupplier<S> supplier, Function<? super S, X> function) {
-    // TODO Auto-generated constructor stub
+  private DataSupplier<S> delegate;
+  private Function<? super S, X> transform;
+  private TypeToken<X> type;
+  
+  public TransformedDataSupplierDecorator(DataSupplier<S> delegate, Function<? super S, X> transform, TypeToken<X> type) {
+  this.delegate =delegate;
+  this.transform=transform;
+  this.type =type;
   }
 
   @Override
   public Iterator<X> iterator() {
-    // TODO Auto-generated method stub
-    return null;
+    return new BoundedDataSupplierIterator<>(this);
   }
 
   @Override
   public X get(int position) {
-    // TODO Auto-generated method stub
-    return null;
+    return transform.apply(delegate.get(position));
   }
 
   @Override
   public TypeToken<X> getType() {
-    // TODO Auto-generated method stub
-    return null;
+    return type;
   }
 
   @Override
   public int getSize() {
-    // TODO Auto-generated method stub
-    return 0;
+    return delegate.getSize();
   }
 
   @Override
   public boolean isEmpty() {
-    // TODO Auto-generated method stub
-    return false;
+    return delegate.isEmpty();
   }
 
   @Override
   public boolean isGenerated() {
-    // TODO Auto-generated method stub
-    return false;
+    return delegate.isGenerated();
   }
 
   @Override
   public boolean isConstant() {
-    // TODO Auto-generated method stub
-    return false;
+   return delegate.isConstant();
   }
+
+  
+
 
 
 }

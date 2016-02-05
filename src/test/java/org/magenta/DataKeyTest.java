@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.DataKey;
 
 import com.google.common.reflect.TypeToken;
 

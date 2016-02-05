@@ -5,7 +5,7 @@ import java.util.Iterator;
 import org.magenta.DataSupplier;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 
 public class FilteredDataSupplierDecorator<D> extends ForwardingDataSupplier<D> implements DataSupplier<D> {
 
@@ -18,18 +18,26 @@ public class FilteredDataSupplierDecorator<D> extends ForwardingDataSupplier<D> 
 
   @Override
   public D get(int position) {
-    return Iterables.get(Iterables.filter(this, filter), position);
+    //TODO : le Integer.MAXVALUE serait en fait le maximum du datasupplier de reference, il serait limite dans le cas d'un static
+    Iterator<D> it = Iterators.filter(new ResizedDataSupplierDecorator<>(getReference(), Integer.MAX_VALUE).iterator(), filter);
+    return Iterators.get(it,position);
   }
 
   @Override
   public Iterator<D> iterator() {
-    // TODO Auto-generated method stub
-    return null;
+    return new BoundedDataSupplierIterator<>(this);
   }
 
   @Override
   public int getSize() {
-    return Iterables.size(this);
+    
+    if(isGenerated()){
+      return super.getSize();
+    }else{
+      return Iterators.size(Iterators.filter(getReference().iterator(), filter));
+    }
+    
+    
   }
 
 }

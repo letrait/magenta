@@ -6,7 +6,6 @@ import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.DataSupplier;
-import org.magenta.Sequence;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;

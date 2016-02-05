@@ -3,6 +3,8 @@ package org.magenta;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 import org.magenta.testing.domain.company.Address;
 import org.magenta.testing.domain.company.AddressGenerator;
@@ -144,6 +146,26 @@ public class FixtureFactoryGeneratedByTest {
     //verify outcome
     assertThat(actual.list()).extracting("employee").containsOnly(employees.array());
   }
+  
+  @Test
+  public void testAFilteredGenerator(){
+
+    //setup fixtures
+    FixtureFactory fixtures = createRootFixtureFactory();
+    fixtures.newGenerator(PhoneNumber.class).generatedBy(new PhoneNumberGenerator(),3);
+
+
+    //exercise sut
+   
+    DataSet<PhoneNumber> phones =fixtures.dataset(PhoneNumber.class);
+
+    List<PhoneNumber> filteredPhones = phones.filter(phone -> phone.getPhoneNumber().startsWith("123")).list();
+    
+    //verify outcome
+    System.out.println(filteredPhones);
+    assertThat(filteredPhones).hasSize(3);
+  }
+
 
   private FixtureFactory createRootFixtureFactory() {
     return Magenta.newFixture();

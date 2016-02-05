@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 import org.magenta.core.context.ThreadLocalFixtureContext;
-import org.magenta.core.data.supplier.SequenceWithFixtureContextManagementDecorator;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;

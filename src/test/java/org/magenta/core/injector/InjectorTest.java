@@ -12,8 +12,6 @@ import org.magenta.Fixture;
 import org.magenta.Sequence;
 import org.magenta.annotation.InjectSequence;
 import org.magenta.core.Injector;
-import org.magenta.core.injector.FieldInjectionChainProcessor;
-import org.magenta.core.injector.FieldInjectionHandler;
 import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 import org.magenta.core.injector.handlers.SequenceFieldHandler;
 

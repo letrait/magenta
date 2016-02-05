@@ -8,7 +8,6 @@ import org.magenta.core.DataSetFunctionRegistry;
 import org.magenta.core.DataSetImpl;
 import org.magenta.core.FixtureContext;
 import org.magenta.core.GenerationStrategy;
-import org.magenta.core.SimpleGenerationStrategy;
 import org.magenta.core.GenerationStrategyFactory;
 import org.magenta.core.RestrictionHelper;
 import org.magenta.core.automagic.generation.DynamicGeneratorFactory;

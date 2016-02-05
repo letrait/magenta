@@ -8,14 +8,11 @@ import org.junit.Test;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.GenerationStrategy;
-import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 
-public class DynamicGeneratorFactoryEnumUseCaseTest extends AbstractReflexionBasedGeneratorFactoryTest {
+public class DynamicGeneratorFactoryEnumUseCaseTest extends AbstractDynamicGeneratorFactoryTest {
 
 
   @Test

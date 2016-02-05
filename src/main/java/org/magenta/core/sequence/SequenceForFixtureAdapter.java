@@ -1,7 +1,5 @@
 package org.magenta.core.sequence;
 
-import java.util.Iterator;
-
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 

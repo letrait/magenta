@@ -3,8 +3,11 @@ package org.magenta.core;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Field;
+import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.DataKey;
@@ -35,9 +38,37 @@ public class DataKeyMapBuilderTest {
 
   }
 
+  @Test
+  public void testIterableFieldsAreNotMappedToDataKey(){
+
+    //setup fixture
+    DataKey<Object> expected = DataKey.of("DataKeyMapBuilderTest", Object.class);
+    Function<Object,DataKey<Object>> mappingFunction = Functions.constant(expected);
+
+    DataKeyMapBuilder sut = new DataKeyMapBuilder((Function)mappingFunction);
+    List<Field> fields = HiearchicalFieldsExtractor.SINGLETON.extractAll(FakeObjectWithIterables.class);
+
+    //exercise sut
+    Map<Field,DataKey<?>> actual = sut.buildMapFrom(fields);
+
+    //verify outcome
+    assertThat(actual).isNotNull().isEmpty();
+  }
+
+  @SuppressWarnings("unused")
   public static class FakeObject {
+
     private String field1;
     private Object field2;
     private int field3;
+  }
+
+  @SuppressWarnings("unused")
+  public static class FakeObjectWithIterables {
+
+    private List<Integer> integers;
+    private Collection<Date> dates;
+    private Set<Object> objects;
+    private Iterable<String> strings;
   }
 }

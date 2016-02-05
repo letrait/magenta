@@ -18,6 +18,7 @@ public class PrimitiveDynamicGeneratorFactoryProvider {
       .put(double.class, Double.class)
       .put(float.class, Float.class)
       .put(long.class, Long.class)
+      .put(boolean.class, Boolean.class)
       .build();
   
   public static List<DynamicGeneratorFactory> get(){
@@ -29,6 +30,7 @@ public class PrimitiveDynamicGeneratorFactoryProvider {
     factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Short.class) || mappedType(type).isAssignableFrom(Short.class), () -> FluentRandom.shorts().anyPositive()));
     factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Double.class) || mappedType(type).isAssignableFrom(Double.class), () -> FluentRandom.doubles().anyPositive()));
     factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Float.class) || mappedType(type).isAssignableFrom(Float.class), () -> new Float(FluentRandom.doubles().anyPositive())));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Boolean.class) || mappedType(type).isAssignableFrom(Boolean.class), () -> FluentRandom.integers().anyPositive(1)==0));
     
     return factories;
   }

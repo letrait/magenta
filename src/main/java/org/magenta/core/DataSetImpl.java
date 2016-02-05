@@ -117,7 +117,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> newType) {
-    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function));
+    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function, TypeToken.of(newType)));
   }
 
   @Override

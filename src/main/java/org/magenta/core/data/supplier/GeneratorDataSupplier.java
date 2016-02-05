@@ -3,7 +3,6 @@ package org.magenta.core.data.supplier;
 import java.util.Iterator;
 
 import org.magenta.DataSupplier;
-import org.magenta.Sequence;
 
 import com.google.common.base.Supplier;
 import com.google.common.reflect.TypeToken;
