@@ -45,7 +45,7 @@ public class DataSetTest {
     DataSetImpl<Integer> sut = createDataSetFrom(expected);
 
     //exercise sut
-    Integer actual = sut.first();
+    Integer actual = sut.head();
 
     //verify outcome
     assertThat(actual).isEqualTo(expected[0]);
@@ -134,6 +134,19 @@ public class DataSetTest {
   }
 
   @Test
+  public void testSubList_greater_than_list(){
+    //setup fixtures
+    Integer[] expected = new Integer[]{1,2,3};
+    DataSetImpl<Integer> sut = createDataSetFrom(expected);
+
+    //exercise sut
+    List<Integer> actual = sut.list(5);
+
+    //verify outcome
+    assertThat(actual).containsExactly(expected);
+  }
+
+  @Test
   public void testResizedList(){
     //setup fixtures
     Integer[] expected = new Integer[]{1,2,3,4,5,6,7,8,9,10};
@@ -171,7 +184,7 @@ public class DataSetTest {
     //verify outcome
     assertThat(actual).containsExactly(1,2,3,4,5);
   }
-  
+
   @Test
   public void testFilter(){
     //setup fixtures
@@ -184,7 +197,7 @@ public class DataSetTest {
     //verify outcome
     assertThat(actual).containsExactly(2,4,6,8,10);
   }
-  
+
   @Test
   public void testTransform(){
     //setup fixtures

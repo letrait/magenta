@@ -52,7 +52,9 @@ public class DataKeyMapBuilderTest {
     Map<Field,DataKey<?>> actual = sut.buildMapFrom(fields);
 
     //verify outcome
-    assertThat(actual).isNotNull().isEmpty();
+    assertThat(actual).isNotNull();
+    assertThat(actual.keySet()).containsAll(fields);
+    assertThat(actual.values()).containsOnly(expected);
   }
 
   @SuppressWarnings("unused")

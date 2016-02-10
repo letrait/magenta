@@ -15,7 +15,8 @@ public class ResizedDataSupplierDecorator<D> extends ForwardingDataSupplier<D> i
 
   @Override
   public int getSize() {
-    return size;
+    int maxSize = getReference().isGenerated() ? Integer.MAX_VALUE: getReference().getSize();
+    return size < maxSize ? size : maxSize;
   }
 
   @Override

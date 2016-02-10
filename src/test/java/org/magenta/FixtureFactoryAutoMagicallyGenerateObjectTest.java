@@ -43,9 +43,9 @@ public class FixtureFactoryAutoMagicallyGenerateObjectTest {
     assertThat(actual).extracting("address").hasSize(5).doesNotContainNull();
     assertThat(actual).extracting("phoneNumbers").hasSize(5).doesNotContainNull();
   }
-  
+
   @Test
-  public void auto_magically_generate_List(){
+  public void auto_magically_generate_set_for_attribtue(){
     //setup fixture
     FixtureFactory sut = createRootFixtureFactory();
 
@@ -53,7 +53,7 @@ public class FixtureFactoryAutoMagicallyGenerateObjectTest {
     sut.newDataSet(Employee.class).autoMagicallyGenerated(1);
 
     //verify outcome
-    Employee actual = sut.dataset(Employee.class).first();
+    Employee actual = sut.dataset(Employee.class).head();
 
     assertThat(actual.getPhoneNumbers()).isNotEmpty();
   }

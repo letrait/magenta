@@ -33,7 +33,7 @@ public class FixtureFactory implements Fixture {
 
   private GenerationStrategyFactory generationStrategyFactory;
   private DynamicGeneratorFactory dynamicGeneratorFactory;
-  
+
   private FixtureContext context;
 
   FixtureFactory(FixtureFactory parent, GenerationStrategyFactory generationStrategyBuilder, DynamicGeneratorFactory generatorFactory,
@@ -82,6 +82,14 @@ public class FixtureFactory implements Fixture {
 
   public <D> DataSetBuilder<D> newDataSet(Class<D> key) {
     return new DataSetBuilder<D>(DataKey.of(key));
+  }
+
+  public <D> void newDataSetOf(D...elements) {
+    new DataSetBuilder<D>(DataKey.of((Class<D>)elements[0].getClass())).composedOf(elements);
+  }
+
+  public <D> void newLazyDataSet(Class<D> key, Supplier<D> generator) {
+    newDataSet(key).generatedBy(generator);
   }
 
   public <D> GeneratorBuilder<D> newGenerator(DataKey<D> key) {
@@ -144,7 +152,7 @@ public class FixtureFactory implements Fixture {
       generatedBy(generator, Optional.of(numberOfItems));
 
     }
-    
+
     public void generatedBy(final GenerationStrategy<D> generator) {
       checkNotNull(generator, "generator argument is null");
 
@@ -173,13 +181,13 @@ public class FixtureFactory implements Fixture {
     }
 
     private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<D> strategy, Optional<Integer> numberOfItems) {
-      return fixture -> 
-         new LazyGeneratedDataSupplier<>(
-            key.getType(), 
-            () -> strategy.generate(fixture),
-            () -> numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture)
-        );
-      
+      return fixture ->
+      new LazyGeneratedDataSupplier<>(
+          key.getType(),
+          () -> strategy.generate(fixture),
+          () -> numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture)
+          );
+
     }
 
     private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<Iterable<D>> strategy) {
@@ -206,7 +214,7 @@ public class FixtureFactory implements Fixture {
 
       generatedBy(generator, Optional.of(defaultSize));
     }
-    
+
     public void generatedBy(final GenerationStrategy<D> generator) {
       checkNotNull(generator, "generator argument is null");
 
@@ -227,14 +235,14 @@ public class FixtureFactory implements Fixture {
     }
 
     private Function<Fixture, DataSupplier<D>> toDataSupplier(final GenerationStrategy<D> strategy, final Optional<Integer> numberOfItems) {
-       return fixture -> 
+      return fixture ->
 
-         new GeneratorDataSupplier<>(
-            key.getType(), 
-            () -> strategy.generate(fixture), 
-            () -> (numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture))
-        );
-      
+      new GeneratorDataSupplier<>(
+          key.getType(),
+          () -> strategy.generate(fixture),
+          () -> (numberOfItems.isPresent() ? numberOfItems.get() : strategy.size(fixture))
+          );
+
     }
 
   }
@@ -252,7 +260,7 @@ public class FixtureFactory implements Fixture {
   private <X> GenerationStrategy<X> toGenerationStrategy(Supplier<X> generator) {
     return generationStrategyFactory.create(generator);
   }
-  
+
   private <X> GenerationStrategy<X> buildDynamicGenerator(TypeToken<X> type) {
     return dynamicGeneratorFactory.buildGeneratorOf(type, FixtureFactory.this, dynamicGeneratorFactory).get();
   }

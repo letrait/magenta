@@ -87,7 +87,7 @@ public class DataSetImpl<D> implements DataSet<D> {
   }
 
   @Override
-  public D first() {
+  public D head() {
    return get(0);
   }
 

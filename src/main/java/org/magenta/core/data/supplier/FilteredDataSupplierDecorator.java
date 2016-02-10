@@ -30,14 +30,14 @@ public class FilteredDataSupplierDecorator<D> extends ForwardingDataSupplier<D> 
 
   @Override
   public int getSize() {
-    
+
     if(isGenerated()){
       return super.getSize();
     }else{
       return Iterators.size(Iterators.filter(getReference().iterator(), filter));
     }
-    
-    
+
+
   }
 
 }

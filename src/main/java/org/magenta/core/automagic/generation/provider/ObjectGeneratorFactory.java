@@ -12,6 +12,7 @@ import org.magenta.FixtureFactory;
 import org.magenta.core.DataKeyMapBuilder;
 import org.magenta.core.GenerationStrategy;
 import org.magenta.core.automagic.generation.DynamicGeneratorFactory;
+import org.magenta.core.automagic.generation.provider.fields.mapper.DataSetFieldHydrater;
 import org.magenta.core.automagic.generation.provider.fields.mapper.SequenceFieldHydrater;
 import org.magenta.core.injector.FieldsExtractor;
 import org.magenta.core.sequence.ObjectSequenceMap;
@@ -55,7 +56,7 @@ public class ObjectGeneratorFactory implements DynamicGeneratorFactory {
     Function<Fixture, ObjectSequenceMap> sequenceProvider = CacheBuilder.newBuilder()
         .build(CacheLoader.from(new ObjectSequenceMapBuilder(dataKeyForFieldMap)));
 
-    return Optional.of(new ObjectGenerator<D>(type, sequenceProvider, Arrays.asList(new SequenceFieldHydrater(sequenceProvider))));
+    return Optional.of(new ObjectGenerator<D>(type, sequenceProvider, Arrays.asList(new SequenceFieldHydrater(sequenceProvider), new DataSetFieldHydrater())));
   }
 
   private boolean isApplicable(TypeToken<?> type) {
@@ -74,6 +75,9 @@ public class ObjectGeneratorFactory implements DynamicGeneratorFactory {
       Map<Field, DataKey<?>> dataKeyForFieldMap) {
     List<Field> toRemove = Lists.newArrayList();
     for (Map.Entry<Field, DataKey<?>> e : dataKeyForFieldMap.entrySet()) {
+
+      //TODO : 3 fevrier 2016 : Il faut aussi generer les types inclues dans les collections (ex: List<Employee>, il faut generer le dataset Employee aussi...)
+
       DataKey<?> key = e.getValue();
       if (!fixture.keys().contains(key)) {
         if (!addToFixtureIfPossible(key, fixture, dynamicGeneratorFactory)) {

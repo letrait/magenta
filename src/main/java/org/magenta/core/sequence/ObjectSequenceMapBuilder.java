@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import org.assertj.core.util.Maps;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
-import org.magenta.DataSetNotFoundException;
 import org.magenta.Fixture;
 import org.magenta.Sequence;
 
@@ -28,7 +27,7 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
   @Override
   public ObjectSequenceMap apply(Fixture fixture) {
 
-   Map<Field, Sequence<?>> map =Maps.newHashMap();
+    Map<Field, Sequence<?>> map =Maps.newHashMap();
 
     SequenceCoordinator coordinator = new SequenceCoordinator();
 
@@ -42,23 +41,28 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
 
     for (Map.Entry<Field, DataKey<?>> e : Ordering.from(comparator).immutableSortedCopy(keyMap.entrySet())) {
 
-      DataKey<?> datakey = generalize(e.getValue(), keys);
+      if(!isAnIterable(e)){
 
-      DataSet<?> dataset = fixture.dataset(datakey);
-      if (!dataset.isConstant()) {
-        map.put(e.getKey(), nonDeterministicSequence(dataset));
-      } else {
-        CoordinatedSequence<?> sequence = combinatorySequence(dataset, coordinator);
+        DataKey<?> datakey = generalize(e.getValue(), keys);
 
-        map.put(e.getKey(), sequence);
+        DataSet<?> dataset = fixture.dataset(datakey);
+        if (!dataset.isConstant()) {
+          map.put(e.getKey(), nonDeterministicSequence(dataset));
+        } else {
+          CoordinatedSequence<?> sequence = combinatorySequence(dataset, coordinator);
 
+          map.put(e.getKey(), sequence);
+
+        }
       }
     }
-    
+
     ObjectSequenceMap sim = new ObjectSequenceMap(map,coordinator.numberOfCombination());
 
     return sim;
   }
+
+
 
   /**
    * Takes the generalized version (a datakey without qualifier) of a given datakey only if that generalized version is placed before this given key in the
@@ -79,6 +83,10 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
       }
     }
     return datakey;
+  }
+
+  private boolean isAnIterable(Entry<Field, DataKey<?>> e) {
+    return Iterable.class.isAssignableFrom(e.getKey().getType()) || e.getKey().getType().isArray();
   }
 
   private <D> CoordinatedSequence<D> combinatorySequence(DataSet<D> dataset, SequenceCoordinator coordinator) {

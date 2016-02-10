@@ -125,28 +125,28 @@ public class FixtureFactoryGeneratedByTest {
     //verify outcome
     assertThat(actual.list(30)).hasSize(30);
   }
-  
+
   @Test
   public void testAGeneratorOfIterable(){
 
     //setup fixtures
     FixtureFactory fixtures = createRootFixtureFactory();
-    
-    fixtures.newDataSet(Occupation.class).composedOf(Occupation.values());
-    fixtures.newDataSet(Address.class).generatedBy(new AddressGenerator());
+
+    fixtures.newDataSetOf(Occupation.values());
+    fixtures.newLazyDataSet(Address.class, new AddressGenerator());
     fixtures.newGenerator(PhoneNumber.class).generatedBy(new PhoneNumberGenerator());
     fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator3());
     fixtures.newDataSet(Contract.class).generatedAsIterableBy(new ContractGenerator());
 
     //exercise sut
-    
+
     DataSet<Contract> actual =fixtures.dataset(Contract.class);
     DataSet<Employee> employees =fixtures.dataset(Employee.class);
 
     //verify outcome
     assertThat(actual.list()).extracting("employee").containsOnly(employees.array());
   }
-  
+
   @Test
   public void testAFilteredGenerator(){
 
@@ -156,11 +156,11 @@ public class FixtureFactoryGeneratedByTest {
 
 
     //exercise sut
-   
+
     DataSet<PhoneNumber> phones =fixtures.dataset(PhoneNumber.class);
 
     List<PhoneNumber> filteredPhones = phones.filter(phone -> phone.getPhoneNumber().startsWith("123")).list();
-    
+
     //verify outcome
     System.out.println(filteredPhones);
     assertThat(filteredPhones).hasSize(3);

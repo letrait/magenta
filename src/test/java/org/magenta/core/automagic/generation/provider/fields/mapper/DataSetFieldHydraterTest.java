@@ -32,13 +32,15 @@ public class DataSetFieldHydraterTest {
     FixtureFactory fixture = Magenta.newFixture();
     DataSetFieldHydrater sut = new DataSetFieldHydrater();
 
+    fixture.newDataSet(String.class).composedOf("abc");
+
     ClassWithAList candidate = new ClassWithAList();
 
     //exercise sut
     sut.hydrate(candidate, fixture);
 
     //then
-    assertThat(candidate.strings).isNotNull().isEmpty();
+    assertThat(candidate.strings).isNotNull().containsExactly("abc");
   }
 
   public static class ClassWithoutList {

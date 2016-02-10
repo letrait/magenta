@@ -37,6 +37,30 @@ public class FixtureFactoryComposedOfTest {
   }
 
   @Test
+  public void testImplicitComposition(){
+
+    Integer[] expectedNumbers = new Integer[]{1,2,3,4,5,6,7};
+    FixtureFactory fixtures = createRootFixtureFactory();
+
+    DataKey<Integer> key = DataKey.of(Integer.class);
+
+    //exercise sut
+    fixtures.newDataSetOf(expectedNumbers);
+    DataSet<Integer> actual = fixtures.dataset(key);
+
+    //verify outcome
+    assertThat(actual).containsExactly(expectedNumbers);
+    assertThat(actual.isConstant()).isTrue();
+    assertThat(actual.isEmpty()).isFalse();
+    assertThat(actual.isGenerated()).isFalse();
+    assertThat(actual.getSize()).isEqualTo(expectedNumbers.length);
+    assertThat(actual.getType()).isEqualTo(key.getType());
+    assertThat(actual.any()).isIn(expectedNumbers);
+
+
+  }
+
+  @Test
   public void testComposedOfTypeToken(){
 
     List<Integer>[] expectedSets = new List[]{Arrays.asList(1,2,3), Arrays.asList(4,5,6), Arrays.asList(7,8,9)};

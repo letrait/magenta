@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Test;
 import org.magenta.DataKey;
@@ -39,7 +40,7 @@ public class ObjectSequenceMapBuilderTest {
     assertThat(actual.isEmpty()).isTrue();
 
   }
-  
+
   @Test
   public void test_when_no_field_exists_then_the_combination_count_is_one() {
 
@@ -55,13 +56,13 @@ public class ObjectSequenceMapBuilderTest {
     assertThat(actual.getCombinationCount()).isEqualTo(1);
 
   }
-  
+
   @Test
   public void test_when_only_one_sequence_exists_then_the_combination_count_is_the_size_of_this_sequence() throws NoSuchFieldException, SecurityException {
 
     // setup fixture
     FixtureFactory fixture = createRootFixtureFactory();
-    
+
     int dataSetSize = 3;
 
     //setup a string generator
@@ -80,7 +81,7 @@ public class ObjectSequenceMapBuilderTest {
 
     // exercise sut
     ObjectSequenceMap actual = sut.apply(fixture);
-    
+
     //verify outcome
     assertThat(actual.getCombinationCount()).isEqualTo(dataSetSize);
 
@@ -151,6 +152,37 @@ public class ObjectSequenceMapBuilderTest {
     assertThat(actualSequence).containsExactly("a", "b", "a", "b");
   }
 
+  @Test
+  public void test_fields_that_are_compatible_with_iterable_should_not_be_mapped() throws NoSuchFieldException, SecurityException{
+    // setup fixture
+    FixtureFactory fixture = createRootFixtureFactory();
+
+    //setup a string generator
+    Supplier<String> stringGenerator = mock(Supplier.class);
+    when(stringGenerator.get()).thenReturn("a", "b", "c");
+
+    //the size of the generator is limited to 2, which would make the sequence return only "a" and "b" if the sequence is deterministic and "a" ,"b", "c"
+    //if the sequence is undeterministic
+    fixture.newDataSet(String.class).generatedBy(stringGenerator, 2);
+
+    //map the field
+    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
+
+    Field stringsField = DummyClass.class.getDeclaredField("strings");
+    keyMap.put(stringsField, DataKey.of(String.class));
+
+    //build sut
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
+
+    // exercise sut
+    ObjectSequenceMap actual = sut.apply(fixture);
+
+    // verify outcome
+    assertThat(actual).as("the sequence").isNotNull();
+
+    assertThat(actual.isEmpty()).isTrue();
+  }
+
   private List<String> readSequence(Sequence<?> actual, int size) {
     List<String> actualSequence = Lists.newArrayList();
     for (int i = 0; i < size; i++) {
@@ -161,5 +193,6 @@ public class ObjectSequenceMapBuilderTest {
 
   public class DummyClass {
     String string;
+    Set<String> strings;
   }
 }

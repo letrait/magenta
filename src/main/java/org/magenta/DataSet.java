@@ -178,7 +178,7 @@ public interface DataSet<D> extends DataSupplier<D>{
    *
    * @return the first item
    */
-  public D first();
+  public D head();
 
 
 
