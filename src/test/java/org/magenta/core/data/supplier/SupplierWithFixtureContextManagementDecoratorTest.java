@@ -32,12 +32,12 @@ public class SupplierWithFixtureContextManagementDecoratorTest {
   public void test_fixture_is_set_to_threadlocal_before_delegating(){
 
     //setup fixtures
-    when(delegate.get()).thenReturn(1);
+    when(delegate.next()).thenReturn(1);
 
     SequenceWithFixtureContextManagementDecorator<Integer> sut = new SequenceWithFixtureContextManagementDecorator<Integer>(delegate, fixture, threadLocal);
 
     //exercise sut
-    Integer actual = sut.get();
+    Integer actual = sut.next();
 
     //verify outcome
     assertThat(actual).isEqualTo(1);
@@ -45,7 +45,7 @@ public class SupplierWithFixtureContextManagementDecoratorTest {
     InOrder order = Mockito.inOrder(threadLocal, delegate);
 
     order.verify(threadLocal).set(fixture);
-    order.verify(delegate).get();
+    order.verify(delegate).next();
     order.verify(threadLocal).clear();
 
   }
@@ -54,14 +54,14 @@ public class SupplierWithFixtureContextManagementDecoratorTest {
   public void test_fixture_is_removed_from_threadlocal_even_if_there_is_an_exception_during_delegation(){
 
     //setup fixtures
-    when(delegate.get()).thenThrow(new RuntimeException("test exception"));
+    when(delegate.next()).thenThrow(new RuntimeException("test exception"));
 
     SequenceWithFixtureContextManagementDecorator<Integer> sut = new SequenceWithFixtureContextManagementDecorator<Integer>(delegate, fixture, threadLocal);
 
     //exercise sut
 
     try{
-      sut.get();
+      sut.next();
       fail("no exception thrown");
     }catch(Exception re){
 
@@ -74,7 +74,7 @@ public class SupplierWithFixtureContextManagementDecoratorTest {
     InOrder order = Mockito.inOrder(threadLocal, delegate);
 
     order.verify(threadLocal).set(fixture);
-    order.verify(delegate).get();
+    order.verify(delegate).next();
     order.verify(threadLocal).clear();
 
   }
@@ -86,12 +86,12 @@ public class SupplierWithFixtureContextManagementDecoratorTest {
 
     //setup fixtures
     when(threadLocal.isSet()).thenReturn(true);
-    when(delegate.get()).thenReturn(1);
+    when(delegate.next()).thenReturn(1);
 
     SequenceWithFixtureContextManagementDecorator<Integer> sut = new SequenceWithFixtureContextManagementDecorator<Integer>(delegate, fixture, threadLocal);
 
     //exercise sut
-    Integer actual = sut.get();
+    Integer actual = sut.next();
 
     //verify outcome
     assertThat(actual).isEqualTo(1);

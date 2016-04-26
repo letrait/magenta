@@ -6,6 +6,7 @@ import java.util.Set;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicate;
+import com.google.common.reflect.TypeToken;
 
 public interface DataSet<D> extends DataSupplier<D>{
 
@@ -141,9 +142,24 @@ public interface DataSet<D> extends DataSupplier<D>{
    * @return a transformed dataset.
    */
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> transformedType);
-  
+
+  /**
+   * Transform this DataSet into another DataSet.
+   *
+   * @param function
+   *          the transformation function
+   * @param transformedType
+   *          the transformed type
+   * @param <X>
+   *          the data type of the transformed dataset.
+   * @return a transformed dataset.
+   */
+  public <X> DataSet<X> transform(Function<? super D, X> function, TypeToken<X> transformedType);
+
 
   public <S> DataSet<S> cast(Class<S> superType);
+
+  public DataSet<D> freeze();
 
 
   /**

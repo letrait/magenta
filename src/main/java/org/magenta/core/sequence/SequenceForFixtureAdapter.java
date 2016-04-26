@@ -26,11 +26,11 @@ public class SequenceForFixtureAdapter<D> implements Sequence<D> {
   }
 
   @Override
-  public D get() {
+  public D next() {
 
     Fixture f = Preconditions.checkNotNull(fixtureSupplier.get());
 
-    return sequenceProvider.apply(f).get();
+    return sequenceProvider.apply(f).next();
   }
 
   @Override
@@ -39,6 +39,6 @@ public class SequenceForFixtureAdapter<D> implements Sequence<D> {
 
     return sequenceProvider.apply(f).size();
   }
-  
+
 
 }

@@ -13,7 +13,7 @@ public class EmployeeGenerator implements Supplier<Employee> {
   @Override
   public Employee get() {
     Employee e = new Employee();
-    e.setOccupation(occupations.get());
+    e.setOccupation(occupations.next());
     return e;
   }
 

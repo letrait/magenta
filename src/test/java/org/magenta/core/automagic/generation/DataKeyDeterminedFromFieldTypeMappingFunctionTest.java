@@ -6,40 +6,47 @@ import java.util.List;
 
 import org.junit.Test;
 import org.magenta.DataKey;
+import org.magenta.core.sequence.FieldSequenceDefinition;
 
 public class DataKeyDeterminedFromFieldTypeMappingFunctionTest {
 
   @Test
-  public void testMappingOfSimpleField() throws NoSuchFieldException, SecurityException{
+  public void testMappingOfSimpleField() throws NoSuchFieldException, SecurityException {
 
-    //setup fixture
+    // setup fixture
     DataKeyDeterminedFromFieldTypeMappingFunction sut = new DataKeyDeterminedFromFieldTypeMappingFunction();
-    DataKey<String> expected = DataKey.of("org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunctionTest$FakeObject.string", String.class);
+    DataKey<String> k = DataKey.of("org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunctionTest$FakeObject.string",
+        String.class);
+    FieldSequenceDefinition expected = FieldSequenceDefinition.make(FakeObject.class.getDeclaredField("string"), k,
+        FieldSequenceDefinition.Type.ATTRIBUTE);
 
-    //exercise sut
-    DataKey actual = sut.apply(FakeObject.class.getDeclaredField("string"));
+    // exercise sut
+    FieldSequenceDefinition actual = sut.apply(FakeObject.class.getDeclaredField("string"));
 
-    //verify outcome
+    // verify outcome
     assertThat(actual).isEqualTo(expected);
 
   }
 
   @Test
-  public void testMappingOfListField() throws NoSuchFieldException, SecurityException{
+  public void testMappingOfListField() throws NoSuchFieldException, SecurityException {
 
-    //setup fixture
+    // setup fixture
     DataKeyDeterminedFromFieldTypeMappingFunction sut = new DataKeyDeterminedFromFieldTypeMappingFunction();
-    DataKey<String> expected = DataKey.of("org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunctionTest$FakeObject.strings", String.class);
+    DataKey<String> k = DataKey.of("org.magenta.core.automagic.generation.DataKeyDeterminedFromFieldTypeMappingFunctionTest$FakeObject.strings",
+        String.class);
+    FieldSequenceDefinition expected = FieldSequenceDefinition.make(FakeObject.class.getDeclaredField("strings"), k,
+        FieldSequenceDefinition.Type.ITERABLE);
 
-    //exercise sut
-    DataKey actual = sut.apply(FakeObject.class.getDeclaredField("strings"));
+    // exercise sut
+    FieldSequenceDefinition actual = sut.apply(FakeObject.class.getDeclaredField("strings"));
 
-    //verify outcome
+    // verify outcome
     assertThat(actual).isEqualTo(expected);
 
   }
 
-  public static class FakeObject{
+  public static class FakeObject {
     private String string;
     private List<String> strings;
   }

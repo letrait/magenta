@@ -41,21 +41,34 @@ public class SequenceCoordinator {
       }
     }
 
-     currentLoop.add(sequence);
+    currentLoop.add(sequence);
 
-     AtomicInteger current = indexMap.get(sequence);
-     int toReturn = current.intValue();
+    AtomicInteger current = indexMap.get(sequence);
+    int toReturn = current.intValue();
 
-
-
-     return toReturn;
+    return toReturn;
   }
 
   public Integer numberOfCombination() {
-    int r = 1;
-    for (CoordinatedSequence<?> s : indexMap.keySet()) {
-      r = r * s.size();
+
+    if(indexMap.isEmpty()){
+      return Integer.MAX_VALUE;
     }
-    return r;
+
+    int r = 1;
+    int uniqueSize = Integer.MAX_VALUE;
+    for (CoordinatedSequence<?> s : indexMap.keySet()) {
+
+      int sequenceSize = s.size();
+
+      if(sequenceSize!=Integer.MAX_VALUE){
+        r = r * s.size();
+      }
+
+      if(s.hasUnicityConstraint()){
+        uniqueSize = sequenceSize < uniqueSize ? sequenceSize : uniqueSize;
+      }
+    }
+    return uniqueSize < r ? uniqueSize : r;
   }
 }

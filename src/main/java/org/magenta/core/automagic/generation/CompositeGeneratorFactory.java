@@ -18,17 +18,17 @@ public class CompositeGeneratorFactory implements DynamicGeneratorFactory {
   }
 
   @Override
-  public <D> Optional<GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture, DynamicGeneratorFactory dynamicGeneratorFactory) {
-    
+  public <D> Optional<? extends GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture, DynamicGeneratorFactory dynamicGeneratorFactory) {
+
     for(DynamicGeneratorFactory p:generatorProviders){
-      
-      Optional<GenerationStrategy<D>> s = p.buildGeneratorOf(type,fixture,dynamicGeneratorFactory);
+
+      Optional<? extends GenerationStrategy<D>> s = p.buildGeneratorOf(type,fixture,dynamicGeneratorFactory);
       if(s.isPresent()){
         return s;
       }
     }
-    
+
     return Optional.absent();
-    
+
   }
 }

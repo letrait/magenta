@@ -37,16 +37,38 @@ public class FixtureFactoryComposedOfTest {
   }
 
   @Test
+  public void testTransformedComposition(){
+    String[] expectedNumbers = new String[]{"1","2","3","4","5","6","7"};
+    Iterable<Integer>   integers = Arrays.asList(1,2,3,4,5,6,7);
+
+    FixtureFactory fixtures = createRootFixtureFactory();
+
+    DataKey<String> key = DataKey.of(String.class);
+
+    //exercise sut
+    fixtures.newDataSet(key).transformed((Integer i)->i.toString()).composedOf(integers);
+    DataSet<String> actual = fixtures.dataset(key);
+    assertThat(actual).containsExactly(expectedNumbers);
+    assertThat(actual.isConstant()).isTrue();
+    assertThat(actual.isEmpty()).isFalse();
+    assertThat(actual.isGenerated()).isFalse();
+    assertThat(actual.getSize()).isEqualTo(expectedNumbers.length);
+    assertThat(actual.getType()).isEqualTo(key.getType());
+    assertThat(actual.any()).isIn(expectedNumbers);
+
+  }
+
+  @Test
   public void testImplicitComposition(){
 
     Integer[] expectedNumbers = new Integer[]{1,2,3,4,5,6,7};
     FixtureFactory fixtures = createRootFixtureFactory();
 
-    DataKey<Integer> key = DataKey.of(Integer.class);
+    DataKey<Number> key = DataKey.of(Number.class);
 
     //exercise sut
     fixtures.newDataSetOf(expectedNumbers);
-    DataSet<Integer> actual = fixtures.dataset(key);
+    DataSet<Number> actual = fixtures.dataset(key);
 
     //verify outcome
     assertThat(actual).containsExactly(expectedNumbers);

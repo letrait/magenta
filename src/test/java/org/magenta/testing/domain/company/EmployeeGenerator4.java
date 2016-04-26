@@ -8,7 +8,10 @@ import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Supplier;
 
-public class EmployeeGenerator3 implements Supplier<Employee> {
+public class EmployeeGenerator4 implements Supplier<Employee> {
+
+  @InjectSequence(unique=true)
+  private Sequence<Employee.Id> ids;
 
   @InjectSequence
   private Sequence<Occupation> occupations;
@@ -22,11 +25,11 @@ public class EmployeeGenerator3 implements Supplier<Employee> {
   @Override
   public Employee get() {
     Employee e = new Employee();
+    e.setEmployeeId(ids.next());
     e.setName(FluentRandom.strings().charabia(16));
     e.setOccupation(occupations.next());
     e.setAddress(address.next());
     e.getPhoneNumbers().addAll(phoneNumbers.set(2));
     return e;
   }
-
 }

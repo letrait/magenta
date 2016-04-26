@@ -6,7 +6,6 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
@@ -17,7 +16,7 @@ import org.magenta.Sequence;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.inject.internal.Sets;
 
 public class ObjectSequenceMapBuilderTest {
 
@@ -31,7 +30,7 @@ public class ObjectSequenceMapBuilderTest {
     // setup fixture
     FixtureFactory fixture = createRootFixtureFactory();
 
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Maps.<Field, DataKey<?>> newLinkedHashMap());
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Lists.newArrayList());
 
     // exercise sut
     ObjectSequenceMap actual = sut.apply(fixture);
@@ -42,18 +41,18 @@ public class ObjectSequenceMapBuilderTest {
   }
 
   @Test
-  public void test_when_no_field_exists_then_the_combination_count_is_one() {
+  public void test_when_no_field_exists_then_the_combination_count_is_infinite() {
 
     // setup fixture
     FixtureFactory fixture = createRootFixtureFactory();
 
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Maps.<Field, DataKey<?>> newLinkedHashMap());
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(Lists.newArrayList());
 
     // exercise sut
     ObjectSequenceMap actual = sut.apply(fixture);
 
     // verify outcome
-    assertThat(actual.getCombinationCount()).isEqualTo(1);
+    assertThat(actual.getCombinationCount()).isEqualTo(Integer.MAX_VALUE);
 
   }
 
@@ -71,13 +70,13 @@ public class ObjectSequenceMapBuilderTest {
     fixture.newDataSet(String.class).generatedBy(stringGenerator, dataSetSize);
 
     //map the field
-    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
+    Set<FieldSequenceDefinition> definitions =Sets.newLinkedHashSet();
 
     Field stringField = DummyClass.class.getDeclaredField("string");
-    keyMap.put(stringField, DataKey.of(String.class));
+    definitions.add(FieldSequenceDefinition.make(stringField, DataKey.of(String.class), FieldSequenceDefinition.Type.ATTRIBUTE));
 
     //build sut
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(definitions);
 
     // exercise sut
     ObjectSequenceMap actual = sut.apply(fixture);
@@ -102,13 +101,13 @@ public class ObjectSequenceMapBuilderTest {
     fixture.newGenerator(String.class).generatedBy(stringGenerator, 1);
 
     //map the field
-    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
+    Set<FieldSequenceDefinition> definitions =Sets.newLinkedHashSet();
 
     Field stringField = DummyClass.class.getDeclaredField("string");
-    keyMap.put(stringField, DataKey.of(String.class));
+    definitions.add(FieldSequenceDefinition.make(stringField, DataKey.of(String.class), FieldSequenceDefinition.Type.ATTRIBUTE));
 
     //build sut
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(definitions);
 
     // exercise sut
     Sequence<?> actual = sut.apply(fixture).get(stringField);
@@ -134,13 +133,13 @@ public class ObjectSequenceMapBuilderTest {
     fixture.newDataSet(String.class).generatedBy(stringGenerator, 2);
 
     //map the field
-    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
+    Set<FieldSequenceDefinition> definitions =Sets.newLinkedHashSet();
 
     Field stringField = DummyClass.class.getDeclaredField("string");
-    keyMap.put(stringField, DataKey.of(String.class));
+    definitions.add(FieldSequenceDefinition.make(stringField, DataKey.of(String.class), FieldSequenceDefinition.Type.ATTRIBUTE));
 
     //build sut
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
+    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(definitions);
 
     // exercise sut
     Sequence<?> actual = sut.apply(fixture).get(stringField);
@@ -152,41 +151,10 @@ public class ObjectSequenceMapBuilderTest {
     assertThat(actualSequence).containsExactly("a", "b", "a", "b");
   }
 
-  @Test
-  public void test_fields_that_are_compatible_with_iterable_should_not_be_mapped() throws NoSuchFieldException, SecurityException{
-    // setup fixture
-    FixtureFactory fixture = createRootFixtureFactory();
-
-    //setup a string generator
-    Supplier<String> stringGenerator = mock(Supplier.class);
-    when(stringGenerator.get()).thenReturn("a", "b", "c");
-
-    //the size of the generator is limited to 2, which would make the sequence return only "a" and "b" if the sequence is deterministic and "a" ,"b", "c"
-    //if the sequence is undeterministic
-    fixture.newDataSet(String.class).generatedBy(stringGenerator, 2);
-
-    //map the field
-    Map<Field, DataKey<?>> keyMap = Maps.newHashMap();
-
-    Field stringsField = DummyClass.class.getDeclaredField("strings");
-    keyMap.put(stringsField, DataKey.of(String.class));
-
-    //build sut
-    ObjectSequenceMapBuilder sut = new ObjectSequenceMapBuilder(keyMap);
-
-    // exercise sut
-    ObjectSequenceMap actual = sut.apply(fixture);
-
-    // verify outcome
-    assertThat(actual).as("the sequence").isNotNull();
-
-    assertThat(actual.isEmpty()).isTrue();
-  }
-
   private List<String> readSequence(Sequence<?> actual, int size) {
     List<String> actualSequence = Lists.newArrayList();
     for (int i = 0; i < size; i++) {
-      actualSequence.add((String) actual.get());
+      actualSequence.add((String) actual.next());
     }
     return actualSequence;
   }

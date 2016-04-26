@@ -25,26 +25,25 @@ public class FieldInjectionChainProcessorTest {
     //setup fixture
     Map<Injector.Key<?>,Object> values1 = ImmutableMap.of(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION,10);
     Map<Injector.Key<?>,Object> values2 = ImmutableMap.of(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION,20);
-    
+
     Fixture fixture = mock(Fixture.class);
     Supplier<Fixture> currentFixture = Suppliers.ofInstance(fixture);
 
     FieldInjectionHandler handler1 = mock(FieldInjectionHandler.class);
     FieldInjectionHandler handler2 = mock(FieldInjectionHandler.class);
-    
+
     when(handler1.injectInto(Mockito.any(Object.class), Mockito.any(Supplier.class))).thenReturn(values1);
     when(handler1.injectInto(Mockito.any(Object.class), Mockito.any(Supplier.class))).thenReturn(values2);
 
     Injector sut = new FieldInjectionChainProcessor(
-        Arrays.asList(handler1, handler2),
-            currentFixture);
+        Arrays.asList(handler1, handler2));
 
     //exercise sut
-    Map<Injector.Key<?>,Object> actual = sut.inject(this);
+    Map<Injector.Key<?>,Object> actual = sut.inject(this, currentFixture);
 
     //verify outcome
     assertThat(actual).containsEntry(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION,20);
-    
+
     InOrder inOrder = Mockito.inOrder(handler1,handler2);
 
     inOrder.verify(handler1).injectInto(this, currentFixture);

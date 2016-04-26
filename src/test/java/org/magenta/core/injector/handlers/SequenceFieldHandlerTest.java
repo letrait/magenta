@@ -104,7 +104,7 @@ public class SequenceFieldHandlerTest {
     private Sequence<Integer> integers;
 
     public Integer get(){
-      return integers.get();
+      return integers.next();
     }
   }
 
@@ -116,7 +116,7 @@ public class SequenceFieldHandlerTest {
     private Sequence<Integer> integers2;
 
     public Integer[] get(){
-      return new Integer[]{integers1.get(), integers2.get()};
+      return new Integer[]{integers1.next(), integers2.next()};
     }
   }
 

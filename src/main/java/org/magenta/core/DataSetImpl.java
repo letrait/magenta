@@ -14,6 +14,7 @@ import org.magenta.DataSupplier;
 import org.magenta.core.data.supplier.BoundedDataSupplierIterator;
 import org.magenta.core.data.supplier.FilteredDataSupplierDecorator;
 import org.magenta.core.data.supplier.ResizedDataSupplierDecorator;
+import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.core.data.supplier.TransformedDataSupplierDecorator;
 import org.magenta.random.FluentRandom;
 
@@ -83,18 +84,18 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public Iterator<D> iterator() {
-     return new BoundedDataSupplierIterator<D>(this);
+    return new BoundedDataSupplierIterator<D>(this);
   }
 
   @Override
   public D head() {
-   return get(0);
+    return get(0);
   }
 
   @Override
   public D any() {
     if(this.isGenerated() && !this.isConstant()){
-     return get(0);
+      return get(0);
     }else{
       return FluentRandom.iterable(this).any();
     }
@@ -117,7 +118,12 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> newType) {
-    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function, TypeToken.of(newType)));
+    return transform(function, TypeToken.of(newType));
+  }
+
+  @Override
+  public <X> DataSet<X> transform(Function<? super D, X> function, TypeToken<X> transformedType) {
+    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function, transformedType));
   }
 
   @Override
@@ -144,6 +150,13 @@ public class DataSetImpl<D> implements DataSet<D> {
   public DataSet<D> without(Collection<D> items) {
     return filter(not(in(items)));
   }
+
+  @Override
+  public DataSet<D> freeze() {
+    return new DataSetImpl<>(new StaticDataSupplier<>(list(), getType()));
+  }
+
+
 
   @Override
   public D[] array() {
@@ -202,7 +215,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public int hashCode() {
-    return !this.isGenerated()? this.hashCode() : super.hashCode();
+    return !this.isGenerated() ? this.getSize() : super.hashCode();
   }
 
   @Override
@@ -219,6 +232,10 @@ public class DataSetImpl<D> implements DataSet<D> {
     }
     return false;
   }
+
+
+
+
 
 
 }

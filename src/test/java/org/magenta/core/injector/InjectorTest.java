@@ -26,29 +26,29 @@ public class InjectorTest {
     //setup fixtures
     Fixture fixture = mock(Fixture.class);
     Supplier<Fixture> fixtureReference = Suppliers.ofInstance(fixture);
-    Injector injector = createInjector(fixtureReference);
+    Injector injector = createInjector();
 
     DummyObject sut = new DummyObject();
 
     //exercise sut
-    Map<Injector.Key<?>,Object> map = injector.inject(sut);
+    Map<Injector.Key<?>,Object> map = injector.inject(sut, fixtureReference);
 
     //verify outcome
     assertThat(sut.getSequence()).isNotNull();
     assertThat(map).containsKey(Injector.Key.NUMBER_OF_COMBINATION_FUNCTION);
   }
 
-  private Injector createInjector(Supplier<Fixture> fixtureReference) {
+  private Injector createInjector() {
 
     List<FieldInjectionHandler> handlers = new ArrayList<>();
 
     handlers.add(sequenceFieldHandler());
 
-    return new FieldInjectionChainProcessor(handlers, fixtureReference);
+    return new FieldInjectionChainProcessor(handlers);
   }
 
   private SequenceFieldHandler sequenceFieldHandler() {
-     return new SequenceFieldHandler(HiearchicalFieldsExtractor.SINGLETON);
+    return new SequenceFieldHandler(HiearchicalFieldsExtractor.SINGLETON);
   }
 
   public class DummyObject {

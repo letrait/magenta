@@ -11,23 +11,23 @@ import com.google.inject.internal.Preconditions;
 
 public class SequenceFieldHydrater implements ObjectHydrater {
 
-  private Function<Fixture, ObjectSequenceMap> objectSequenceMapOfFixture;
-  
-  
-  public SequenceFieldHydrater(Function<Fixture, ObjectSequenceMap> objectSequenceMapOfFixture) {
+  private Function<? super Fixture, ObjectSequenceMap> objectSequenceMapOfFixture;
+
+
+  public SequenceFieldHydrater(Function<? super Fixture, ObjectSequenceMap> objectSequenceMapOfFixture) {
     this.objectSequenceMapOfFixture = Preconditions.checkNotNull(objectSequenceMapOfFixture);
   }
 
   @Override
   public void hydrate(Object candidate, Fixture fixture) throws IllegalArgumentException, IllegalAccessException {
-    
+
     ObjectSequenceMap map = objectSequenceMapOfFixture.apply(fixture);
-    
+
     for(Field f: map.fields()){
       f.setAccessible(true);
-      f.set(candidate, map.get(f).get());
+      f.set(candidate, map.get(f).next());
     }
-    
+
   }
 
 }

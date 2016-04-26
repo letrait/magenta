@@ -13,16 +13,14 @@ import com.google.common.collect.Maps;
 
 public class FieldInjectionChainProcessor implements Injector {
 
-  private Supplier<Fixture> fixtureReference;
   private List<? extends FieldInjectionHandler> handlers;
 
-  public FieldInjectionChainProcessor(List<FieldInjectionHandler> handlers, Supplier<Fixture> fixtureReference) {
+  public FieldInjectionChainProcessor(List<FieldInjectionHandler> handlers) {
     this.handlers = checkNotNull(handlers);
-    this.fixtureReference = checkNotNull(fixtureReference);
   }
 
   @Override
-  public Map<Injector.Key<?>, Object> inject(Object o) {
+  public Map<Injector.Key<?>, Object> inject(Object o, Supplier<Fixture> fixtureReference) {
     Map<Injector.Key<?>, Object> injectionResults = Maps.newHashMap();
 
     for (FieldInjectionHandler handler : handlers) {

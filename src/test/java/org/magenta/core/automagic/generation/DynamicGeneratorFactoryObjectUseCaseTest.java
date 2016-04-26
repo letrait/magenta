@@ -20,13 +20,13 @@ public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGen
 
     //exercise sut
     //The bar class does not have a no-arg constructor, therefore no generation strategy should be returned
-    Optional<GenerationStrategy<Bar>> actual = sut.buildGeneratorOf(TypeToken.of(Bar.class), fixture, sut);
+    Optional<? extends GenerationStrategy<Bar>> actual = sut.buildGeneratorOf(TypeToken.of(Bar.class), fixture, sut);
 
     //verify outcome
     assertThat(actual.isPresent()).as("the presence of a generation strategy").isFalse();
 
   }
-  
+
   @Test
   public void testGenerationOfAValueObject(){
     //setup fixture
@@ -45,7 +45,7 @@ public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGen
     assertThat(actual.aPrimitiveInteger).isGreaterThan(0);
     assertThat(actual.aPrimitiveLong).isGreaterThan(0);
   }
-  
+
 
 
 
@@ -57,14 +57,14 @@ public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGen
 
     private int aPrimitiveInteger;
     private long aPrimitiveLong;
-    
+
     private Bar bar;
 
   }
-  
+
   public static class Bar {
     public Bar(String arg1, String arg2){
-      
+
     }
   }
 }

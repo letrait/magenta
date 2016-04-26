@@ -8,5 +8,5 @@ import com.google.common.reflect.TypeToken;
 
 public interface DynamicGeneratorFactory {
 
-  public <D>  Optional<GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture, DynamicGeneratorFactory dynamicGeneratorFactory);
+  public <D>  Optional<? extends GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture, DynamicGeneratorFactory dynamicGeneratorFactory);
 }

@@ -24,14 +24,14 @@ public class SequenceWithFixtureContextManagementDecorator<D> implements Sequenc
   }
 
   @Override
-  public D get() {
+  public D next() {
     boolean managed = false;
     try {
       if(!context.isSet()){
         managed = true;
         context.set(fixture);
       }
-      return delegate.get();
+      return delegate.next();
     } finally{
       if(managed){
         context.clear();

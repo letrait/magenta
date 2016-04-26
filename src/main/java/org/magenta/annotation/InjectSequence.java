@@ -11,4 +11,6 @@ import org.magenta.DataKey;
 @Target({ ElementType.FIELD })
 public @interface InjectSequence {
   String value() default DataKey.DEFAULT;
+
+  boolean unique() default false;
 }

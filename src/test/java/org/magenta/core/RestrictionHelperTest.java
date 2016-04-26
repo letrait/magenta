@@ -19,155 +19,155 @@ import com.google.common.reflect.TypeToken;
 
 public class RestrictionHelperTest {
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testApplyRestrictions_with_non_existing_dataset(){
+  @Test(expected = IllegalArgumentException.class)
+  public void testApplyRestrictions_with_non_existing_dataset(){
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-
-
-		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
-
-		//exercise sut
-		//Since the data domain does not contain any Employee dataset, it is illegal to
-		//try to restrict on Employee
-		RestrictionHelper.applyRestrictions(sut, candidate);
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
 
 
-	}
+    Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
 
-	@Test
-	public void testApplyRestrictions_single_item(){
+    //exercise sut
+    //Since the data domain does not contain any Employee dataset, it is illegal to
+    //try to restrict on Employee
+    RestrictionHelper.applyRestrictions(sut, candidate);
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-		Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
+  }
 
-		//exercise sut
-		RestrictionHelper.applyRestrictions(sut, candidate);
+  @Test
+  public void testApplyRestrictions_single_item(){
 
-		//verify outcome
-		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate);
-	}
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
+    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-	@Test
-	public void testApplyRestrictions_item_lists(){
+    Employee candidate=createAnonymousEmployee("testApplyRestrictions_single_item");
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, candidate);
 
-		Employee candidate1=createAnonymousEmployee("candidate1");
-		Employee candidate2=createAnonymousEmployee("candidate2");
-		Employee candidate3=createAnonymousEmployee("candidate3");
+    //verify outcome
+    assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate);
+  }
 
-		//exercise sut
-		RestrictionHelper.applyRestrictions(sut, Arrays.asList(candidate1,candidate2,candidate3));
+  @Test
+  public void testApplyRestrictions_item_lists(){
 
-		//verify outcome
-		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1,candidate2,candidate3);
-	}
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
+    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-	@Test
-	public void testApplyRestrictions_item_array(){
+    Employee candidate1=createAnonymousEmployee("candidate1");
+    Employee candidate2=createAnonymousEmployee("candidate2");
+    Employee candidate3=createAnonymousEmployee("candidate3");
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, Arrays.asList(candidate1,candidate2,candidate3));
 
-		Employee candidate1=createAnonymousEmployee("candidate1");
-		Employee candidate2=createAnonymousEmployee("candidate2");
-		Employee candidate3=createAnonymousEmployee("candidate3");
+    //verify outcome
+    assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1,candidate2,candidate3);
+  }
 
-		//exercise sut
-		RestrictionHelper.applyRestrictions(sut, candidate1, new Employee[]{candidate2,candidate3});
+  @Test
+  public void testApplyRestrictions_item_array(){
 
-		//verify outcome
-		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1,candidate2,candidate3);
-	}
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
+    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-	@Test
-	public void testApplyRestrictions_mix_of_array_and_list(){
+    Employee candidate1=createAnonymousEmployee("candidate1");
+    Employee candidate2=createAnonymousEmployee("candidate2");
+    Employee candidate3=createAnonymousEmployee("candidate3");
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, candidate1, new Employee[]{candidate2,candidate3});
 
-		Employee candidate1=createAnonymousEmployee("candidate1");
-		Employee candidate2=createAnonymousEmployee("candidate2");
-		Employee candidate3=createAnonymousEmployee("candidate3");
-		Employee candidate4=createAnonymousEmployee("candidate4");
-		Employee candidate5=createAnonymousEmployee("candidate5");
+    //verify outcome
+    assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1,candidate2,candidate3);
+  }
 
-		//exercise sut
-		RestrictionHelper.applyRestrictions(sut, candidate1, new Employee[]{candidate2,candidate3},Arrays.asList(candidate4,candidate5));
+  @Test
+  public void testApplyRestrictions_mix_of_array_and_list(){
 
-		//verify outcome
-		assertThat(sut.dataset(Employee.class)
-				.list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
-	}
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
+    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-	@Test
-	public void testApplyRestrictions_using_a_dataset(){
+    Employee candidate1=createAnonymousEmployee("candidate1");
+    Employee candidate2=createAnonymousEmployee("candidate2");
+    Employee candidate3=createAnonymousEmployee("candidate3");
+    Employee candidate4=createAnonymousEmployee("candidate4");
+    Employee candidate5=createAnonymousEmployee("candidate5");
 
-		//setup fixtures
-		FixtureFactory sut=createFixtureFactory();
-		sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, candidate1, new Employee[]{candidate2,candidate3},Arrays.asList(candidate4,candidate5));
 
-		Employee candidate1=createAnonymousEmployee("candidate1");
-		Employee candidate2=createAnonymousEmployee("candidate2");
-		Employee candidate3=createAnonymousEmployee("candidate3");
-		Employee candidate4=createAnonymousEmployee("candidate4");
-		Employee candidate5=createAnonymousEmployee("candidate5");
+    //verify outcome
+    assertThat(sut.dataset(Employee.class)
+        .list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
+  }
 
-		DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)));
+  @Test
+  public void testApplyRestrictions_using_a_dataset(){
 
-		//exercise sut
-		RestrictionHelper.applyRestrictions(sut, employees);
+    //setup fixtures
+    FixtureFactory sut=createFixtureFactory();
+    sut.newDataSet(Employee.class).generatedBy(new EmployeeGenerator());
 
-		//verify outcome
-		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
-	}
+    Employee candidate1=createAnonymousEmployee("candidate1");
+    Employee candidate2=createAnonymousEmployee("candidate2");
+    Employee candidate3=createAnonymousEmployee("candidate3");
+    Employee candidate4=createAnonymousEmployee("candidate4");
+    Employee candidate5=createAnonymousEmployee("candidate5");
 
-	@Test
-	public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order(){
-	  //setup fixtures
-	  FixtureFactory parent=createFixtureFactory();
+    DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)));
 
-	  parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
-	  parent.newDataSet(String.class).composedOf("a","b","c","d");
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, employees);
 
-	  FixtureFactory sut = parent.newChild();
+    //verify outcome
+    assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
+  }
 
-	  //exercise sut
-	  RestrictionHelper.applyRestrictions(sut, 9, "z");
+  @Test
+  public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order(){
+    //setup fixtures
+    FixtureFactory parent=createFixtureFactory();
 
-	  //verify outcome
-	  assertThat(sut.keys()).containsExactly(DataKey.of(Integer.class), DataKey.of(String.class));
+    parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
+    parent.newDataSet(String.class).composedOf("a","b","c","d");
 
-	}
+    FixtureFactory sut = parent.newChild();
 
-	 @Test
-	  public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order_opposite_case(){
-	    //setup fixtures
-	    FixtureFactory parent=createFixtureFactory();
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, 9, "z");
 
-	    parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
-	    parent.newDataSet(String.class).composedOf("a","b","c","d");
+    //verify outcome
+    assertThat(sut.keys()).containsExactly(DataKey.of(Integer.class), DataKey.of(String.class));
 
-	    FixtureFactory sut = parent.newChild();
+  }
 
-	    //exercise sut
-	    RestrictionHelper.applyRestrictions(sut, "z", 9);
+  @Test
+  public void testApplyRestrictions_fixture_datakeys_order_follow_restriction_order_opposite_case(){
+    //setup fixtures
+    FixtureFactory parent=createFixtureFactory();
 
-	    //verify outcome
-	    assertThat(sut.keys()).containsExactly( DataKey.of(String.class), DataKey.of(Integer.class));
+    parent.newDataSet(Integer.class).composedOf(1,2,3,4,5);
+    parent.newDataSet(String.class).composedOf("a","b","c","d");
 
-	  }
+    FixtureFactory sut = parent.newChild();
 
-	/*@Test
+    //exercise sut
+    RestrictionHelper.applyRestrictions(sut, "z", 9);
+
+    //verify outcome
+    assertThat(sut.keys()).containsExactly( DataKey.of(String.class), DataKey.of(Integer.class));
+
+  }
+
+  /*@Test
 	public void testApplyRestrictions_using_a_qualified_dataset(){
 
 		//setup fixtures
@@ -191,7 +191,7 @@ public class RestrictionHelperTest {
 		assertThat(sut.dataset(Employee.class).list()).containsExactly(candidate1, candidate2, candidate3, candidate4, candidate5);
 	}*/
 
-	 /*@Test
+  /*@Test
 	  public void testApplyRestrictions_using_an_empty_dataset(){
 
 	    //setup fixtures
@@ -208,15 +208,15 @@ public class RestrictionHelperTest {
 	    assertThat(sut.dataset(Employee.class).list()).isEmpty();
 	  }*/
 
-	private Employee createAnonymousEmployee(String name) {
-		Employee e=new Employee();
-		e.setEmployeeId(1234L);
-		e.setName(name);
-		e.setOccupation(Occupation.TESTER);
-		return e;
-	}
+  private Employee createAnonymousEmployee(String name) {
+    Employee e=new Employee();
+    e.setEmployeeId(Employee.Id.value(1234L));
+    e.setName(name);
+    e.setOccupation(Occupation.TESTER);
+    return e;
+  }
 
-	private FixtureFactory createFixtureFactory() {
-		return Magenta.newFixture();
-	}
+  private FixtureFactory createFixtureFactory() {
+    return Magenta.newFixture();
+  }
 }

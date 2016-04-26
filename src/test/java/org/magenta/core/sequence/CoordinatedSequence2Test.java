@@ -21,15 +21,15 @@ public class CoordinatedSequence2Test {
   public void testReadingFromOneSequence(){
 
     //setup fixture
-     Integer[] expected = new Integer[]{1,2,3,4,5};
-     DataSet<Integer> integers = createDataSetFrom(expected);
-     Sequence<Integer> uniqueSequence = createUniqueSequence(integers);
+    Integer[] expected = new Integer[]{1,2,3,4,5};
+    DataSet<Integer> integers = createDataSetFrom(expected);
+    Sequence<Integer> uniqueSequence = createUniqueSequence(integers);
 
     //exercise sut
-     List<Integer> actual = readFromSequence(uniqueSequence,5);
+    List<Integer> actual = readFromSequence(uniqueSequence,5);
 
     //verify outcome
-     assertThat(actual).containsExactly(expected);
+    assertThat(actual).containsExactly(expected);
 
   }
 
@@ -38,15 +38,15 @@ public class CoordinatedSequence2Test {
 
     //setup fixture
 
-     DataSet<Integer> set1 = createDataSetFrom(1,2);
-     DataSet<Integer> set2 = createDataSetFrom(10,20,30);
-     List<Sequence<?>> sequences = createSequences(set1,set2);
+    DataSet<Integer> set1 = createDataSetFrom(1,2);
+    DataSet<Integer> set2 = createDataSetFrom(10,20,30);
+    List<Sequence<?>> sequences = createSequences(set1,set2);
 
     //exercise sut
-     List<Integer> actual = readFromSequences(sequences,6);
+    List<Integer> actual = readFromSequences(sequences,6);
 
     //verify outcome
-     assertThat(actual).as(actual.toString()).containsExactly(1,10,2,10,1,20,2,20,1,30,2,30);
+    assertThat(actual).as(actual.toString()).containsExactly(1,10,2,10,1,20,2,20,1,30,2,30);
 
   }
 
@@ -55,16 +55,16 @@ public class CoordinatedSequence2Test {
 
     //setup fixture
 
-     DataSet<Integer> set1 = createDataSetFrom(1,2);
-     DataSet<Integer> set2 = createDataSetFrom(10,20,30);
-     List<Sequence<?>> sequences = createSequences(set1,set2);
+    DataSet<Integer> set1 = createDataSetFrom(1,2);
+    DataSet<Integer> set2 = createDataSetFrom(10,20,30);
+    List<Sequence<?>> sequences = createSequences(set1,set2);
 
     //exercise sut
-     List<Integer> actual = readFromSequences(Lists.reverse(sequences),6);
+    List<Integer> actual = readFromSequences(Lists.reverse(sequences),6);
 
     //verify outcome
 
-     assertThat(actual).as(actual.toString()).containsExactly(10,1,10,2,20,1,20,2,30,1,30,2);
+    assertThat(actual).as(actual.toString()).containsExactly(10,1,10,2,20,1,20,2,30,1,30,2);
 
   }
 
@@ -96,23 +96,23 @@ public class CoordinatedSequence2Test {
   public void testReadingFromOneSequenceMultipleLoops(){
 
     //setup fixture
-     DataSet<Integer> integers = createDataSetFrom(1,2);
-     Sequence<Integer> uniqueSequence = createUniqueSequence(integers);
+    DataSet<Integer> integers = createDataSetFrom(1,2);
+    Sequence<Integer> uniqueSequence = createUniqueSequence(integers);
 
     //exercise sut
-     List<Integer> actual = readFromSequence(uniqueSequence,5);
+    List<Integer> actual = readFromSequence(uniqueSequence,5);
 
     //verify outcome
-     assertThat(actual).containsExactly(1,2,1,2,1);
+    assertThat(actual).containsExactly(1,2,1,2,1);
 
   }
-  
+
 
   private <D> List<D> readFromSequence(Sequence<D> sequence, int numberOfItems) {
     List<D> values = Lists.newArrayList();
 
     for(int i = 0; i<numberOfItems;i++){
-      values.add(sequence.get());
+      values.add(sequence.next());
     }
     return values;
   }
@@ -122,18 +122,18 @@ public class CoordinatedSequence2Test {
 
     for(int i = 0; i<numberOfItems;i++){
       for(Sequence<?> s:sequences){
-      values.add(s.get());
+        values.add(s.next());
       }
     }
     return values;
   }
 
   private <D> Sequence<D> createUniqueSequence(DataSet<D> dataset) {
-    return new CoordinatedSequence<D>(dataset, new SequenceCoordinator());
+    return new CoordinatedSequence<D>(dataset, false, new SequenceCoordinator());
   }
 
   private <D> Sequence<D> createSequence(DataSet<D> d, SequenceCoordinator coordinator) {
-    return new CoordinatedSequence<D>(d, coordinator);
+    return new CoordinatedSequence<D>(d, false, coordinator);
   }
 
   private List<Sequence<?>> createSequences(DataSet<?>...sets) {

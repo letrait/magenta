@@ -28,9 +28,9 @@ public class ObjectGenerator<D> implements GenerationStrategy<D> {
   public D generate(Fixture fixture) {
     try {
 
-      Constructor<? super D> c = type.getRawType().getConstructor();
-
-      D candidate = (D) type.constructor(c).invoke(null);
+      Constructor<? super D> c = type.getRawType().getDeclaredConstructor();
+      c.setAccessible(true);
+      D candidate = type.constructor(c).invoke(null);
 
       for(ObjectHydrater hydrater:hydraters){
         hydrater.hydrate(candidate, fixture);
@@ -42,7 +42,7 @@ public class ObjectGenerator<D> implements GenerationStrategy<D> {
     }
   }
 
- 
+
 
   @Override
   public Integer size(Fixture fixture) {

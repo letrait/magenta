@@ -10,9 +10,10 @@ import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 
+@Deprecated //no more needed
 public abstract class AbstractFieldAnnotationHandler<A extends Annotation> {
 
-  private final FieldsExtractor fieldExtractors;
+  protected final FieldsExtractor fieldExtractors;
 
   public AbstractFieldAnnotationHandler(FieldsExtractor fieldExtractors){
     this.fieldExtractors = fieldExtractors;
@@ -24,7 +25,7 @@ public abstract class AbstractFieldAnnotationHandler<A extends Annotation> {
     return FluentIterable.from(allFields).filter(havingAnnotation()).transform(toFieldAnnotationPair());
   }
 
-  private Predicate<Field> havingAnnotation() {
+  protected Predicate<Field> havingAnnotation() {
     return new Predicate<Field>(){
 
       @Override

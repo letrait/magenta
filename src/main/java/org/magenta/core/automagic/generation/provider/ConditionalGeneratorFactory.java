@@ -15,13 +15,13 @@ import com.google.common.reflect.TypeToken;
 
 public class ConditionalGeneratorFactory implements DynamicGeneratorFactory{
 
-  
+
   private final Predicate<TypeToken<?>> spec;
   private final Function<? super Fixture,?> generator;
-  
-  
+
+
   // the injector could be used to inject into the generator
-  
+  // the supplier could be a function that take as input the field or the class of the candidate
   public <D> ConditionalGeneratorFactory(Predicate<TypeToken<D>> spec, Supplier<D> generator) {
     super();
     this.spec = (Predicate)spec;
@@ -31,9 +31,9 @@ public class ConditionalGeneratorFactory implements DynamicGeneratorFactory{
   @Override
   public <D> Optional<GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture,
       DynamicGeneratorFactory dynamicGeneratorFactory) {
-    
+
     Function<Fixture,D> g = (Function)generator;
-    
+
     return spec.apply(type) ? Optional.of(new SimpleGenerationStrategy<D>(g,f -> 1)) : Optional.absent();
   }
 

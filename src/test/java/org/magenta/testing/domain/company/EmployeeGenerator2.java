@@ -16,8 +16,8 @@ public class EmployeeGenerator2 implements Supplier<Employee> {
   @Override
   public Employee get() {
     Employee e = new Employee();
-    e.setOccupation(occupations.get());
-    e.setAddress(address.get());
+    e.setOccupation(occupations.next());
+    e.setAddress(address.next());
     return e;
   }
 

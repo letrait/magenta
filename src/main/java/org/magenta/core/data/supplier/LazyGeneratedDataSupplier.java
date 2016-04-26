@@ -28,12 +28,12 @@ public class LazyGeneratedDataSupplier<D> implements DataSupplier<D> {
     super();
     this.generator = checkNotNull(generator);
     this.sizeOf = checkNotNull(sizeOf);
-    this.type = checkNotNull(type);
+    this.type = type;
 
     this.generatedData = new ArrayList<Object>();
     this.generatedFlags = new ArrayList<Boolean>();
   }
-  
+
 
 
   @Override
@@ -81,7 +81,7 @@ public class LazyGeneratedDataSupplier<D> implements DataSupplier<D> {
 
   private D doGenerate() {
     try{
-    return generator.get();
+      return generator.get();
     }catch(RuntimeException e){
       throw new DataGenerationException(String.format("Error while generating %s with %s", type, generator),e);
     }
@@ -117,13 +117,13 @@ public class LazyGeneratedDataSupplier<D> implements DataSupplier<D> {
   @Override
   public int getSize() {
     try{
-    return this.sizeOf.get() ;
+      return this.sizeOf.get() ;
     }catch(RuntimeException e){
       throw new DataGenerationException(String.format("Error while computing the size of the generator of %s", type),e);
     }
   }
-  
-  
-  
+
+
+
 
 }

@@ -2,7 +2,7 @@ package org.magenta;
 
 public interface Sequence<D>{
 
-  D get();
+  D next();
 
   int size();
 }

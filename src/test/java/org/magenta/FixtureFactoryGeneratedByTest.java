@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.Test;
 import org.magenta.testing.domain.company.Address;
@@ -14,6 +15,7 @@ import org.magenta.testing.domain.company.Employee;
 import org.magenta.testing.domain.company.EmployeeGenerator;
 import org.magenta.testing.domain.company.EmployeeGenerator2;
 import org.magenta.testing.domain.company.EmployeeGenerator3;
+import org.magenta.testing.domain.company.EmployeeGenerator4;
 import org.magenta.testing.domain.company.Occupation;
 import org.magenta.testing.domain.company.PhoneNumber;
 import org.magenta.testing.domain.company.PhoneNumberGenerator;
@@ -36,6 +38,7 @@ public class FixtureFactoryGeneratedByTest {
       actual.any();
       fail("expecting"+DataGenerationException.class.getName());
     } catch (DataGenerationException dge) {
+      dge.printStackTrace();
       assertThat(dge).hasMessageContaining("Employee").hasRootCauseInstanceOf(DataSetNotFoundException.class);
     }
 
@@ -95,8 +98,49 @@ public class FixtureFactoryGeneratedByTest {
 
     assertThat(actual.getType()).isEqualTo(TypeToken.of(Employee.class));
     assertThat(actual.any().getPhoneNumbers()).isNotEmpty();
-    System.out.println(actual.list());
+
   }
+
+  @Test
+  public void testAGeneratorUsingAnUniqueSequence(){
+    //setup fixtures
+    FixtureFactory fixtures = createRootFixtureFactory();
+    fixtures.newDataSet(Employee.Id.class).transformed(id->Employee.Id.value((Long)id)).composedOf(1L,2L,3L);
+    fixtures.newDataSet(Occupation.class).composedOf(Occupation.values());
+    fixtures.newDataSet(Address.class).generatedBy(new AddressGenerator());
+    fixtures.newGenerator(PhoneNumber.class).generatedBy(new PhoneNumberGenerator());
+    fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator4());
+    DataSet<Employee> actual = fixtures.dataset(Employee.class);
+
+    //exercise sut and verify outcome
+    assertThat(actual.getSize()).isEqualTo(3);
+
+    actual.list().forEach(e->print(e));
+  }
+
+  @Test
+  public void testAGeneratorUsingAnUniqueSequenceThatIsNotLimitedToASetOfValue(){
+    //setup fixtures
+    final AtomicLong idCount = new AtomicLong(0);
+
+    FixtureFactory fixtures = createRootFixtureFactory();
+    fixtures.newDataSet(Employee.Id.class).transformed(id->Employee.Id.value((Long)id)).generatedBy(()->idCount.incrementAndGet());
+    fixtures.newDataSet(Occupation.class).composedOf(Occupation.values());
+    fixtures.newDataSet(Address.class).generatedBy(new AddressGenerator());
+    fixtures.newGenerator(PhoneNumber.class).generatedBy(new PhoneNumberGenerator());
+    fixtures.newDataSet(Employee.class).generatedBy(new EmployeeGenerator4());
+    DataSet<Employee> actual = fixtures.dataset(Employee.class);
+
+    //exercise sut and verify outcome
+    assertThat(actual.getSize()).isEqualTo(4);
+
+    actual.list().forEach(e->print(e));
+  }
+
+  private void print(Object e) {
+    System.out.println(e);
+  }
+
 
   @Test
   public void testAGeneratorWithASpecifiedDefaultSize(){
@@ -162,8 +206,29 @@ public class FixtureFactoryGeneratedByTest {
     List<PhoneNumber> filteredPhones = phones.filter(phone -> phone.getPhoneNumber().startsWith("123")).list();
 
     //verify outcome
-    System.out.println(filteredPhones);
     assertThat(filteredPhones).hasSize(3);
+  }
+
+  @Test
+  public void testATransformedGenerator(){
+
+    //setup fixtures
+    FixtureFactory fixtures = createRootFixtureFactory();
+
+    PhoneNumber expected = new PhoneNumber();
+    expected.setPhoneNumber("123-4567");
+
+    fixtures.newDataSet(String.class).transformed((PhoneNumber p)->p.getPhoneNumber()).generatedBy(()->expected,3);
+
+
+    //exercise sut
+
+    DataSet<String> phones =fixtures.dataset(String.class);
+
+    List<String> filteredPhones = phones.list();
+
+    //verify outcome
+    assertThat(filteredPhones).containsOnly("123-4567");
   }
 
 
