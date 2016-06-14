@@ -194,10 +194,7 @@ public interface DataSet<D> extends DataSupplier<D>{
    *
    * @return the first item
    */
-  public D head();
-
-
-
+  public D first();
 
   /**
    * @return true if this dataset is empty

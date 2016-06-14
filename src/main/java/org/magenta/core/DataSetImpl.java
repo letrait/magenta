@@ -11,11 +11,14 @@ import java.util.Set;
 
 import org.magenta.DataSet;
 import org.magenta.DataSupplier;
+import org.magenta.Magenta;
+import org.magenta.UnboundedDataSetException;
 import org.magenta.core.data.supplier.BoundedDataSupplierIterator;
 import org.magenta.core.data.supplier.FilteredDataSupplierDecorator;
 import org.magenta.core.data.supplier.ResizedDataSupplierDecorator;
 import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.core.data.supplier.TransformedDataSupplierDecorator;
+import org.magenta.events.DataReturned;
 import org.magenta.random.FluentRandom;
 
 import com.google.common.base.Function;
@@ -38,6 +41,7 @@ import com.google.common.reflect.TypeToken;
 public class DataSetImpl<D> implements DataSet<D> {
 
   protected final DataSupplier<D> supplier;
+  private boolean postEventEnabled;
 
   /**
    * Construct a new dataset using the provided supplier as source.
@@ -47,8 +51,9 @@ public class DataSetImpl<D> implements DataSet<D> {
    * @param random
    *          the java random to use for shuffling and by the "any()" method
    */
-  public DataSetImpl(DataSupplier<D> datasetSupplier) {
+  public DataSetImpl(DataSupplier<D> datasetSupplier, boolean postEventEnabled) {
     this.supplier = datasetSupplier;
+    this.postEventEnabled = postEventEnabled;
   }
 
   @Override
@@ -67,8 +72,14 @@ public class DataSetImpl<D> implements DataSet<D> {
   }
 
   @Override
-  public D get(int position) {
-    return this.supplier.get(position);
+  public D get(int index) {
+    D data = this.supplier.get(index);
+
+    if(postEventEnabled){
+      Magenta.eventBus().post(DataReturned.of(data, index));
+    }
+
+    return data;
   }
 
   @Override
@@ -88,7 +99,7 @@ public class DataSetImpl<D> implements DataSet<D> {
   }
 
   @Override
-  public D head() {
+  public D first() {
     return get(0);
   }
 
@@ -97,23 +108,32 @@ public class DataSetImpl<D> implements DataSet<D> {
     if(this.isGenerated() && !this.isConstant()){
       return get(0);
     }else{
+      checkBound();
       return FluentRandom.iterable(this).any();
     }
   }
 
+
+
+  public boolean isUnbounded() {
+    return getSize() == Integer.MAX_VALUE;
+  }
+
   @Override
   public D any(Predicate<? super D> filter) {
+    checkBound();
     return FluentRandom.iterable(Iterables.filter(this, filter)).any();
   }
 
   @Override
   public DataSet<D> resize(int size) {
-    return new DataSetImpl<D>(new ResizedDataSupplierDecorator<D>(this.supplier,size));
+    return new DataSetImpl<D>(new ResizedDataSupplierDecorator<D>(this.supplier,size), false);
   }
 
   @Override
   public DataSet<D> filter(Predicate<? super D> filter) {
-    return new DataSetImpl<D>(new FilteredDataSupplierDecorator<D>(this.supplier,filter));
+    checkBound();
+    return new DataSetImpl<D>(new FilteredDataSupplierDecorator<D>(this.supplier,filter), false);
   }
 
   @Override
@@ -123,7 +143,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, TypeToken<X> transformedType) {
-    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function, transformedType));
+    return new DataSetImpl<X>(new TransformedDataSupplierDecorator<D,X>(this.supplier,function, transformedType), false);
   }
 
   @Override
@@ -153,13 +173,12 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public DataSet<D> freeze() {
-    return new DataSetImpl<>(new StaticDataSupplier<>(list(), getType()));
+    return new DataSetImpl<>(new StaticDataSupplier<>(list(), getType()), false);
   }
-
-
 
   @Override
   public D[] array() {
+    checkBound();
     return Iterables.toArray(this, (Class<D>)this.supplier.getType().getRawType());
   }
 
@@ -170,6 +189,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public D[] randomArray() {
+    checkBound();
     return Iterables.toArray(randomList(), (Class<D>)this.supplier.getType().getRawType());
   }
 
@@ -180,7 +200,8 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public List<D> list() {
-    return Lists.newArrayList(this);
+    checkBound();
+    return Lists.newArrayList(this.iterator());
   }
 
   @Override
@@ -190,6 +211,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public List<D> randomList() {
+    checkBound();
     return FluentRandom.iterable(this).shuffle().list();
   }
 
@@ -200,6 +222,7 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   @Override
   public Set<D> set() {
+    checkBound();
     return Sets.newLinkedHashSet(this);
   }
 
@@ -208,8 +231,10 @@ public class DataSetImpl<D> implements DataSet<D> {
     return resize(size).set();
   }
 
-  public DataSupplier<D> getSupplier() {
-    return this.supplier;
+  protected void checkBound(){
+    if(isUnbounded()) {
+      throw new UnboundedDataSetException(String.format("The dataset %s is unbounded so it is not possible to select using any", this.getType()));
+    }
   }
 
 
@@ -232,10 +257,4 @@ public class DataSetImpl<D> implements DataSet<D> {
     }
     return false;
   }
-
-
-
-
-
-
 }

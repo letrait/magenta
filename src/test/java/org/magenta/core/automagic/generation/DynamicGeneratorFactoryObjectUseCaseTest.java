@@ -3,12 +3,12 @@ package org.magenta.core.automagic.generation;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
+import org.magenta.DataKey;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.GenerationStrategy;
 
 import com.google.common.base.Optional;
-import com.google.common.reflect.TypeToken;
 
 public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGeneratorFactoryTest {
 
@@ -20,7 +20,7 @@ public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGen
 
     //exercise sut
     //The bar class does not have a no-arg constructor, therefore no generation strategy should be returned
-    Optional<? extends GenerationStrategy<Bar>> actual = sut.buildGeneratorOf(TypeToken.of(Bar.class), fixture, sut);
+    Optional<? extends GenerationStrategy<Bar>> actual = sut.buildGeneratorOf(DataKey.of(Bar.class), fixture, sut);
 
     //verify outcome
     assertThat(actual.isPresent()).as("the presence of a generation strategy").isFalse();
@@ -34,7 +34,7 @@ public class DynamicGeneratorFactoryObjectUseCaseTest extends AbstractDynamicGen
     DynamicGeneratorFactory sut = buildDynamicGeneratorFactory();
 
     //exercise sut
-    Foo actual = sut.buildGeneratorOf(TypeToken.of(Foo.class), fixture, sut).get().generate(fixture);
+    Foo actual = sut.buildGeneratorOf(DataKey.of(Foo.class), fixture, sut).get().generate(fixture);
 
     //verify outcome
     assertThat(actual.bar).as("The bar attribute").isNull();

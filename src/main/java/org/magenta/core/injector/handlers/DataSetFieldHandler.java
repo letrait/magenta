@@ -54,7 +54,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
     FieldInjectorUtils.injectInto(target, f, dataset);
 
   }
-  
+
   private <T> DataKey<T> determinDataKeyFromGenericType(Field f, InjectDataSet annotation) {
 
     String qualifier = annotation.value();
@@ -69,8 +69,8 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
         return DataKey.of(qualifier, keyType);
       } else {
         throw new IllegalStateException("Dataset cannot be injected into field [" + f.getName() + "] of [" + f.getDeclaringClass()
-            .getName() + "] because the specified DataSet is a generic type [" + t
-            + "].  A specific type should be declared such as DataSet<Integer>  instead of DataSet<D>.");
+        .getName() + "] because the specified DataSet is a generic type [" + t
+        + "].  A specific type should be declared such as DataSet<Integer>  instead of DataSet<D>.");
       }
     } else {
       throw new IllegalStateException(
@@ -78,14 +78,14 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
               + f.getName()
               + "] of ["
               + f.getDeclaringClass()
-                  .getName()
+              .getName()
               + "] because the key cannot be derived from the DataSet since it is a rawtype.  A specific type should be declared such as a DataSet<Integer> instead of just a raw DataSet.");
     }
 
   }
 
   private <D> DataSet<D> newDataSetProxy(final DataKey<D> key, final Supplier<? extends Fixture> fixture) {
-    return new DataSetImpl<D>(newDataSupplierProxy(key, fixture));
+    return new DataSetImpl<D>(newDataSupplierProxy(key, fixture), false);
   }
 
   private <D> DataSupplier<D> newDataSupplierProxy(DataKey<D> key, Supplier<? extends Fixture> fixture) {
@@ -93,7 +93,7 @@ public class DataSetFieldHandler extends AbstractFieldAnnotationHandler<InjectDa
     return new ForwardingDataSupplier<D>(DataSetSupplier.forKey(key, fixture));
 
   }
-  
+
   private IllegalStateException invalidFieldType(Field f) {
     return new IllegalStateException("Annotation "+InjectDataSet.class.getName()+" is present on field named "+f.getName()+", but this field type is not a "+DataSet.class.getName());
   }

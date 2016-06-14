@@ -7,6 +7,7 @@ import java.util.Collections;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.magenta.DataKey;
 import org.magenta.FixtureFactory;
 import org.magenta.core.GenerationStrategy;
 import org.magenta.core.automagic.generation.provider.ConditionalGeneratorFactory;
@@ -15,7 +16,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Suppliers;
-import com.google.common.reflect.TypeToken;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CompositeGeneratorFactoryTest {
@@ -31,7 +31,7 @@ public class CompositeGeneratorFactoryTest {
     CompositeGeneratorFactory sut = new CompositeGeneratorFactory(Collections.emptyList());
 
     //exercise sut
-    Optional<? extends GenerationStrategy<Object>> actual = sut.buildGeneratorOf(TypeToken.of(Object.class), fixture, sut);
+    Optional<? extends GenerationStrategy<Object>> actual = sut.buildGeneratorOf(DataKey.of(Object.class), fixture, sut);
 
     //verify outcome
     assertThat(actual.isPresent()).as("the presence of a generation strategy").isFalse();
@@ -48,7 +48,7 @@ public class CompositeGeneratorFactoryTest {
     CompositeGeneratorFactory sut = new CompositeGeneratorFactory(Arrays.asList(unmatchingCandidate, matchingCandidate));
 
     //exercise sut
-    Optional<? extends GenerationStrategy<Object>> actual = sut.buildGeneratorOf(TypeToken.of(Object.class), fixture, sut);
+    Optional<? extends GenerationStrategy<Object>> actual = sut.buildGeneratorOf(DataKey.of(Object.class), fixture, sut);
 
     //verify outcome
     assertThat(actual.isPresent()).as("the presence of a generation strategy").isTrue();

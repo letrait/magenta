@@ -16,7 +16,6 @@ import org.magenta.core.injector.extractors.HiearchicalFieldsExtractor;
 import org.mockito.Mockito;
 
 import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
 
 public class ObjectGeneratorTest {
 
@@ -34,7 +33,7 @@ public class ObjectGeneratorTest {
   public void testGenerationOfAnObjectWithoutField(){
 
     //setup fixture
-    TypeToken<DummyObject> type = TypeToken.of(DummyObject.class);
+    DataKey<DummyObject> type = DataKey.of(DummyObject.class);
     FixtureFactory fixture = Magenta.newFixture();
 
     ObjectGenerator<DummyObject> sut = factory.buildGeneratorOf(type, fixture, dynamicGeneratorFactoryMock).get();
@@ -51,7 +50,7 @@ public class ObjectGeneratorTest {
   public void testGenerationOfAnObjectWithAnEnum(){
 
     //setup fixture
-    TypeToken<DummyObjectWithEnum> type = TypeToken.of(DummyObjectWithEnum.class);
+    DataKey<DummyObjectWithEnum> type = DataKey.of(DummyObjectWithEnum.class);
     FixtureFactory fixture = Magenta.newFixture();
 
     fixture.newDataSet(DataKey.of(DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.values());
@@ -77,7 +76,7 @@ public class ObjectGeneratorTest {
   public void testSizeOfAnObjectWithAnEnum(){
 
     //setup fixture
-    TypeToken<DummyObjectWithEnum> type = TypeToken.of(DummyObjectWithEnum.class);
+    DataKey<DummyObjectWithEnum> type = DataKey.of(DummyObjectWithEnum.class);
     FixtureFactory fixture = Magenta.newFixture();
 
     fixture.newDataSet(DataKey.of(DummyObjectWithEnum.Color.class)).composedOf(DummyObjectWithEnum.Color.values());

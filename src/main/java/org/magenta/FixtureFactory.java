@@ -2,8 +2,6 @@ package org.magenta;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.magenta.core.DataSetFunctionRegistry;
@@ -18,6 +16,7 @@ import org.magenta.core.data.supplier.LazyGeneratedCollectionDataSupplier;
 import org.magenta.core.data.supplier.LazyGeneratedDataSupplier;
 import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.magenta.core.data.supplier.TransformedDataSupplierDecorator;
+import org.magenta.events.DataSetFound;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -28,7 +27,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
-import com.google.inject.internal.Lists;
 
 public class FixtureFactory implements Fixture {
 
@@ -50,7 +48,8 @@ public class FixtureFactory implements Fixture {
   }
 
   public FixtureFactory newChild() {
-    return new FixtureFactory(this, generationStrategyFactory, dynamicGeneratorFactory, context);
+    FixtureFactory child = new FixtureFactory(this, generationStrategyFactory, dynamicGeneratorFactory, context);
+    return child;
   }
 
   @Override
@@ -63,9 +62,45 @@ public class FixtureFactory implements Fixture {
     return doGetDatasetFunction(key).apply(this);
   }
 
+  @Override
+  public FixtureFactory init(Class<?> type) {
+
+    DataKey key = DataKey.of(type);
+
+    newDataSet(key).composedOf(dataset(key).list());
+    return this;
+  }
+
+  @Override
+  public FixtureFactory init(DataKey key) {
+
+
+    newDataSet(key).composedOf(dataset(key).list());
+    return this;
+  }
+
+  @Override
+  public FixtureFactory init(Class<?> type, int size) {
+
+    DataKey key = DataKey.of(type);
+
+    newDataSet(key).composedOf(dataset(key).list(size));
+
+    return this;
+  }
+
+  @Override
+  public FixtureFactory init(DataKey key, int size) {
+
+    newDataSet(key).composedOf(dataset(key).list(size));
+
+    return this;
+  }
+
   private <D> Function<Fixture, DataSet<D>> doGetDatasetFunction(DataKey<D> key) {
     Function<Fixture, DataSet<D>> datasetFunction = registry.get(key);
     if (datasetFunction != null) {
+      Magenta.eventBus().post(DataSetFound.from(key, this));
       return datasetFunction;
     } else {
       if (parent != null) {
@@ -88,42 +123,15 @@ public class FixtureFactory implements Fixture {
     return new DataSetBuilder<D,D>(DataKey.of(key), Functions.identity());
   }
 
-  public <D> void newDataSetOf(D...elements) {
-    for(DataKey key:getKeys(elements[0].getClass())){
-      newConcretDataSetOf(key, elements);
-    }
+  @SafeVarargs
+  public final void newDataSetsOf(Object first, Object...rest) {
+    RestrictionHelper.createDatasets(this, first, rest);
   }
 
-  private <D> void newConcretDataSetOf(DataKey<? super D> key, D[] elements) {
-    new DataSetBuilder<>(key, Functions.identity()).composedOf(elements);
-
+  @SafeVarargs
+  public final <D> void newDataSetOf(D first, D...rest) {
+    newDataSetsOf(first, rest);
   }
-
-  private <D> Collection<DataKey> getKeys(Class<D> clazz) {
-
-    List keys = Lists.newArrayList();
-
-    DataKey<D> key = DataKey.of(clazz);
-
-    if(!keys().contains(key)){
-      keys.add(key);
-    }
-
-    Class<?>[] interfaces = clazz.getInterfaces();
-    for (Class i : interfaces) {
-      keys.addAll(getKeys(i));
-    }
-
-    Class<?> parent = clazz.getSuperclass();
-    if (parent != null && !parent.isAssignableFrom(Object.class)) {
-      keys.addAll(getKeys(parent));
-    }
-
-
-    return keys;
-  }
-
-
 
   public <D> void newLazyDataSet(Class<D> key, Supplier<D> generator) {
     newDataSet(key).generatedBy(generator);
@@ -176,7 +184,7 @@ public class FixtureFactory implements Fixture {
     }
 
     private void composedOf(ImmutableList<S> items) {
-      DataSet<D> dataset = new DataSetImpl<D>(new TransformedDataSupplierDecorator<>(new StaticDataSupplier<S>(items,  (TypeToken<S>)this.key.getType()),transform,key.getType()));
+      DataSet<D> dataset = new DataSetImpl<D>(new TransformedDataSupplierDecorator<>(new StaticDataSupplier<S>(items,  (TypeToken<S>)this.key.getType()),transform,key.getType()), true);
       registry.register(key, Functions.constant(dataset));
     }
 
@@ -195,7 +203,7 @@ public class FixtureFactory implements Fixture {
 
     public void autoMagicallyGenerated() {
 
-      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(buildDynamicGenerator((TypeToken<S>)key.getType()), Optional.<Integer> absent())));
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(buildDynamicGenerator((DataKey<S>)key), Optional.<Integer> absent())));
 
       registry.register(key, getDataset);
 
@@ -203,17 +211,17 @@ public class FixtureFactory implements Fixture {
 
     public void autoMagicallyGenerated(int numberOfItems) {
 
-      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(buildDynamicGenerator((TypeToken<S>)key.getType()), Optional.of(numberOfItems))));
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(buildDynamicGenerator((DataKey<S>)key), Optional.of(numberOfItems))));
 
       registry.register(key, getDataset);
 
     }
 
-    public void generatedBy(final Supplier<S> generator) {
+    public void generatedBy(final Supplier<? extends S> generator) {
       generatedBy(generator, Optional.<Integer> absent());
     }
 
-    public void generatedBy(final Supplier<S> generator, final Integer numberOfItems) {
+    public void generatedBy(final Supplier<? extends S> generator, final Integer numberOfItems) {
       generatedBy(generator, Optional.of(numberOfItems));
 
     }
@@ -227,11 +235,11 @@ public class FixtureFactory implements Fixture {
 
     }
 
-    protected void generatedBy(final Supplier<S> generator, final Optional<Integer> numberOfItems) {
+    protected void generatedBy(final Supplier<? extends S> generator, final Optional<Integer> numberOfItems) {
 
       checkNotNull(generator, "generator argument is null");
 
-      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator), numberOfItems)));
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(key, (Supplier<S>)generator), numberOfItems)));
 
       registry.register(key, getDataset);
 
@@ -240,7 +248,7 @@ public class FixtureFactory implements Fixture {
     public void generatedAsIterableBy(Supplier<? extends Iterable<S>> generator) {
       checkNotNull(generator, "generator argument is null");
 
-      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator))));
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(key, generator))));
 
       registry.register(key, getDataset);
     }
@@ -293,7 +301,7 @@ public class FixtureFactory implements Fixture {
 
       checkNotNull(generator, "generator argument is null");
 
-      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(generator), numberOfItems)));
+      Function<Fixture, DataSet<D>> getDataset = cache(toDataSet(toDataSupplier(toGenerationStrategy(key, generator), numberOfItems)));
 
       registry.register(key, getDataset);
 
@@ -318,16 +326,20 @@ public class FixtureFactory implements Fixture {
 
   private <X> Function<Fixture, DataSet<X>> toDataSet(Function<Fixture, DataSupplier<X>> dataSupplier) {
     return fixture -> {
-      return new DataSetImpl<>(dataSupplier.apply(fixture));
+      return new DataSetImpl<>(dataSupplier.apply(fixture), true);
     };
   }
 
-  private <X> GenerationStrategy<X> toGenerationStrategy(Supplier<X> generator) {
-    return generationStrategyFactory.create(generator);
+  private <X> GenerationStrategy<X> toGenerationStrategy(DataKey key,Supplier<X> generator) {
+    return generationStrategyFactory.create(key, generator);
   }
 
-  private <X> GenerationStrategy<X> buildDynamicGenerator(TypeToken<X> type) {
+  private <X> GenerationStrategy<X> buildDynamicGenerator(DataKey<X> type) {
     return dynamicGeneratorFactory.buildGeneratorOf(type, FixtureFactory.this, dynamicGeneratorFactory).get();
   }
+
+
+
+
 
 }

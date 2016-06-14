@@ -5,10 +5,14 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.assertj.core.util.Lists;
+import org.magenta.DataSupplier;
+import org.magenta.core.data.supplier.StaticDataSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Range;
+import com.google.common.reflect.TypeToken;
 
 /**
  * An instance of this class allow random generation of various primitives ({@code integers, shorts, longs, double}) and
@@ -155,7 +159,7 @@ public class FluentRandom {
    */
   @SafeVarargs
   public final static <E> RandomList<E> array(E... values) {
-    return new RandomList<>(INSTANCE.random, integers(), Arrays.asList(values));
+    return new RandomList<E>(INSTANCE.random, integers(), new StaticDataSupplier(Lists.newArrayList(values), TypeToken.of(values[0].getClass())));
   }
 
   /**
@@ -167,7 +171,16 @@ public class FluentRandom {
 
     List<E> enums = Arrays.asList(clazz.getEnumConstants());
 
-    return new RandomList<>(INSTANCE.random, integers(), enums);
+    return new RandomList<>(INSTANCE.random, integers(),  new StaticDataSupplier<E>(enums, TypeToken.of(clazz)));
+  }
+
+  /**
+   * @param values the collection of values to pick from
+   * @param <E> the type of value
+   * @return a list picker
+   */
+  public static <E> RandomList<E> iterable(DataSupplier<E> values) {
+    return new RandomList<>(INSTANCE.random, integers(), values);
   }
 
   /**
@@ -176,7 +189,7 @@ public class FluentRandom {
    * @return a list picker
    */
   public static <E> RandomList<E> iterable(Iterable<E> values) {
-    return new RandomList<>(INSTANCE.random, integers(), values);
+    return new RandomList<E>(INSTANCE.random, integers(), new StaticDataSupplier(Lists.newArrayList(values), TypeToken.of(values.iterator().next().getClass())));
   }
 
   /**

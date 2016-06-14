@@ -5,10 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.magenta.DataSupplier;
+import org.magenta.core.data.supplier.StaticDataSupplier;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 
 /**
  * Helper class for random selection of objects from a list.
@@ -19,7 +22,7 @@ import com.google.common.collect.Lists;
  */
 public class RandomList<E> {
 
-  private final Iterable<E> values;
+  private final DataSupplier<E> values;
   private final RandomInteger integers;
   private final Random random;
 
@@ -30,7 +33,7 @@ public class RandomList<E> {
    * @param integers the {@code RandomInteger} to use (for picks)
    * @param values the list from which to pick values
    */
-  public RandomList(Random random, RandomInteger integers, Iterable<E> values) {
+  public RandomList(Random random, RandomInteger integers, DataSupplier<E> values) {
     this.integers = integers;
     this.values = values;
     this.random = random;
@@ -42,8 +45,8 @@ public class RandomList<E> {
    * @return a randomly picked value
    */
   public E any() {
-    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
-    return Iterables.get(values, integers.anyPositive(Iterables.size(values)));
+    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
+    return values.get(integers.anyPositive(values.getSize()));
   }
 
   /**
@@ -65,8 +68,8 @@ public class RandomList<E> {
    * @return a of random size list of values randomly picked from this instance own values.
    */
   public List<E> some() {
-    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
-    int numberOfItemsToPick = integers.anyPositive(Iterables.size(values));
+    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
+    int numberOfItemsToPick = integers.anyPositive(values.getSize());
 
     return shuffle().list().subList(0, numberOfItemsToPick);
   }
@@ -79,8 +82,8 @@ public class RandomList<E> {
    */
   @SafeVarargs
   public final List<E> someBut(E... thoseOnes) {
-    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
-    int numberOfItemsToPick = integers.anyPositive(Iterables.size(values));
+    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
+    int numberOfItemsToPick = integers.anyPositive(values.getSize());
     List<E> l = Lists.newArrayList(values);
     l.removeAll(Arrays.asList(thoseOnes));
 
@@ -95,8 +98,8 @@ public class RandomList<E> {
    * @return a list of values randomly picked from this instance own values.
    */
   public List<E> some(int numberOfItemsToPick) {
-    Preconditions.checkState(!Iterables.isEmpty(values), "No items in the list to select, the list is empty");
-    Preconditions.checkState(Iterables.size(values) > numberOfItemsToPick, "The number Of items to pick is greater than the number of items in the list");
+    Preconditions.checkState(!values.isEmpty(), "No items in the list to select, the list is empty");
+    Preconditions.checkState(values.getSize() >= numberOfItemsToPick, "The number Of items to pick is greater than the number of items in the list");
 
     return shuffle().list().subList(0, numberOfItemsToPick);
   }
@@ -111,7 +114,8 @@ public class RandomList<E> {
     List<E> l = Lists.newArrayList(values);
 
     Collections.shuffle(l, random);
-    return this;
+
+    return new RandomList<>(random, integers, new StaticDataSupplier(l, TypeToken.of(values.get(0).getClass())));
   }
 
   /**

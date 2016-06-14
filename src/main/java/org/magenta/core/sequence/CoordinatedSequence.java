@@ -18,7 +18,12 @@ public class CoordinatedSequence<D> implements Sequence<D> {
 
   @Override
   public D next() {
-    return this.dataset.get(coordinator.getIndexFor(this));
+
+    int index = coordinator.getIndexFor(this);
+
+    D data = this.dataset.get(index);
+
+    return data;
 
   }
 

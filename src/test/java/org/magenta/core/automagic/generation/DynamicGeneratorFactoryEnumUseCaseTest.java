@@ -5,12 +5,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
+import org.magenta.DataKey;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.GenerationStrategy;
 
 import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
 
 public class DynamicGeneratorFactoryEnumUseCaseTest extends AbstractDynamicGeneratorFactoryTest {
 
@@ -25,7 +25,7 @@ public class DynamicGeneratorFactoryEnumUseCaseTest extends AbstractDynamicGener
     // exercise sut
     List<Car> actual = Lists.newArrayList();
 
-    GenerationStrategy<Car> gen= sut.buildGeneratorOf(TypeToken.of(Car.class),fixture, sut).get();
+    GenerationStrategy<Car> gen= sut.buildGeneratorOf(DataKey.of(Car.class),fixture, sut).get();
 
     for (int i = 0; i < 3; i++) {
 

@@ -9,6 +9,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.Fixture;
 import org.magenta.FixtureFactory;
@@ -46,7 +47,7 @@ public class GenerationStrategyFactoryTest {
     when(generator.get()).thenReturn("a","b","c");
 
     //exercise sut
-    GenerationStrategy<String> strategy = sut.create(generator);
+    GenerationStrategy<String> strategy = sut.create(DataKey.of(String.class), generator);
 
     //verify outcome
     assertThat(strategy.generate(fixture)).isEqualTo("a");
@@ -70,7 +71,7 @@ public class GenerationStrategyFactoryTest {
 
     //exercise sut
 
-    GenerationStrategy<List<Integer>> strategy = sut.create(candidate);
+    GenerationStrategy<List<Integer>> strategy = sut.create(DataKey.of(Integer.class), candidate);
 
     //verify outcome
 
@@ -90,7 +91,7 @@ public class GenerationStrategyFactoryTest {
 
     //exercise sut
 
-    GenerationStrategy<Integer> strategy = sut.create(candidate);
+    GenerationStrategy<Integer> strategy = sut.create(DataKey.of(Integer.class), candidate);
 
     //verify outcome
 
@@ -117,7 +118,7 @@ public class GenerationStrategyFactoryTest {
 
     //exercise sut
 
-    GenerationStrategy<String> strategy = sut.create(candidate);
+    GenerationStrategy<String> strategy = sut.create(DataKey.of(String.class), candidate);
 
     //verify outcome
 

@@ -5,11 +5,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 
 import org.junit.Test;
-import org.magenta.annotation.InjectSequence;
 import org.magenta.testing.domain.playing.cards.Card;
 import org.magenta.testing.domain.playing.cards.Kind;
-
-import com.google.common.base.Supplier;
 
 public class FixtureFactorySequenceDemonstrationTest {
 
@@ -67,20 +64,5 @@ public class FixtureFactorySequenceDemonstrationTest {
     return fixtures;
   }
 
-  public static class CardGenerator implements Supplier<Card>{
 
-    @InjectSequence
-    Sequence<Kind> kinds;
-
-    @InjectSequence
-    Sequence<Integer> values;
-
-    @Override
-    public Card get() {
-      Card c = new Card();
-      c.setKind(kinds.next());
-      c.setValue(values.next());
-      return c;
-    }
-  }
 }

@@ -45,7 +45,7 @@ public class DataSetTest {
     DataSetImpl<Integer> sut = createDataSetFrom(expected);
 
     //exercise sut
-    Integer actual = sut.head();
+    Integer actual = sut.first();
 
     //verify outcome
     assertThat(actual).isEqualTo(expected[0]);
@@ -225,6 +225,6 @@ public class DataSetTest {
 
 
   private <D> DataSetImpl<D> createDataSetFrom(DataSupplier<D> supplier) {
-    return new DataSetImpl<D>(supplier);
+    return new DataSetImpl<D>(supplier, true);
   }
 }

@@ -39,14 +39,14 @@ public class ObjectGeneratorFactory implements DynamicGeneratorFactory {
   }
 
   @Override
-  public <D> Optional<ObjectGenerator<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture,
+  public <D> Optional<ObjectGenerator<D>> buildGeneratorOf(DataKey<D> key, FixtureFactory fixture,
       DynamicGeneratorFactory dynamicGeneratorFactory) {
 
-    if (!isApplicable(type)) {
+    if (!isApplicable(key.getType())) {
       return Optional.absent();
     }
 
-    Iterable<FieldSequenceDefinition> fieldSequenceDefinitions = buildDataKeyMapFor(type.getRawType());
+    Iterable<FieldSequenceDefinition> fieldSequenceDefinitions = buildDataKeyMapFor(key.getType().getRawType());
 
     List<Field> ignoredFields = buildGeneratorForEachRequiredField(fixture, dynamicGeneratorFactory, fieldSequenceDefinitions);
 
@@ -54,7 +54,7 @@ public class ObjectGeneratorFactory implements DynamicGeneratorFactory {
         .build(CacheLoader.from(new ObjectSequenceMapBuilder(
             Iterables.filter(fieldSequenceDefinitions, d->!ignoredFields.contains(d.getField()) && d.getType()==FieldSequenceDefinition.Type.ATTRIBUTE))));
 
-    return Optional.of(new ObjectGenerator<D>(type, sequenceProvider, Arrays.asList(new SequenceFieldHydrater(sequenceProvider), new DataSetFieldHydrater())));
+    return Optional.of(new ObjectGenerator<D>(key.getType(), sequenceProvider, Arrays.asList(new SequenceFieldHydrater(sequenceProvider), new DataSetFieldHydrater())));
   }
 
   private boolean isApplicable(TypeToken<?> type) {
@@ -97,7 +97,7 @@ public class ObjectGeneratorFactory implements DynamicGeneratorFactory {
       return true;
     } else {
       // TODO : in some case a dataset could be generated instead
-      Optional<? extends GenerationStrategy<X>> nullableGenerator = dynamicGeneratorFactory.buildGeneratorOf(key.getType(), fixture, dynamicGeneratorFactory);
+      Optional<? extends GenerationStrategy<X>> nullableGenerator = dynamicGeneratorFactory.buildGeneratorOf(key, fixture, dynamicGeneratorFactory);
       if (nullableGenerator.isPresent()) {
         fixture.newGenerator(key).generatedBy(nullableGenerator.get());
         return true;

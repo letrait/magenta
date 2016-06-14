@@ -12,4 +12,13 @@ public interface Fixture {
   public Set<DataKey<?>> keys();
 
   public Fixture restrictTo(Object first, Object...theRest);
+
+  public Fixture init(Class<?> clazz);
+
+  public Fixture init(DataKey<?> key);
+
+  public Fixture init(Class<?> clazz, int resize);
+
+  public Fixture init(DataKey<?> key, int resize);
+
 }

@@ -9,34 +9,36 @@ import com.google.common.base.Supplier;
 
 public class ContextualizedSupplierFunctionAdapter<D> implements Function<Fixture,D> {
 
-	private final Supplier<D> delegate;
-	private final FixtureContext context;
+  private final Supplier<D> delegate;
+  private final FixtureContext context;
 
-	public ContextualizedSupplierFunctionAdapter(Supplier<D> delegate, FixtureContext context) {
-		super();
-		this.delegate = delegate;
-		this.context = context;
-	}
+  public ContextualizedSupplierFunctionAdapter(Supplier<D> delegate, FixtureContext context) {
+    super();
+    this.delegate = delegate;
+    this.context = context;
+  }
 
-	@Override
-	public D apply(Fixture fixture) {
-		boolean managed = false;
-		try {
-			if (!context.isSet()) {
-				managed = true;
-				context.set(fixture);
-			}
-			return delegate.get();
-		} finally {
-			if (managed) {
-				context.clear();
-			}
-		}
-	}
-	
-	public String toString(){
-	  
-	  return "contextualized "+delegate.toString();
-	}
+  @Override
+  public D apply(Fixture fixture) {
+    boolean managed = false;
+    try {
+      if (!context.isSet()) {
+        managed = true;
+        context.set(fixture);
+      }
+      D data = delegate.get();
+      return data;
+    } finally {
+      if (managed) {
+        context.clear();
+      }
+    }
+  }
+
+  @Override
+  public String toString(){
+
+    return "contextualized "+delegate.toString();
+  }
 
 }

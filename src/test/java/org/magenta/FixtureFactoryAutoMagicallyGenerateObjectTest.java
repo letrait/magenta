@@ -53,7 +53,7 @@ public class FixtureFactoryAutoMagicallyGenerateObjectTest {
     sut.newDataSet(Employee.class).autoMagicallyGenerated(1);
 
     //verify outcome
-    Employee actual = sut.dataset(Employee.class).head();
+    Employee actual = sut.dataset(Employee.class).first();
 
     assertThat(actual.getPhoneNumbers()).isNotEmpty();
   }

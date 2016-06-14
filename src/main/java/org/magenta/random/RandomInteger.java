@@ -3,12 +3,15 @@ package org.magenta.random;
 import java.util.List;
 import java.util.Random;
 
+import org.magenta.core.data.supplier.StaticDataSupplier;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
+import com.google.common.reflect.TypeToken;
 
 /**
  * Helper class that generates random integers.
@@ -108,7 +111,7 @@ public class RandomInteger {
 
     Preconditions.checkArgument(size <= a.size(), "the number of items to pick (%s) must be lower than the number of integers available in the range (%s): ",size, a.size());
 
-    RandomList<Integer> integers = new RandomList<Integer>(random, this, Lists.newArrayList(a));
+    RandomList<Integer> integers = new RandomList<Integer>(random, this, new StaticDataSupplier<>(Lists.newArrayList(a),TypeToken.of(Integer.class)));
 
     return integers.some(size);
 

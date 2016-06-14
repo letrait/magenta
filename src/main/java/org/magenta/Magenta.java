@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Lists;
+import com.google.common.eventbus.EventBus;
 
 public class Magenta {
 
@@ -44,8 +45,14 @@ public class Magenta {
 
   });
 
+  private static final Supplier<EventBus> eventBus = Suppliers.memoize(()->new EventBus());
+
   public static FixtureFactory newFixture() {
     return modules().fixtureFactory();
+  }
+
+  public static EventBus eventBus(){
+    return eventBus.get();
   }
 
   /*public static ObjectSequenceMapBuilder newSequenceMapBuilder(Class<?> type) {

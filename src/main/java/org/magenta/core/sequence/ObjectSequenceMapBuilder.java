@@ -108,8 +108,6 @@ public class ObjectSequenceMapBuilder implements Function<Fixture, ObjectSequenc
       public int size(){
         return 1;
       }
-
-
     };
   }
 

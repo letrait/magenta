@@ -1,7 +1,10 @@
 package org.magenta.core;
 
+import java.io.Externalizable;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
@@ -53,6 +56,11 @@ public class RestrictionHelper {
 
   private static final Object EMPTY = new Object();
 
+
+  public static void createDatasets(FixtureFactory domain, Object first, Object... rest) {
+    configureDatasets(false, domain, first, rest);
+  }
+
   /**
    * Fixes corresponding dataset with the given <code>objects</code> into the
    * <code>domain</code>.
@@ -62,28 +70,33 @@ public class RestrictionHelper {
    * @param objects
    *          an array of object
    */
-  @SuppressWarnings({ "rawtypes", "unchecked" })
+
   public static void applyRestrictions(FixtureFactory domain, Object first, Object... rest) {
+    configureDatasets(true, domain, first, rest);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  public static void configureDatasets( boolean keyMustExist, FixtureFactory domain, Object first, Object... rest) {
     Multimap<DataKey<?>, Object> multimap = LinkedHashMultimap.create();
 
-    normalize(domain, Lists.asList(first, rest), multimap);
+    normalize(domain, Lists.asList(first, rest), multimap, keyMustExist);
 
     for (DataKey key : multimap.keySet()) {
       Collection<Object> objs = multimap.get(key);
       if (objs.size() == 1 && objs.iterator()
           .next() == EMPTY) {
         domain.newDataSet(key)
-            .composedOf();
+        .composedOf();
       } else {
         domain.newDataSet(key)
-            .composedOf(multimap.get(key));
+        .composedOf(multimap.get(key));
       }
 
     }
   }
 
   @VisibleForTesting
-  static void normalize(Fixture domain, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap) {
+  static void normalize(Fixture fixture, Iterable<?> objects, Multimap<DataKey<?>, Object> multimap, boolean keyMustExist) {
     for (Object o : objects) {
       /*if (o instanceof QualifiedDataSet) {
         QualifiedDataSet<?> qDataSetItem = (QualifiedDataSet<?>) o;
@@ -112,17 +125,26 @@ public class RestrictionHelper {
         }
       } else if (o instanceof Iterable) {
         Iterable<?> iterableItem = (Iterable<?>) o;
-        normalize(domain, iterableItem, multimap);
+        normalize(fixture, iterableItem, multimap, keyMustExist);
       } else if (o.getClass()
           .isArray()) {
         Object[] arrayItem = (Object[]) o;
-        normalize(domain, Arrays.asList(arrayItem), multimap);
+        normalize(fixture, Arrays.asList(arrayItem), multimap, keyMustExist);
       } else {
-        DataKey<?> key = findKeyForClass(domain, o.getClass());
+        DataKey<?> key = findKeyForClass(fixture, o.getClass());
         if (key == null) {
-          throw new IllegalArgumentException("Cannot restrict with " + o.getClass() + ", this dataset does not exist in this DataSetManager.");
+          if(keyMustExist){
+            throw new IllegalArgumentException("Cannot restrict with " + o.getClass() + ", this dataset does not exist in this DataSetManager.");
+          }else{
+            Collection<DataKey<?>> keys = getKeys(fixture, o.getClass());
+            for(DataKey<?> k:keys){
+              multimap.put(k, o);
+            }
+          }
+        }else{
+          multimap.put(key, o);
         }
-        multimap.put(key, o);
+
       }
     }
   }
@@ -150,5 +172,49 @@ public class RestrictionHelper {
 
     return null;
 
+  }
+
+  static <D> Collection<DataKey<?>> getKeys(Fixture fixture, Class<D> clazz) {
+
+    List keys = Lists.newArrayList();
+
+    DataKey<D> key = DataKey.of(clazz);
+
+    if(!fixture.keys().contains(key)){
+      keys.add(key);
+    }
+
+    Class<?>[] interfaces = clazz.getInterfaces();
+    for (Class i : interfaces) {
+      if(!isAKnownBehaviorInterface(i)){
+        keys.addAll(getKeys(fixture,i));
+      }
+
+    }
+
+    Class<?> parent = clazz.getSuperclass();
+    if (parent != null && !isAKnownSuperObject(parent)) {
+      keys.addAll(getKeys(fixture, parent));
+    }
+
+    return keys;
+  }
+
+  private static boolean isAKnownBehaviorInterface(Class<?> candidate) {
+    for(Class behavior : Arrays.asList(Cloneable.class, Serializable.class, Comparable.class, Externalizable.class)){
+      if(candidate.equals(behavior)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean isAKnownSuperObject(Class<?> candidate) {
+    for(Class behavior : Arrays.asList(Object.class, Enum.class, Comparable.class)){
+      if(candidate.equals(behavior)){
+        return true;
+      }
+    }
+    return false;
   }
 }

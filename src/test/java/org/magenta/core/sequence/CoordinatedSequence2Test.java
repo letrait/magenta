@@ -159,6 +159,6 @@ public class CoordinatedSequence2Test {
 
 
   private <D> DataSetImpl<D> createDataSetFrom(DataSupplier<D> supplier) {
-    return new DataSetImpl<D>(supplier);
+    return new DataSetImpl<D>(supplier, true);
   }
 }

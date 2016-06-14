@@ -3,6 +3,7 @@ package org.magenta.core;
 
 import java.util.Map;
 
+import org.magenta.DataKey;
 import org.magenta.Fixture;
 import org.magenta.core.data.supplier.ContextualizedSupplierFunctionAdapter;
 
@@ -21,13 +22,14 @@ public class GenerationStrategyFactory {
 
   }
 
-  public <D> GenerationStrategy<D> create(Supplier<D> generator){
+  public <D> GenerationStrategy<D> create(DataKey<?> key, Supplier<D> generator){
 
     Map<Injector.Key<?>, Object> injectionResults = injector.inject(generator, fixtureContext);
 
     final Function<Fixture,Integer> generatorSizeFunction = Injector.Key.NUMBER_OF_COMBINATION_FUNCTION.getFrom(injectionResults);
 
     return new SimpleGenerationStrategy<>(
+        key,
         new ContextualizedSupplierFunctionAdapter<>(generator, fixtureContext),
         generatorSizeFunction);
   }

@@ -122,7 +122,7 @@ public class RestrictionHelperTest {
     Employee candidate4=createAnonymousEmployee("candidate4");
     Employee candidate5=createAnonymousEmployee("candidate5");
 
-    DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)));
+    DataSet<Employee> employees = new DataSetImpl<>(new StaticDataSupplier<>(Arrays.asList(candidate1,candidate2,candidate3,candidate4,candidate5), TypeToken.of(Employee.class)), true);
 
     //exercise sut
     RestrictionHelper.applyRestrictions(sut, employees);

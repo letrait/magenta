@@ -10,31 +10,31 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.magenta.DataKey;
 import org.magenta.FixtureFactory;
 import org.magenta.Magenta;
 import org.magenta.core.GenerationStrategy;
 
 import com.google.common.base.Optional;
-import com.google.common.reflect.TypeToken;
 
 @RunWith(Parameterized.class)
 public class DynamicGeneratorFactoryPrimitiveUseCaseTest extends AbstractDynamicGeneratorFactoryTest {
 
   @Parameters(name = "{index}: for {0}")
   public static Collection<Object[]> data() {
-    return Arrays.asList(new Object[][] { 
-      { String.class, String.class }, 
-      { Integer.class,Integer.class }, 
-      { Double.class, Double.class }, 
-      { Short.class, Short.class }, 
-      { Long.class, Long.class }, 
+    return Arrays.asList(new Object[][] {
+      { String.class, String.class },
+      { Integer.class,Integer.class },
+      { Double.class, Double.class },
+      { Short.class, Short.class },
+      { Long.class, Long.class },
       { Float.class, Float.class },
       { Boolean.class, Boolean.class },
-      { int.class, Integer.class }, 
-      { long.class, Long.class }, 
-      { short.class, Short.class }, 
-      { double.class, Double.class }, 
-      { float.class, Float.class }, 
+      { int.class, Integer.class },
+      { long.class, Long.class },
+      { short.class, Short.class },
+      { double.class, Double.class },
+      { float.class, Float.class },
       { boolean.class, Boolean.class },
       { Date.class, Date.class}});
   }
@@ -55,7 +55,7 @@ public class DynamicGeneratorFactoryPrimitiveUseCaseTest extends AbstractDynamic
     DynamicGeneratorFactory sut = buildDynamicGeneratorFactory();
 
     // exercise sut
-    Optional<GenerationStrategy<?>> actual = (Optional) sut.buildGeneratorOf(TypeToken.of(inputType), fixture, sut);
+    Optional<GenerationStrategy<?>> actual = (Optional) sut.buildGeneratorOf(DataKey.of(inputType), fixture, sut);
 
     // verify outcome
     assertThat(actual.isPresent()).as("the presence of a generation strategy for type " + inputType.getName()).isTrue();

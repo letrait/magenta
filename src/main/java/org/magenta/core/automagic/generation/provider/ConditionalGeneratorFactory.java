@@ -1,5 +1,6 @@
 package org.magenta.core.automagic.generation.provider;
 
+import org.magenta.DataKey;
 import org.magenta.Fixture;
 import org.magenta.FixtureFactory;
 import org.magenta.core.GenerationStrategy;
@@ -29,12 +30,12 @@ public class ConditionalGeneratorFactory implements DynamicGeneratorFactory{
   }
 
   @Override
-  public <D> Optional<GenerationStrategy<D>> buildGeneratorOf(TypeToken<D> type, FixtureFactory fixture,
+  public <D> Optional<GenerationStrategy<D>> buildGeneratorOf(DataKey<D> key, FixtureFactory fixture,
       DynamicGeneratorFactory dynamicGeneratorFactory) {
 
     Function<Fixture,D> g = (Function)generator;
 
-    return spec.apply(type) ? Optional.of(new SimpleGenerationStrategy<D>(g,f -> 1)) : Optional.absent();
+    return spec.apply(key.getType()) ? Optional.of(new SimpleGenerationStrategy<D>(key, g,f -> 1)) : Optional.absent();
   }
 
 }
