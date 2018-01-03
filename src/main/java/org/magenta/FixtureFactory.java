@@ -182,7 +182,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @param dataspecification
    *          the {@link DataSpecification} of the new node.
    * @param <X>
-   *          the type of the {@link DataSpecification} inheriting from <S>
+   *          the type of the {@link DataSpecification} inheriting from S
    * @return a new DataSetManager child of this one.
    */
   @SuppressWarnings("unchecked")
@@ -1203,7 +1203,6 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      * Build a {@link Generator} that delegate to a simple <code>strategy</code>.
      *
      * @param generator the strategy to use
-     * @param numberOfItems override the default number of items of the {@link DataSpecification}.
      * @return a new generated data set
      */
     public Generator<D> generatedBy(final Supplier<? extends T> generator) {

@@ -104,7 +104,7 @@ public class DataKey<D> {
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet}.
    *
    * @param randomizer
    *          the randomizer to use
@@ -119,10 +119,8 @@ public class DataKey<D> {
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet}.
    *
-   * @param randomizer
-   *          the randomizer to use
    * @param data
    *          the data composing the qualified data set.
    * @return a new QualifiedDataSet
@@ -134,7 +132,7 @@ public class DataKey<D> {
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet}.
    *
    * @param dataset
    *          the dataset to qualify.
@@ -147,7 +145,7 @@ public class DataKey<D> {
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet}.
    *
    * @param dataset
    *          the dataset to qualify.
@@ -263,5 +261,4 @@ public class DataKey<D> {
 
     };
   }
-
 }
