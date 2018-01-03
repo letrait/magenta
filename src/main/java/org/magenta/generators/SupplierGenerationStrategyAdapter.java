@@ -34,8 +34,6 @@ public class SupplierGenerationStrategyAdapter<D, S extends DataSpecification> e
    *
    * @param generator
    *          the simple generation strategy implementation
-   * @param numberOfElements
-   *          the number of elements to generate.
    * @param affectedDataSet
    *          the affected data set
    */

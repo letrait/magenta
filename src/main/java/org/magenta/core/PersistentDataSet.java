@@ -4,10 +4,9 @@ import org.magenta.DataSet;
 import org.magenta.DataStore;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
-
 
 /**
  * Implementation of {@link DataSet} that persist data.
@@ -70,7 +69,6 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("type", getType()).toString();
+    return MoreObjects.toStringHelper(this).add("type", getType()).toString();
   }
-
 }
