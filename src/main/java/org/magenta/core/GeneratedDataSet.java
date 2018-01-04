@@ -36,15 +36,6 @@ public class GeneratedDataSet<D, S extends DataSpecification> extends AbstractDa
 
   /**
    * Default constructor.
-   *
-   * @param domain
-   *          the domain that the strategy will use to generate data
-   * @param strategy
-   *          the generation strategy
-   * @param type
-   *          the type of data
-   * @param <S>
-   *          the data specification type
    */
   public  GeneratedDataSet(final Fixture<S> domain, final GenerationStrategy<D, ? super S> strategy, final DataKey<D> key, EventBus eventBus) {
     super(key.getType(), domain.getRandomizer());

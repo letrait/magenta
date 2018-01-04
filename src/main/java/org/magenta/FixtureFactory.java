@@ -1,7 +1,6 @@
 package org.magenta;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +43,6 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -114,9 +112,9 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     this.eventBus = new EventBus(name);
 
 
-    this.dataSetMap = new HashMap<DataKey<?>, DataSet<?>>();
+    this.dataSetMap = new HashMap<>();
     this.generatorMap = new HashMap<DataKey<?>, GenerationStrategy<?, ?>>();
-    this.numberOfItemsMap = new HashMap<DataKey<?>, Integer>();
+    this.numberOfItemsMap = new HashMap<>();
     this.processors = Lists.newArrayList();
 
     final List<FieldInjectionHandler<S>> handlers = Lists.newArrayList();
@@ -125,7 +123,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     handlers.add(new FluentRandomFieldHandler());
 
 
-    this.injector = new FieldInjectionChainProcessor<S>(currentFixtureSupplier, HiearchicalFieldsFinder.SINGLETON, handlers);
+    this.injector = new FieldInjectionChainProcessor<>(currentFixtureSupplier, HiearchicalFieldsFinder.SINGLETON, handlers);
   }
 
   // -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -148,7 +146,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory}
    */
   public static <S extends DataSpecification> FixtureFactory<S> newRoot(String name, S specification, FluentRandom randomizer) {
-    FixtureFactory<S> fixtureBuilder = new FixtureFactory<S>(name, null, specification, false, randomizer, null, new ThreadLocalDataDomainSupplier());
+    FixtureFactory<S> fixtureBuilder = new FixtureFactory<>(name, null, specification, false, randomizer, null, new ThreadLocalDataDomainSupplier());
 
     fixtureBuilder.getEventBus().register(new DataSetRelationLoader());
 
@@ -165,7 +163,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new {@link FixtureFactory} child of this one.
    */
   public FixtureFactory<S> newNode(String name) {
-    FixtureFactory<S> child = new FixtureFactory<S>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
+    FixtureFactory<S> child = new FixtureFactory<>(name, this, this.getSpecification(), this.persistent, this.randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,this.generationCallStack*/);
 
     child.getEventBus().register(this);
 
@@ -182,14 +180,14 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @param dataspecification
    *          the {@link DataSpecification} of the new node.
    * @param <X>
-   *          the type of the {@link DataSpecification} inheriting from <S>
+   *          the type of the {@link DataSpecification} inheriting from S
    * @return a new DataSetManager child of this one.
    */
   @SuppressWarnings("unchecked")
   public <X extends S> FixtureFactory<X> newNode(String name, X dataspecification) {
     // Cast is safe here, because the parent will be in fact used with its child
     // DataSpecification which extends the parent data specification
-    FixtureFactory<X> child = new FixtureFactory<X>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
+    FixtureFactory<X> child = new FixtureFactory<>(name, (FixtureFactory<X>) this, dataspecification, this.persistent, this.randomizer, this.dataStoreProvider, (ThreadLocalDataDomainSupplier<X>)this.currentFixtureSupplier/*,
        this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -208,8 +206,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new DataSetManager child of this one.
    */
   public FixtureFactory<S> newNode(Fixture<? super S> dataDomain) {
-    DataDomainAggregator<S> aggregation = new DataDomainAggregator<S>(dataDomain, this);
-    FixtureFactory<S> child = new FixtureFactory<S>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
+    DataDomainAggregator<S> aggregation = new DataDomainAggregator<>(dataDomain, this);
+    FixtureFactory<S> child = new FixtureFactory<>("child of " + this.getName(), aggregation, this.getSpecification(), this.persistent, randomizer, this.dataStoreProvider, this.currentFixtureSupplier/*,
          this.generationCallStack*/);
 
     child.getEventBus().register(this);
@@ -396,7 +394,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new builder
    */
   public <D> DataSetBuilder<D, D> newDataSet(DataKey<D> key) {
-    return new DataSetBuilder<D, D>(key, Predicates.alwaysTrue(), Functions.<D> identity());
+    return new DataSetBuilder<>(key, Predicates.alwaysTrue(), Functions.<D> identity());
   }
 
   /**
@@ -461,7 +459,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new builder
    */
   public <D> GeneratorBuilder<D, D> newGenerator(DataKey<D> key) {
-    return new GeneratorBuilder<D, D>(key, Predicates.alwaysTrue(), Functions.<D> identity());
+    return new GeneratorBuilder<>(key, Predicates.alwaysTrue(), Functions.<D> identity());
   }
 
   /**
@@ -630,13 +628,13 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     if (s != null) {
       DataSet<D> gd = null;
       if(ds.isConstant()) {
-        gd =  new GeneratedDataSet<D,S>(FixtureFactory.this, s, key, eventBus);
+        gd =  new GeneratedDataSet<>(FixtureFactory.this, s, key, eventBus);
       }else{
-        gd = new GeneratorImpl<D, S>(FixtureFactory.this, s, key.getType());
+        gd = new GeneratorImpl<>(FixtureFactory.this, s, key.getType());
       }
 
       if (ds.isPersistent()) {
-        ds = new PersistentDataSet<D>(gd, new Supplier<DataStore<D>>(){
+        ds = new PersistentDataSet<>(gd, new Supplier<DataStore<D>>(){
 
           @SuppressWarnings("unchecked")
           @Override
@@ -677,7 +675,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     if (gen == null) {
       throw new GeneratorNotFoundException("No generator found for key " + clazz);
     } else {
-      return new GeneratorImpl<D, S>(FixtureFactory.this, gen, clazz);
+      return new GeneratorImpl<>(FixtureFactory.this, gen, clazz);
     }
   }
 
@@ -688,7 +686,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     if (gen == null) {
       throw new GeneratorNotFoundException("No generator found for key " + key);
     } else {
-      return new GeneratorImpl<D, S>(FixtureFactory.this, gen, key.getType());
+      return new GeneratorImpl<>(FixtureFactory.this, gen, key.getType());
     }
 
   }
@@ -879,7 +877,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       injector.inject(aConverter);
       Function<? super NEW_TYPE, D> newConverter = Functions.compose(this.converter, aConverter);
       Predicate<? super NEW_TYPE> newPredicate = Predicates.compose(this.filter, aConverter);
-      return new DataSetBuilder<D, NEW_TYPE>(originalKey, newPredicate, newConverter);
+      return new DataSetBuilder<>(originalKey, newPredicate, newConverter);
     }
 
     /**
@@ -891,7 +889,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     @SafeVarargs
     public final DataSet<D> composedOf(T... elements) {
       Iterable<T> items = Iterables.filter(Arrays.asList(elements), filter);
-      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -904,7 +902,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final DataSet<D> composedOf(Iterable<? extends T> elements) {
       Iterable<? extends T> items = Iterables.filter(elements, filter);
-      DataSet<D> dataset = new GenericDataSet<D>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -930,7 +928,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       };
 
       Iterable<D> items = FluentIterable.from(datasetList).transformAndConcat(toIterable).filter(filter).transform(converter);
-      DataSet<D> dataset = new GenericDataSet<D>(Suppliers.ofInstance(items), originalKey.getType(), getRandomizer());
+      DataSet<D> dataset = new GenericDataSet<>(Suppliers.ofInstance(items), originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -1031,10 +1029,10 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final DataSet<D> generatedBy(final GenerationStrategy<? extends T, ? super S> strategy) {
 
-      GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter,
+      GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<>(strategy, filter,
           converter), originalKey, currentFixtureSupplier);
 
-      GeneratedDataSet<D, S> dataset = new GeneratedDataSet<D, S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      GeneratedDataSet<D, S> dataset = new GeneratedDataSet<>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
       FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1082,8 +1080,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      * @return a new generated data set
      */
     public final DataSet<D> materalizedFrom(final Iterable<DataKey<? extends T>> keys) {
-      GenerationStrategy<D, S> derivedStrategy = new TransformedStrategy<D, T, S>(new DataSetAggregationStrategy<T, S>(keys), filter, converter);
-      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<D,S>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
+      GenerationStrategy<D, S> derivedStrategy = new TransformedStrategy<>(new DataSetAggregationStrategy<T, S>(keys), filter, converter);
+      GeneratedDataSet<D,S> dataset = new GeneratedDataSet<>(FixtureFactory.this, derivedStrategy, originalKey, eventBus);
       FixtureFactory.this.put(originalKey, derivedStrategy);
 
       addToDataDomain(dataset);
@@ -1157,7 +1155,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
       injector.inject(converter);
       Function<? super NEW_TYPE, D> newConverter = Functions.compose(this.converter, converter);
       Predicate<? super NEW_TYPE> newPredicate = Predicates.compose(this.filter, converter);
-      return new GeneratorBuilder<D, NEW_TYPE>(originalKey, newPredicate, newConverter);
+      return new GeneratorBuilder<>(originalKey, newPredicate, newConverter);
     }
 
     /**
@@ -1168,12 +1166,12 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public Generator<D> generatedBy(final GenerationStrategy<? extends T, ? super S> strategy) {
 
-      GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<D, T, S>(strategy, filter,
+      GenerationStrategy<D, S> derivedStrategy = new ContextualGenerationStrategyDecorator<>(new TransformedStrategy<>(strategy, filter,
           converter), originalKey, currentFixtureSupplier);
 
       FixtureFactory.this.put(originalKey, derivedStrategy);
 
-      Generator<D> generator = new GeneratorImpl<D, S>(FixtureFactory.this, derivedStrategy, originalKey.getType());
+      Generator<D> generator = new GeneratorImpl<>(FixtureFactory.this, derivedStrategy, originalKey.getType());
 
       addToDataDomain(generator);
 
@@ -1203,7 +1201,6 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      * Build a {@link Generator} that delegate to a simple <code>strategy</code>.
      *
      * @param generator the strategy to use
-     * @param numberOfItems override the default number of items of the {@link DataSpecification}.
      * @return a new generated data set
      */
     public Generator<D> generatedBy(final Supplier<? extends T> generator) {

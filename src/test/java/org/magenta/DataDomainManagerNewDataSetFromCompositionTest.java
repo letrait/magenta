@@ -198,6 +198,11 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 			public boolean apply(Integer input) {
 				return input.intValue()>=0;
 			}
+
+			@Override
+      public boolean test(Integer input) {
+        return input.intValue()>=0;
+      }
 		};
 
 		//exercise sut
@@ -223,6 +228,11 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 			public boolean apply(Integer input) {
 				return input.intValue()>=0;
 			}
+
+			@Override
+      public boolean test(Integer input) {
+        return input.intValue()>=0;
+      }
 		};
 
 		//shh shh

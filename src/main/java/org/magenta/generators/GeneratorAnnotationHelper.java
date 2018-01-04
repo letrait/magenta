@@ -11,12 +11,6 @@ import org.magenta.core.injection.HiearchicalFieldsFinder;
 
 import com.google.common.collect.Lists;
 
-/**
- * Helper class that is able to read {@link TriggeredGeneration} annotation and extract the related {@link DataKey} from them.
- *
- * @author ngagnon
- *
- */
 public class GeneratorAnnotationHelper {
 
   private GeneratorAnnotationHelper() {

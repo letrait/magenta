@@ -59,8 +59,6 @@ public class RestrictionHelper {
    *
    * @param domain
    *          the domain
-   * @param objects
-   *          an array of object
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
   public static void applyRestrictions(FixtureFactory<?> domain, Object first, Object... rest) {

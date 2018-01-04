@@ -86,6 +86,11 @@ public class TransformedStrategyTest {
 			public boolean apply(Integer input) {
 				return Math.abs(input) % 2 == 1;
 			}
+
+			@Override
+      public boolean test(Integer input) {
+        return Math.abs(input) % 2 == 1;
+      }
 		};
 	}
 
