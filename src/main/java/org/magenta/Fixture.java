@@ -47,7 +47,7 @@ public interface Fixture<S extends DataSpecification> {
   public Fixture<S> getParent();
 
   /**
-   * Return the {@linkplain RandomBuilder} associated to this domain.
+   * Return the {@linkplain FluentRandom} associated to this domain.
    *
    * @return the randomizer
    */

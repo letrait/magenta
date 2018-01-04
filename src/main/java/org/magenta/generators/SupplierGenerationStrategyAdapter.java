@@ -2,20 +2,17 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 
 /**
- * This class adapts an existing {@link SimpleGenerationStrategy} to be used as
- * a {@link GenerationStrategy}. If no number Of elements to generate is passed
- * in to the constructor, then the specified
- * {@link SimpleGenerationStrategy#getPreferredNumberOfItems(DataSpecification)}
- * will be used instead.
+ * This class adapts an existing supplier to be used as
+ * a {@link GenerationStrategy}.
  *
  * @author normand
  *
@@ -34,8 +31,6 @@ public class SupplierGenerationStrategyAdapter<D, S extends DataSpecification> e
    *
    * @param generator
    *          the simple generation strategy implementation
-   * @param numberOfElements
-   *          the number of elements to generate.
    * @param affectedDataSet
    *          the affected data set
    */

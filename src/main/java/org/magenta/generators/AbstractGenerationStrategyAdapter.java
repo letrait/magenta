@@ -2,9 +2,9 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 
 import com.google.common.collect.Lists;
@@ -24,8 +24,6 @@ public abstract class AbstractGenerationStrategyAdapter<D, S extends DataSpecifi
 
   /**
    * Default constructor.
-   *
-   * @param numberOfElements the number of elements to generate or null if we should use this class <code>getPreferredNumberOfItems</code>.
    * @param affectedDataSet The dataset that are affected by this generation strategy (other than the generated object).
    */
   public AbstractGenerationStrategyAdapter(DataKey<?> key, List<DataKey<?>> affectedDataSet) {

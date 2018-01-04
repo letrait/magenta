@@ -17,7 +17,7 @@ public class RandomDoubleTest {
 		//exercise SUT
 		for(int x=0;x<50;x++){
 			double actual=sut.any();
-			System.out.println(actual);
+
 		}
 
 	}

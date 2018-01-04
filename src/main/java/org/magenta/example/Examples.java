@@ -135,6 +135,11 @@ public class Examples {
         return input.getRed()>128;
       }
 
+      @Override
+      public boolean test(Color input) {
+        return input.getRed()>128;
+      }
+
     });
 
     out("Colors having a red component greater than 128 : %s",reddish.list());

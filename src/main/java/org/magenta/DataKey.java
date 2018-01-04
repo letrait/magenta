@@ -51,7 +51,7 @@ public class DataKey<D> {
    * @return a new key
    */
   public static <D> DataKey<D> makeQualified(String qualifier, Class<D> type) {
-    DataKey<D> ref = new DataKey<D>(qualifier, type);
+    DataKey<D> ref = new DataKey<>(qualifier, type);
     return ref;
   }
 
@@ -65,7 +65,7 @@ public class DataKey<D> {
    * @return a new key
    */
   public static <D> DataKey<D> makeDefault(Class<D> type) {
-    DataKey<D> ref = new DataKey<D>(DEFAULT_QUALIFIER, type);
+    DataKey<D> ref = new DataKey<>(DEFAULT_QUALIFIER, type);
     return ref;
   }
 
@@ -104,7 +104,7 @@ public class DataKey<D> {
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet} dataset.
    *
    * @param randomizer
    *          the randomizer to use
@@ -115,14 +115,12 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(FluentRandom randomizer, D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
+    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet} dataset.
    *
-   * @param randomizer
-   *          the randomizer to use
    * @param data
    *          the data composing the qualified data set.
    * @return a new QualifiedDataSet
@@ -130,11 +128,11 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(D... data) {
-    return new QualifiedDataSetImpl<D>(this, new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
+    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet} dataset.
    *
    * @param dataset
    *          the dataset to qualify.
@@ -143,11 +141,11 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> qualify(DataSet<D> dataset) {
-    return new QualifiedDataSetImpl<D>(this, dataset);
+    return new QualifiedDataSetImpl<>(this, dataset);
   }
 
   /**
-   * Return a {@link Qualified} dataset.
+   * Return a {@link QualifiedDataSet} dataset.
    *
    * @param dataset
    *          the dataset to qualify.
@@ -156,7 +154,7 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> qualify(Supplier<DataSet<D>> dataset) {
-    return new QualifiedDataSetImpl<D>(this, dataset);
+    return new QualifiedDataSetImpl<>(this, dataset);
   }
 
   /**

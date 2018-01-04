@@ -42,8 +42,6 @@ public class RandomDate {
    *          the date range from which to pick a date
    * @param longs
    *          the random longs from which moments will be randomly selected.
-   * @param ticker
-   *          a ticker to read the current time
    */
   public RandomDate(long resolutionInMillis, Range<Date> constraint, RandomLong longs) {
     this.resolutionInMillis = resolutionInMillis;

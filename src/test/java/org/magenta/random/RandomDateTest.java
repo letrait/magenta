@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -44,6 +45,7 @@ public class RandomDateTest {
 	}
 
 	@Test
+	@Ignore
 	public void testAnyInFuture() {
 		// setup fixtures
 		RandomDate sut = createSimpleRandomDate();

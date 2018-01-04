@@ -2,9 +2,9 @@ package org.magenta.generators;
 
 import java.util.List;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 
 import com.google.common.base.Supplier;
@@ -12,7 +12,7 @@ import com.google.common.collect.Iterables;
 
 
 /**
- * This class adapts an existing {@link ImplicitGenerationStrategy} to be used as
+ * This class adapts an existing supplier to be used as
  * a {@link GenerationStrategy}.
  *
  * @author normand
