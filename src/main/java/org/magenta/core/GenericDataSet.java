@@ -2,7 +2,7 @@ package org.magenta.core;
 
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Objects;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 
@@ -71,7 +71,7 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
 
   @Override
   public String toString() {
-    return Objects.toStringHelper(this).add("type", getType()).toString();
+    return MoreObjects.toStringHelper(this).add("type", getType()).toString();
   }
 
 }
