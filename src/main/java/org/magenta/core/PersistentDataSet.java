@@ -1,12 +1,12 @@
 package org.magenta.core;
 
+import java.util.function.Supplier;
+
 import org.magenta.DataSet;
 import org.magenta.DataStore;
+import org.magenta.commons.Preconditions;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 
 
 /**
@@ -68,9 +68,5 @@ public class PersistentDataSet<D> extends AbstractDataSet<D> {
     return this;
   }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).add("type", getType()).toString();
-  }
 
 }

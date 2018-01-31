@@ -5,6 +5,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.junit.Test;
 import org.magenta.DataSpecification;
@@ -14,8 +16,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 
 public class TransformedStrategyTest {
 
@@ -82,12 +82,11 @@ public class TransformedStrategyTest {
 
 	private Predicate<Integer> oddNumberFilter() {
 		return new Predicate<Integer>() {
-			@Override
 			public boolean apply(Integer input) {
 				return Math.abs(input) % 2 == 1;
 			}
 
-			@Override
+      @Override
       public boolean test(Integer input) {
         return Math.abs(input) % 2 == 1;
       }

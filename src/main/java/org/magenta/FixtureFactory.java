@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
+import org.magenta.commons.Preconditions;
 import org.magenta.core.DataDomainAggregator;
 import org.magenta.core.DataSetRelationLoader;
 import org.magenta.core.EmptyDataSet;
@@ -36,13 +40,6 @@ import org.magenta.random.FluentRandom;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -347,7 +344,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public FixtureFactory<S> fix(Class<?>... classes) {
 
-    DataKey<?>[] keys = FluentIterable.from(Arrays.asList(classes)).transform(DataKey.classToKey()).toArray(DataKey.class);
+    DataKey<?>[] keys = FluentIterable.from(Arrays.asList(classes)).transform(i -> DataKey.classToKey().apply(i)).toArray(DataKey.class);
 
     return fix(keys);
   }
@@ -394,7 +391,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new builder
    */
   public <D> DataSetBuilder<D, D> newDataSet(DataKey<D> key) {
-    return new DataSetBuilder<>(key, Predicates.alwaysTrue(), Functions.<D> identity());
+    return new DataSetBuilder<>(key, i->true , i->i);
   }
 
   /**
@@ -459,7 +456,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    * @return a new builder
    */
   public <D> GeneratorBuilder<D, D> newGenerator(DataKey<D> key) {
-    return new GeneratorBuilder<>(key, Predicates.alwaysTrue(), Functions.<D> identity());
+    return new GeneratorBuilder<>(key, i->true, i->i);
   }
 
   /**
@@ -823,13 +820,13 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public class DataSetBuilder<D, T> {
     private final DataKey<D> originalKey;
-    private Predicate<? super T> filter;
-    private final Function<? super T, D> converter;
+    private Predicate<T> filter;
+    private final Function<T, D> converter;
     private boolean persistent;
 
     DataSetBuilder(DataKey<D> originalQualifier, Predicate<? super T> filter, Function<? super T, D> converter) {
-      this.filter = filter;
-      this.converter = converter;
+      this.filter = (Predicate<T>) filter;
+      this.converter = (Function<T,D>) converter;
       this.originalKey = originalQualifier;
     }
 
@@ -862,7 +859,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final DataSetBuilder<D, T> filtered(Predicate<? super T> aFilter) {
       injector.inject(aFilter);
-      this.filter = Predicates.and(this.filter, aFilter);
+      this.filter = this.filter.and(aFilter);
       return this;
     }
 
@@ -875,8 +872,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public final <NEW_TYPE> DataSetBuilder<D, NEW_TYPE> transformed(Function<? super NEW_TYPE, ? extends T> aConverter) {
       injector.inject(aConverter);
-      Function<? super NEW_TYPE, D> newConverter = Functions.compose(this.converter, aConverter);
-      Predicate<? super NEW_TYPE> newPredicate = Predicates.compose(this.filter, aConverter);
+      Function<? super NEW_TYPE, D> newConverter = this.converter.compose(aConverter);
+      Predicate<? super NEW_TYPE> newPredicate = i -> this.filter.test(aConverter.apply(i));
       return new DataSetBuilder<>(originalKey, newPredicate, newConverter);
     }
 
@@ -888,8 +885,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     @SafeVarargs
     public final DataSet<D> composedOf(T... elements) {
-      Iterable<T> items = Iterables.filter(Arrays.asList(elements), filter);
-      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      Iterable<T> items = Iterables.filter(Arrays.asList(elements), i -> filter.test(i));
+      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, i -> converter.apply(i)), originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -901,8 +898,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      * @return a new static data set
      */
     public final DataSet<D> composedOf(Iterable<? extends T> elements) {
-      Iterable<? extends T> items = Iterables.filter(elements, filter);
-      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, converter), originalKey.getType(), getRandomizer());
+      Iterable<? extends T> items = Iterables.filter(elements, i -> filter.test(i));
+      DataSet<D> dataset = new GenericDataSet<>(Iterables.transform(items, i -> converter.apply(i)), originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -920,15 +917,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
 
       List<DataSet<? extends T>> datasetList = Arrays.asList(datasets);
 
-      Function<DataSet<? extends T>, Iterable<? extends T>> toIterable = new Function<DataSet<? extends T>, Iterable<? extends T>>() {
-        @Override
-        public Iterable<? extends T> apply(DataSet<? extends T> ds) {
-          return ds.get();
-        }
-      };
-
-      Iterable<D> items = FluentIterable.from(datasetList).transformAndConcat(toIterable).filter(filter).transform(converter);
-      DataSet<D> dataset = new GenericDataSet<>(Suppliers.ofInstance(items), originalKey.getType(), getRandomizer());
+      Iterable<D> items = FluentIterable.from(datasetList).transformAndConcat(ds->ds.get()).filter(i -> filter.test(i)).transform(i -> converter.apply(i));
+      DataSet<D> dataset = new GenericDataSet<>(() -> items, originalKey.getType(), getRandomizer());
       addToDataDomain(dataset);
       return dataset;
     }
@@ -1052,12 +1042,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     @SafeVarargs
     public final DataSet<D> materalizedFrom(final Class<? extends T>... keys) {
-      return materalizedFrom(Iterables.transform(Arrays.asList(keys), new Function<Class<? extends T>, DataKey<? extends T>>() {
-        @Override
-        public DataKey<? extends T> apply(Class<? extends T> input) {
-          return DataKey.makeDefault(input);
-        }
-      }));
+      return materalizedFrom(Iterables.transform(Arrays.asList(keys), input -> DataKey.makeDefault(input)));
     }
 
     /**
@@ -1122,11 +1107,11 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
    */
   public class GeneratorBuilder<D, T> {
     private final DataKey<D> originalKey;
-    private Predicate<? super T> filter;
+    private Predicate<T> filter;
     private final Function<? super T, D> converter;
 
     GeneratorBuilder(DataKey<D> origoriginalKey, Predicate<? super T> filter, Function<? super T, D> converter) {
-      this.filter = filter;
+      this.filter = (Predicate<T>) filter;
       this.converter = converter;
       this.originalKey = origoriginalKey;
     }
@@ -1139,7 +1124,7 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
      */
     public GeneratorBuilder<D, T> filtered(Predicate<? super T> filter) {
       injector.inject(filter);
-      this.filter = Predicates.and(this.filter, filter);
+      this.filter = this.filter.and(filter);
       return this;
     }
 
@@ -1153,8 +1138,8 @@ public class FixtureFactory<S extends DataSpecification> implements Fixture<S> {
     public <NEW_TYPE> GeneratorBuilder<D, NEW_TYPE> transformed(Function<? super NEW_TYPE, T> converter) {
 
       injector.inject(converter);
-      Function<? super NEW_TYPE, D> newConverter = Functions.compose(this.converter, converter);
-      Predicate<? super NEW_TYPE> newPredicate = Predicates.compose(this.filter, converter);
+      Function<? super NEW_TYPE, D> newConverter = this.converter.compose(converter);
+      Predicate<? super NEW_TYPE> newPredicate = i -> this.filter.test(converter.apply(i));
       return new GeneratorBuilder<>(originalKey, newPredicate, newConverter);
     }
 

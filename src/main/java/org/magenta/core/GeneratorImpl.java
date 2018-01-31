@@ -1,26 +1,20 @@
 package org.magenta.core;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
 import org.magenta.FixtureFactory;
 import org.magenta.GenerationStrategy;
 import org.magenta.Generator;
+import org.magenta.commons.JavaSuppliers;
 import org.magenta.generators.TransformedStrategy;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -81,7 +75,7 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
 
     do {
       candidate = any();
-    } while (i++ < MAX_COUNT && filter.apply(candidate));
+    } while (i++ < MAX_COUNT && filter.test(candidate));
 
     if (i >= MAX_COUNT) {
       throw new IllegalStateException(String.format("reach maximum count while trying to generate a %s that matches the filter %s", type, filter));
@@ -147,32 +141,29 @@ public class GeneratorImpl<T, S extends DataSpecification> implements Generator<
 
   @Override
   public DataSet<T> subset(final int size) {
-    return new GenericDataSet<T>(Suppliers.memoize(new Supplier<Iterable<T>>() {
-      @Override
-      public Iterable<T> get() {
-        return strategy.generate(size, dataSetMap);
-      }
-    }), this.type, dataSetMap.getRandomizer());
+    return new GenericDataSet<>(()->JavaSuppliers.memoize(()-> strategy.generate(size, dataSetMap)).get(), this.type, dataSetMap.getRandomizer());
   }
 
   @Override
   public Generator<T> filter(final Predicate<? super T> filter) {
-    return new GeneratorImpl<T, S>(dataSetMap, new TransformedStrategy<T, T, S>(strategy, filter, Functions.<T> identity()), type);
+    return new GeneratorImpl<>(dataSetMap, new TransformedStrategy<T, T, S>(strategy, filter, i->i), type);
   }
 
   @Override
   public Generator<T> without(T... items) {
-    return filter(not(in(Arrays.asList(items))));
+    Predicate<T> filter = i -> Arrays.asList(items).contains(i);
+    return filter(filter.negate());
   }
 
   @Override
   public Generator<T> without(Collection<T> items) {
-    return filter(not(in(items)));
+    Predicate<T> filter = i -> items.contains(i);
+    return filter(filter.negate());
   }
 
   @Override
   public <X> Generator<X> transform(final Function<? super T, X> function, Class<X> newType) {
-    return new GeneratorImpl<X, S>(dataSetMap, new TransformedStrategy<>(strategy, Predicates.alwaysTrue(), function), newType);
+    return new GeneratorImpl<X, S>(dataSetMap, new TransformedStrategy<>(strategy, i->true, function), newType);
   }
 
   @Override

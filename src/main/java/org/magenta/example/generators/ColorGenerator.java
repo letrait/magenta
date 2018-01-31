@@ -1,12 +1,12 @@
 package org.magenta.example.generators;
 
 import java.awt.Color;
+import java.util.function.Supplier;
 
 import org.magenta.annotations.InjectDataSpecification;
 import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Supplier;
 
 public class ColorGenerator implements Supplier<Color>{
 

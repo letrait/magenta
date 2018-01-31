@@ -1,11 +1,11 @@
 package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
+import java.util.function.Supplier;
 
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 
-import com.google.common.base.Supplier;
 
 /**
  * A FieldHandler is a link in the chain of responsibility handled by the FieldProcessor.

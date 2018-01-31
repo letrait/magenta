@@ -4,14 +4,14 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 
-import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 
@@ -66,7 +66,7 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
 
     Function<DataKey<? extends D>, DataSet<? extends D>> getDataSetFromKey = createGetDataSetFunction(dataDomain);
 
-    return dataDomain.getRandomizer().mix(FluentIterable.from(keys).transform(getDataSetFromKey).transform(getIterableFromDataSet));
+    return dataDomain.getRandomizer().mix(FluentIterable.from(keys).transform(i -> getDataSetFromKey.apply(i)).transform(i -> getIterableFromDataSet.apply(i)));
 
   }
 
@@ -75,14 +75,14 @@ public class DataSetAggregationStrategy<D, S extends DataSpecification> implemen
 
     Function<DataKey<? extends D>, DataSet<? extends D>> getDataSetFromKey = createGetDataSetFunction(dataDomain);
 
-    return Iterables.limit(dataDomain.getRandomizer().mix(FluentIterable.from(keys).transform(getDataSetFromKey).transform(getIterableFromDataSet)),
+    return Iterables.limit(dataDomain.getRandomizer().mix(FluentIterable.from(keys).transform(i -> getDataSetFromKey.apply(i)).transform(i -> getIterableFromDataSet.apply(i))),
         numberOfElements);
   }
 
   private Function<DataKey<? extends D>, DataSet<? extends D>> createGetDataSetFunction(final Fixture<? extends S> dataDomain) {
     Function<DataKey<? extends D>, DataSet<? extends D>> toDataSet = new Function<DataKey<? extends D>, DataSet<? extends D>>() {
 
-      private Map<DataKey,CacheEntry> cache = new HashMap<DataKey,CacheEntry>();
+      private Map<DataKey,CacheEntry> cache = new HashMap<>();
 
 
       @Override

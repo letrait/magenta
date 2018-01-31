@@ -4,8 +4,6 @@ import java.util.Arrays;
 
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Suppliers;
-
 public class Fixtures {
 
 	public static FluentRandom randomizer(){
@@ -21,6 +19,6 @@ public class Fixtures {
   }
 
   public static <D> GenericDataSet<D> createDataSetOf(D... elements) {
-    return new GenericDataSet<D>(Suppliers.ofInstance(Arrays.asList(elements)), (Class<D>) elements[0].getClass(),randomizer());
+    return new GenericDataSet<>(() -> Arrays.asList(elements), (Class<D>) elements[0].getClass(),randomizer());
   }
 }

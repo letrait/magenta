@@ -1,10 +1,10 @@
 package org.magenta.example.generators;
 
+import java.util.function.Supplier;
+
 import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.example.domain.Owner;
 import org.magenta.random.FluentRandom;
-
-import com.google.common.base.Supplier;
 
 public class OwnerGenerator implements Supplier<Owner> {
 

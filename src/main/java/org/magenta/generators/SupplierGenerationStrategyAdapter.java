@@ -1,14 +1,14 @@
 package org.magenta.generators;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
+import org.magenta.commons.Preconditions;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 
 /**
  * This class adapts an existing supplier to be used as

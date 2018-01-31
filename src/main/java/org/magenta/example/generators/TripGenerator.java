@@ -4,6 +4,7 @@ package org.magenta.example.generators;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.magenta.DataSet;
 import org.magenta.annotations.InjectDataSet;
@@ -13,7 +14,6 @@ import org.magenta.example.domain.Car;
 import org.magenta.example.domain.Trip;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
 

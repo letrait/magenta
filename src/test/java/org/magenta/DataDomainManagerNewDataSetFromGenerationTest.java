@@ -6,10 +6,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 
-import com.google.common.base.Supplier;
 
 public class DataDomainManagerNewDataSetFromGenerationTest extends FixtureFactoryTestSupport {
 

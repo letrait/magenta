@@ -1,13 +1,14 @@
 package org.magenta.generators;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.GenerationStrategy;
 
-import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 
@@ -41,13 +42,13 @@ public class TransformedStrategy<D, O, S extends DataSpecification> implements G
 
   @Override
   public Iterable<D> generate(Fixture<? extends S> dataDomain) {
-    return FluentIterable.from(strategy.generate(dataDomain)).filter(filter).transform(converter);
+    return FluentIterable.from(strategy.generate(dataDomain)).filter(i -> filter.test(i)).transform(i -> converter.apply(i));
   }
 
   @Override
   public Iterable<D> generate(int numberOfElements, Fixture<? extends S> dataDomain) {
     //the filter may reduce the number of elements returned
-    return FluentIterable.from(strategy.generate(numberOfElements,dataDomain)).filter(filter).transform(converter);
+    return FluentIterable.from(strategy.generate(numberOfElements,dataDomain)).filter(i -> filter.test(i)).transform(i -> converter.apply(i));
   }
 
   @Override

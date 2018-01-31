@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.awt.Color;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.junit.Test;
 import org.magenta.DataKey;
@@ -21,8 +23,7 @@ import org.magenta.example.generators.ColorGenerator;
 import org.magenta.example.generators.TripGenerator;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
+
 
 public class Examples {
 
@@ -130,7 +131,6 @@ public class Examples {
 
     DataSet<Color> reddish = colors.filter(new Predicate<Color>(){
 
-      @Override
       public boolean apply(Color input) {
         return input.getRed()>128;
       }

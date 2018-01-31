@@ -17,8 +17,6 @@ import org.magenta.QualifiedDataSet;
 import org.magenta.annotations.InjectDataSet;
 import org.mockito.Mockito;
 
-import com.google.common.base.Suppliers;
-
 public class DataSetFieldHandlerTest<D> {
 
   @InjectDataSet
@@ -52,7 +50,7 @@ public class DataSetFieldHandlerTest<D> {
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this, ()->fixture);
 
     //verify outcome
     assertThat(handled).overridingErrorMessage("The field 'notAnnotated' of this test class was not expected to be handled").isFalse();
@@ -69,7 +67,7 @@ public class DataSetFieldHandlerTest<D> {
     Fixture fixture = mock(Fixture.class);
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this,  ()->fixture);
 
 
     //verify outcome
@@ -92,7 +90,7 @@ public class DataSetFieldHandlerTest<D> {
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this,  ()->fixture);
 
 
     //verify outcome
@@ -115,7 +113,7 @@ public class DataSetFieldHandlerTest<D> {
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(mock(DataSet.class));
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this,  ()->fixture);
     dataSet.get();
     dataSet.get();
 
@@ -141,7 +139,7 @@ public class DataSetFieldHandlerTest<D> {
     when(fixture.dataset(Mockito.any(DataKey.class))).thenThrow(new DataSetNotFoundException("not found"));
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this,  ()->fixture);
 
     //verify outcome
     try{
@@ -165,7 +163,7 @@ public class DataSetFieldHandlerTest<D> {
     Fixture fixture = null;
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+    boolean handled = sut.handle(f, this,  ()->fixture);
 
     //verify outcome
     try{
@@ -189,7 +187,7 @@ public class DataSetFieldHandlerTest<D> {
 
     //exercise sut
     try{
-      boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+      boolean handled = sut.handle(f, this,  ()->fixture);
       fail("Dataset with no type cannot be injected, an error must have been thrown");
     }catch(IllegalStateException ise){
       assertThat(ise).hasMessageContaining("rawtype");
@@ -206,7 +204,7 @@ public class DataSetFieldHandlerTest<D> {
 
     //exercise sut
     try{
-      boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+      boolean handled = sut.handle(f, this,  ()->fixture);
       fail("Dataset with a generic type cannot be injected, an error must have been thrown");
     }catch(IllegalStateException ise){
       assertThat(ise).hasMessageContaining("generic");
@@ -223,7 +221,7 @@ public class DataSetFieldHandlerTest<D> {
 
     //exercise sut
     try{
-      boolean handled = sut.handle(f, this, Suppliers.ofInstance(fixture));
+      boolean handled = sut.handle(f, this,  ()->fixture);
       fail("Field that are not a DataSet cannot be injected, an error must have been thrown");
     }catch(IllegalStateException ise){
       assertThat(ise).hasMessageContaining("DataSet");

@@ -3,10 +3,9 @@ package org.magenta;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * A DataSet is a collection of item of the same type. This class provides

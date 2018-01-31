@@ -3,12 +3,12 @@ package org.magenta.core.injection;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.annotations.InjectFixture;
 
-import com.google.common.base.Supplier;
 import com.google.common.reflect.Reflection;
 
 public class FixtureFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {

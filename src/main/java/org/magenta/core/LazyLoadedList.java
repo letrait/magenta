@@ -2,11 +2,11 @@ package org.magenta.core;
 
 import java.util.AbstractList;
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.magenta.DataStore;
+import org.magenta.commons.Preconditions;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
 /**

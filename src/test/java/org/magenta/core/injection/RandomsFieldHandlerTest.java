@@ -13,7 +13,6 @@ import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.random.FluentRandom;
 import org.mockito.Mockito;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Range;
 
 
@@ -41,7 +40,7 @@ public class RandomsFieldHandlerTest  {
     FluentRandomFieldHandler sut = new FluentRandomFieldHandler();
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(mock));
+    boolean handled = sut.handle(f, this, ()->mock);
 
     //verify outcome
     assertThat(handled).overridingErrorMessage("The field 'randomBuilder' of this test class was expected to be handled").isTrue();

@@ -3,7 +3,8 @@ package org.magenta.random;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.base.Preconditions;
+import org.magenta.commons.Preconditions;
+
 import com.google.common.collect.BoundType;
 import com.google.common.collect.ContiguousSet;
 import com.google.common.collect.DiscreteDomain;
@@ -108,7 +109,7 @@ public class RandomInteger {
 
     Preconditions.checkArgument(size <= a.size(), "the number of items to pick (%s) must be lower than the number of integers available in the range (%s): ",size, a.size());
 
-    RandomList<Integer> integers = new RandomList<Integer>(random, this, Lists.newArrayList(a));
+    RandomList<Integer> integers = new RandomList<>(random, this, Lists.newArrayList(a));
 
     return integers.some(size);
 

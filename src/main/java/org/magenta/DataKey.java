@@ -1,17 +1,15 @@
 package org.magenta;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Arrays;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
+import org.magenta.commons.Preconditions;
 import org.magenta.core.EmptyDataSet;
 import org.magenta.core.ForwardingDataSet;
 import org.magenta.core.GenericDataSet;
 import org.magenta.random.FluentRandom;
-
-import com.google.common.base.Function;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 
 /**
  * A DataKey is used to reference a {@link DataSet}, {@link Generator} or a
@@ -34,8 +32,8 @@ public class DataKey<D> {
   private final Class<D> type;
 
   DataKey(String qualifier, Class<D> type) {
-    this.qualifier = checkNotNull(qualifier);
-    this.type = checkNotNull(type);
+    this.qualifier = Preconditions.checkNotNull(qualifier);
+    this.type = Preconditions.checkNotNull(type);
   }
 
   /**
@@ -115,7 +113,7 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(FluentRandom randomizer, D... data) {
-    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(Suppliers.ofInstance(Arrays.asList(data)), this.type, randomizer));
+    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(() -> Arrays.asList(data), this.type, randomizer));
   }
 
   /**
@@ -128,7 +126,7 @@ public class DataKey<D> {
 
   @SuppressWarnings("unchecked")
   public QualifiedDataSet<D> datasetOf(D... data) {
-    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(Suppliers.ofInstance(Arrays.asList(data)), this.type, FluentRandom.singleton()));
+    return new QualifiedDataSetImpl<>(this, new GenericDataSet<>(() -> Arrays.asList(data), this.type, FluentRandom.singleton()));
   }
 
   /**
@@ -224,7 +222,7 @@ public class DataKey<D> {
     private final DataKey<D2> key;
 
     private QualifiedDataSetImpl(DataKey<D2> qualifier, DataSet<D2> delegate) {
-      super(Suppliers.ofInstance(delegate));
+      super(()->delegate);
       this.key = qualifier;
     }
 

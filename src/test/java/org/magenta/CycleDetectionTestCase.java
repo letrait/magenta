@@ -1,9 +1,10 @@
 package org.magenta;
 
+import java.util.function.Supplier;
+
 import org.junit.Test;
 import org.magenta.annotations.InjectDataSet;
 
-import com.google.common.base.Supplier;
 
 public class CycleDetectionTestCase extends FixtureFactoryTestSupport{
 

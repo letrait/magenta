@@ -2,17 +2,17 @@ package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
+
+import org.magenta.DataSpecification;
+import org.magenta.Fixture;
+import org.magenta.annotations.InjectDataSpecification;
 
 import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-import org.magenta.DataSpecification;
-import org.magenta.Fixture;
-import org.magenta.annotations.InjectDataSpecification;
-
-import com.google.common.base.Supplier;
 
 public class DataSpecificationFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {
 

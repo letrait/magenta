@@ -1,21 +1,18 @@
 package org.magenta.core;
 
-import static com.google.common.base.Predicates.in;
-import static com.google.common.base.Predicates.not;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.magenta.DataSet;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -46,14 +43,14 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
    *          the java random to use for shuffling and by the "any()" method
    */
   public AbstractDataSet(Class<D> type, FluentRandom randomizer) {
-    this.links = new LinkedHashMap<Object, D>();
+    this.links = new LinkedHashMap<>();
     this.type = type;
     this.randomizer = randomizer;
   }
 
   @Override
   public boolean isEmpty() {
-    return Iterables.isEmpty(get());
+    return !get().iterator().hasNext();
   }
 
 
@@ -65,17 +62,17 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public DataSet<D> subset(int size) {
-    return new GenericDataSet<D>(Iterables.limit(get(), size), this.type, getRandomizer());
+    return new GenericDataSet<>(Iterables.limit(get(), size), this.type, getRandomizer());
   }
 
   @Override
   public DataSet<D> filter(Predicate<? super D> filter) {
-    return new GenericDataSet<D>(Iterables.filter(get(), filter), this.type, getRandomizer());
+    return new GenericDataSet<>(Iterables.filter(get(),  o -> filter.test(o)), this.type, getRandomizer());
   }
 
   @Override
   public <X> DataSet<X> transform(Function<? super D, X> function, Class<X> newType) {
-    return new GenericDataSet<X>(Iterables.transform(get(), function), newType, getRandomizer());
+    return new GenericDataSet<>(Iterables.transform(get(), i -> function.apply(i)), newType, getRandomizer());
   }
 
   @Override
@@ -111,12 +108,14 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
   @Override
   @SafeVarargs
   public final DataSet<D> without(D... items) {
-    return filter(not(in(Arrays.asList(items))));
+    Predicate<D> filter = i -> Arrays.asList(items).contains(i);
+    return filter(filter.negate());
   }
 
   @Override
   public DataSet<D> without(Collection<D> items) {
-    return filter(not(in(items)));
+    Predicate<D> filter = i -> items.contains(i);
+    return filter(filter.negate());
   }
 
   @Override
@@ -182,7 +181,7 @@ public abstract class AbstractDataSet<D> implements DataSet<D> {
 
   @Override
   public D any(Predicate<? super D> filter) {
-    return getRandomizer().iterable(Iterables.filter(get(), filter)).any();
+    return getRandomizer().iterable(Iterables.filter(get(), i -> filter.test(i))).any();
   }
 
   @Override

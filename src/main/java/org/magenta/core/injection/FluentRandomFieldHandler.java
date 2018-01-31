@@ -2,18 +2,18 @@ package org.magenta.core.injection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
+import java.util.function.Supplier;
 
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.annotations.InjectFluentRandom;
 import org.magenta.random.FluentRandom;
 
-import com.google.common.base.Supplier;
+import net.sf.cglib.proxy.Callback;
+import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.MethodInterceptor;
+import net.sf.cglib.proxy.MethodProxy;
+
 
 /**
  * Inject the current RandomBuilderImplobject into a given field.

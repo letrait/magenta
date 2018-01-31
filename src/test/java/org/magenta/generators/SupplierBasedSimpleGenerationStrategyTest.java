@@ -5,13 +5,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.function.Supplier;
 
 import org.junit.Test;
-import org.magenta.Fixture;
 import org.magenta.DataKey;
 import org.magenta.DataSpecification;
+import org.magenta.Fixture;
 
-import com.google.common.base.Supplier;
 
 public class SupplierBasedSimpleGenerationStrategyTest {
 

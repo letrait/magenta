@@ -1,11 +1,11 @@
 package org.magenta.core.injection;
 
 import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 
 import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 
-import com.google.common.base.Supplier;
 
 public interface FixtureContext<S extends DataSpecification> extends Supplier<Fixture<S>> {
 

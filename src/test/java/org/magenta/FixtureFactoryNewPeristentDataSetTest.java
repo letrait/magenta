@@ -5,6 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.function.Supplier;
+
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,9 +18,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import com.google.common.base.Predicates;
-import com.google.common.base.Supplier;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FixtureFactoryNewPeristentDataSetTest extends FixtureFactoryTestSupport {
@@ -109,7 +108,7 @@ public class FixtureFactoryNewPeristentDataSetTest extends FixtureFactoryTestSup
     sut.setDataStoreProvider(provider, true);
 
     sut.newDataSet(Integer.class).composedOf(1,2,3);
-    sut.newDataSet(String.class).persistent().filtered(Predicates.alwaysTrue()).composedOf("a","b","c");
+    sut.newDataSet(String.class).persistent().filtered(i->true).composedOf("a","b","c");
 
     //exercise sut
 

@@ -3,9 +3,10 @@ package org.magenta.core.injection;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+
 
 public enum HiearchicalFieldsFinder implements Function<Class<?>,List<Field>> {
 

@@ -6,14 +6,12 @@ import static org.magenta.testing.MagentaAssertions.assertThat;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.junit.Test;
 import org.magenta.core.GenericDataSet;
 import org.magenta.random.FluentRandom;
-
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
 
 
 
@@ -176,7 +174,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 
 		//exercise sut
 		DataSet<String> numberInString = domain.newDataSet(String.class)
-				.transformed(Functions.toStringFunction())
+				.transformed(i->i.toString())
 				.composedOf(1, 2, 3);
 
 		//verify outcome
@@ -194,12 +192,12 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		Predicate<Integer> isPositive = new Predicate<Integer>(){
-			@Override
+
 			public boolean apply(Integer input) {
 				return input.intValue()>=0;
 			}
 
-			@Override
+      @Override
       public boolean test(Integer input) {
         return input.intValue()>=0;
       }
@@ -224,19 +222,19 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 		FixtureFactory<SimpleDataSpecification> domain = createAnonymousFixtureFactory();
 
 		Predicate<Integer> isPositive = new Predicate<Integer>(){
-			@Override
+
 			public boolean apply(Integer input) {
 				return input.intValue()>=0;
 			}
 
-			@Override
+      @Override
       public boolean test(Integer input) {
         return input.intValue()>=0;
       }
 		};
 
 		//shh shh
-		Function<Integer,String> integerToString=(Function)Functions.toStringFunction();
+		Function<Integer,String> integerToString=i->i.toString();
 
 		//exercise sut
 		DataSet<String> positiveNumbers = domain.newDataSet(String.class)
@@ -268,7 +266,7 @@ public class DataDomainManagerNewDataSetFromCompositionTest extends FixtureFacto
 
 		//exercise sut
 		DataSet<String> doubleNumbers = domain.newDataSet(String.class)
-				.transformed(Functions.toStringFunction())
+				.transformed(i->i.toString())
 				.transformed(multiplyByTwo)
 				.composedOf(1, 2, 3);
 

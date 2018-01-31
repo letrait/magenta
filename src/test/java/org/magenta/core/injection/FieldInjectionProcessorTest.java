@@ -5,14 +5,12 @@ import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 import org.magenta.Fixture;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
 
 public class FieldInjectionProcessorTest {
 
@@ -24,7 +22,7 @@ public class FieldInjectionProcessorTest {
 
     //setup fixture
     Fixture fixture = mock(Fixture.class);
-    Supplier<Fixture> currentFixture = Suppliers.ofInstance(fixture);
+    Supplier<Fixture> currentFixture =()->fixture;
 
     FieldInjectionHandler handler1 = mock(FieldInjectionHandler.class);
     FieldInjectionHandler handler2 = mock(FieldInjectionHandler.class);

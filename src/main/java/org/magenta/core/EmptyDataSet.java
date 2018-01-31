@@ -4,12 +4,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.magenta.DataSet;
 
-import com.google.common.base.Function;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 
 /**
@@ -177,11 +176,6 @@ public class EmptyDataSet<D> implements DataSet<D> {
   @Override
   public boolean isEmpty() {
     return true;
-  }
-
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).add("type", getType()).toString();
   }
 
   @Override

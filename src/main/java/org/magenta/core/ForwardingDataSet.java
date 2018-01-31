@@ -3,13 +3,11 @@ package org.magenta.core;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.magenta.DataSet;
-
-import com.google.common.base.Function;
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Predicate;
-import com.google.common.base.Supplier;
 
 /**
  * Implementation of a forwarding data set that can be used to implement the
@@ -207,10 +205,6 @@ public class ForwardingDataSet<D> implements DataSet<D> {
     return delegate.get().any(filter);
   }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).add("delegate", delegate).toString();
-  }
   @Override
   public DataSet<D> persist() {
 

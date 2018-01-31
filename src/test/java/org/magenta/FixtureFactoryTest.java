@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.junit.Test;
 import org.magenta.testing.domain.Employee;
@@ -11,7 +12,6 @@ import org.magenta.testing.domain.Occupation;
 import org.magenta.testing.domain.generators.EmployeeGenerator;
 import org.mockito.Mockito;
 
-import com.google.common.base.Supplier;
 
 public class FixtureFactoryTest extends FixtureFactoryTestSupport {
 

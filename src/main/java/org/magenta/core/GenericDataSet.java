@@ -1,10 +1,9 @@
 package org.magenta.core;
 
-import org.magenta.random.FluentRandom;
+import java.util.Objects;
+import java.util.function.Supplier;
 
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
+import org.magenta.random.FluentRandom;
 
 /**
  * A generic dataset implementation.
@@ -30,7 +29,7 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
    */
   public GenericDataSet(Iterable<D> data, Class<D> type, FluentRandom random) {
     super(type, random);
-    this.delegate = Suppliers.ofInstance(data);
+    this.delegate = () -> data;
   }
 
   /**
@@ -69,9 +68,5 @@ public class GenericDataSet<D> extends AbstractDataSet<D> {
     return true;
   }
 
-  @Override
-  public String toString() {
-    return MoreObjects.toStringHelper(this).add("type", getType()).toString();
-  }
 
 }

@@ -3,6 +3,7 @@ package org.magenta.core.injection;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.function.Supplier;
 
 import org.magenta.DataKey;
 import org.magenta.DataSet;
@@ -10,8 +11,6 @@ import org.magenta.DataSpecification;
 import org.magenta.Fixture;
 import org.magenta.QualifiedDataSet;
 import org.magenta.annotations.InjectDataSet;
-
-import com.google.common.base.Supplier;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DataSetFieldHandler<S extends DataSpecification> implements FieldInjectionHandler<S> {

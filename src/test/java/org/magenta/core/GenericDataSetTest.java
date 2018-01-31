@@ -1,8 +1,6 @@
 package org.magenta.core;
 
 import static com.google.common.base.Predicates.containsPattern;
-import static com.google.common.base.Predicates.equalTo;
-import static com.google.common.base.Predicates.or;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 
@@ -10,14 +8,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import org.junit.Test;
 import org.magenta.DataSet;
 import org.magenta.random.FluentRandom;
-
-import com.google.common.base.Functions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Suppliers;
 
 public class GenericDataSetTest {
 
@@ -65,7 +60,7 @@ public class GenericDataSetTest {
 		GenericDataSet<String> sut = Fixtures.createDataSetOf("1","2","3");
 
 		// exercise sut
-		boolean actual = sut.filter(containsPattern("5")).isEmpty();
+		boolean actual = sut.filter(i -> containsPattern("5").apply(i)).isEmpty();
 
 		// verify outcome
 		assertThat(actual).isTrue();
@@ -251,7 +246,7 @@ public class GenericDataSetTest {
     // setup fixtures
 
     GenericDataSet<String> sut = Fixtures.createDataSetOf("a","b","c");
-    Predicate<String> filter=or(equalTo("b"),equalTo("c"));
+    Predicate<String> filter= i-> i.equals("b") || i.equals("c");
 
     // exercise sut
     String actual = sut.any(filter);
@@ -298,7 +293,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list()), String.class,FluentRandom.singleton());
+    DataSet<String> ds2 = new GenericDataSet<>(() ->ds1.list(), String.class,FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isEqualTo(ds1);
@@ -318,7 +313,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     DataSet<String> ds1 = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> ds2 = new GenericDataSet<String>(Suppliers.ofInstance(ds1.list(4)), String.class,FluentRandom.singleton());
+    DataSet<String> ds2 = new GenericDataSet<>(()->ds1.list(4), String.class,FluentRandom.singleton());
 
     // exercise SUT / verify outcome
     assertThat(ds1).isNotEqualTo(ds2);
@@ -330,7 +325,7 @@ public class GenericDataSetTest {
 
     // setup fixtures
     GenericDataSet<String> sut = Fixtures.createAnonymousDataSet(5);
-    DataSet<String> expected = new GenericDataSet<String>(Suppliers.ofInstance(sut.list(3)), String.class,FluentRandom.singleton());
+    DataSet<String> expected = new GenericDataSet<>(()->sut.list(3), String.class,FluentRandom.singleton());
 
     // exercise SUT
     DataSet<String> actual = sut.subset(3);
@@ -348,7 +343,7 @@ public class GenericDataSetTest {
     GenericDataSet<String> sut = Fixtures.createDataSetOf("a", "abc", "c", "abcd");
 
     // exercise sut
-    DataSet<String> filtered = sut.filter(containsPattern("abc"));
+    DataSet<String> filtered = sut.filter(i->containsPattern("abc").apply(i));
 
     // verify outcome
     assertThat(filtered.list()).containsExactly("abc", "abcd");
@@ -361,7 +356,7 @@ public class GenericDataSetTest {
     GenericDataSet<Integer> sut = Fixtures.createDataSetOf(1, 2, 3, 4, 5);
 
     // exercise sut
-    DataSet<String> filtered = sut.transform(Functions.toStringFunction(), String.class);
+    DataSet<String> filtered = sut.transform(i->i.toString(), String.class);
 
     // verify outcome
     assertThat(filtered.list()).containsExactly("1", "2", "3", "4", "5");
@@ -397,7 +392,7 @@ public class GenericDataSetTest {
     GenericDataSet<Integer> sut =  Fixtures.createDataSetOf(1, 2, 3, 4, 5);
 
     // exercise sut
-    List<String> actual = sut.transform(Functions.toStringFunction(), String.class).without("2","5").list();
+    List<String> actual = sut.transform(i->i.toString(), String.class).without("2","5").list();
 
     // verify outcome
     assertThat(actual).containsOnly("1","3","4");

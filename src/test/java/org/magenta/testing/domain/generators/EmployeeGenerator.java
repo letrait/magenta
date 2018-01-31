@@ -1,5 +1,7 @@
 package org.magenta.testing.domain.generators;
 
+import java.util.function.Supplier;
+
 import org.magenta.DataSet;
 import org.magenta.annotations.InjectDataSet;
 import org.magenta.annotations.InjectFluentRandom;
@@ -7,7 +9,6 @@ import org.magenta.random.FluentRandom;
 import org.magenta.testing.domain.Employee;
 import org.magenta.testing.domain.Occupation;
 
-import com.google.common.base.Supplier;
 
 public class EmployeeGenerator implements Supplier<Employee>{
 

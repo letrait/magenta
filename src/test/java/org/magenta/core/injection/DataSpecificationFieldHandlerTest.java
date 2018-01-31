@@ -12,8 +12,6 @@ import org.magenta.Fixture;
 import org.magenta.SimpleDataSpecification;
 import org.magenta.annotations.InjectDataSpecification;
 
-import com.google.common.base.Suppliers;
-
 
 public class DataSpecificationFieldHandlerTest  {
 
@@ -37,7 +35,7 @@ public class DataSpecificationFieldHandlerTest  {
     DataSpecificationFieldHandler sut = new DataSpecificationFieldHandler();
 
     //exercise sut
-    boolean handled = sut.handle(f, this, Suppliers.ofInstance(mock));
+    boolean handled = sut.handle(f, this,()->mock);
 
     //verify outcome
     assertThat(handled).overridingErrorMessage("The field 'dataSpecification' of this test class was expected to be handled").isTrue();
