@@ -57,7 +57,7 @@ public class RandomDateTest {
 
 		// verify outcome
 
-		assertThat(actual).isEqualTo(expected);
+		assertThat(actual.toString()).isEqualTo(expected.toString());
 
 	}
 
@@ -74,7 +74,7 @@ public class RandomDateTest {
 		Date actual = sut.anyInThePast(1, TimeUnit.DAYS);
 
 		// verify outcome
-		assertThat(actual).isEqualTo(expected);
+		assertThat(actual.toString()).isEqualTo(expected.toString());
 	}
 
 	@Test

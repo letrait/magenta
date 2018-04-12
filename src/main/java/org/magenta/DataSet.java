@@ -179,13 +179,6 @@ public interface DataSet<D> extends DataSupplier<D>{
    */
   public D any(Predicate<? super D> filter);
 
-  /**
-   * TODO: put in an "inner" interface, do not expose
-   *
-   * @param filter
-   *          the filter
-   * @return a randomly selected item
-   */
   @Override
   public D get(int position);
 

@@ -10,7 +10,6 @@ public interface DataSupplier<D> extends Iterable<D> {
 
   int getSize();
 
-
   boolean isEmpty();
 
   boolean isGenerated();

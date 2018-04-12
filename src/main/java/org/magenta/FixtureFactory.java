@@ -2,6 +2,7 @@ package org.magenta;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.List;
 import java.util.Set;
 
 import org.magenta.core.DataSetFunctionRegistry;
@@ -55,6 +56,41 @@ public class FixtureFactory implements Fixture {
   @Override
   public <D> DataSet<D> dataset(Class<D> type) {
     return dataset(DataKey.of(type));
+  }
+
+  @Override
+  public <D> D any(Class<D> type, Object firstRestriction, Object...rest) {
+    return restrictTo(firstRestriction, rest).dataset(DataKey.of(type)).any();
+  }
+
+  @Override
+  public <D> D any(Class<D> type) {
+    return dataset(DataKey.of(type)).any();
+  }
+
+  @Override
+  public <D> D first(Class<D> type) {
+    return dataset(DataKey.of(type)).first();
+  }
+
+  @Override
+  public <D> D first(Class<D> type, Object firstRestriction, Object... rest) {
+    return restrictTo(firstRestriction, rest).dataset(DataKey.of(type)).first();
+  }
+
+  @Override
+  public <D> List<D> list(Class<D> type) {
+    return dataset(DataKey.of(type)).list();
+  }
+
+  @Override
+  public <D> List<D> list(Class<D> type, Object firstRestriction, Object...rest) {
+    return restrictTo(firstRestriction, rest).dataset(DataKey.of(type)).list();
+  }
+
+  @Override
+  public <D> List<D> list(Class<D> type, Integer size, Object firstRestriction, Object...rest) {
+    return restrictTo(firstRestriction, rest).dataset(DataKey.of(type)).list(size);
   }
 
   @Override

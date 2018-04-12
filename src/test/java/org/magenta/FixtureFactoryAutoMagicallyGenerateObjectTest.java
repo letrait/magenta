@@ -35,7 +35,7 @@ public class FixtureFactoryAutoMagicallyGenerateObjectTest {
     sut.newDataSet(Employee.class).autoMagicallyGenerated(5);
 
     //verify outcome
-    List<Employee> actual = sut.dataset(Employee.class).list();
+    List<Employee> actual = sut.list(Employee.class);
 
     assertThat(actual).extracting("employeeId").hasSize(5).doesNotContainNull();
     assertThat(actual).extracting("name").hasSize(5).doesNotContainNull();
@@ -53,7 +53,7 @@ public class FixtureFactoryAutoMagicallyGenerateObjectTest {
     sut.newDataSet(Employee.class).autoMagicallyGenerated(1);
 
     //verify outcome
-    Employee actual = sut.dataset(Employee.class).first();
+    Employee actual = sut.first(Employee.class);
 
     assertThat(actual.getPhoneNumbers()).isNotEmpty();
   }
