@@ -67,8 +67,10 @@ public class RestrictionHelper {
    *
    * @param domain
    *          the domain
-   * @param objects
-   *          an array of object
+   * @param first
+   *          the first restriction
+   * @param rest
+   *          the rest of restrictions
    */
 
   public static void applyRestrictions(FixtureFactory domain, Object first, Object... rest) {

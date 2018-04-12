@@ -55,9 +55,12 @@ public class FluentRandom {
     return INSTANCE.random;
   }
 
-  public static void setRandom(Random r){
+  public static void incrementSeed(){
+    INSTANCE = new FluentRandom(Helper.incrementSeed());
+  }
 
-    INSTANCE = new FluentRandom(r);
+  public static void setRandom(Random random) {
+    INSTANCE = new FluentRandom(random);
   }
 
   /**
@@ -204,42 +207,29 @@ public class FluentRandom {
   }
 
   private static class Helper {
+
+    public static AtomicLong DEFAULT_SEED_FOR_RANDOM = new AtomicLong(0L);
+
+
     private static final Logger LOG = LoggerFactory.getLogger(FluentRandom.class);
 
     public static final String RANDOM_SEED_SYSTEM_PROPERTY_KEY = "magenta.random.seed";
-
-    // <--
-    // cut&paste from the Random class
-    private static final AtomicLong SEED_UNIQUIFIER = new AtomicLong(8682522807148012L);
-
-    private static final long M = 181783497276652981L;
-
-    private static long seedUniquifier() {
-      // L'Ecuyer, "Tables of Linear Congruential Generators of
-      // Different Sizes and Good Lattice Structure", 1999
-      for (;;) {
-        long current = SEED_UNIQUIFIER.get();
-        long next = current * M;
-        if (SEED_UNIQUIFIER.compareAndSet(current, next)) {
-          return next;
-        }
-      }
-    }
 
     // -->
     // end cut&paste
 
     private static Random initWithDefaultRandom() {
       LOG.info("------------------------------------------------------------------------");
-      LOG.info("MAGENTA RANDOM initialization");
+      LOG.info("MAGENTA FluentRandom initialization");
 
       String seedValue = System.getProperty(RANDOM_SEED_SYSTEM_PROPERTY_KEY);
       Long seed = null;
       if (seedValue != null) {
         try {
 
-          LOG.info("The seed value read from the system property {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seedValue);
+          LOG.info("Magenta FluentRandom seed is read from system property {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seedValue);
           seed = Long.parseLong(seedValue);
+          DEFAULT_SEED_FOR_RANDOM.set(seed);
 
         } catch (Throwable t) {
           // ignore;
@@ -247,17 +237,20 @@ public class FluentRandom {
         }
       }
 
-      if (seed == null) {
-        seed = seedUniquifier() ^ System.nanoTime();
-      }
-
-      LOG.info("The seed used by magenta for random is {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seed);
-      LOG.info("------------------------------------------------------------------------");
-      Random random = new Random(seed);
-
-      return random;
+      return setSeed(DEFAULT_SEED_FOR_RANDOM.get());
 
     }
+
+    public static Random incrementSeed() {
+      return setSeed(DEFAULT_SEED_FOR_RANDOM.incrementAndGet());
+    }
+
+    public static Random setSeed(long seed) {
+      LOG.info("Magenta FluentRandom seed is currently {}={}", RANDOM_SEED_SYSTEM_PROPERTY_KEY, seed);
+      return new Random(seed);
+    }
+
+
   }
 
 }

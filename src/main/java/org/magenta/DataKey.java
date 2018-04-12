@@ -104,13 +104,4 @@ public final static String DEFAULT = "default";
     builder.append(getType()).append(':').append(getQualifier());
     return builder.toString();
   }
-
-
-
-
-
-
-
-
-
 }

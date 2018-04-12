@@ -26,7 +26,7 @@ public class ConditionalGeneratorProviderTest {
   @Test
   public void testAGeneratorIsProvidedWhenTheTypeIsString(){
 
-    ConditionalGeneratorFactory sut = new ConditionalGeneratorFactory( type -> type.isAssignableFrom(String.class), Suppliers.ofInstance("abcd"));
+    ConditionalGeneratorFactory sut = new ConditionalGeneratorFactory( type -> type.isSubtypeOf(String.class), Suppliers.ofInstance("abcd"));
 
     //exercise sut
     Optional<GenerationStrategy<String>> actual = sut.buildGeneratorOf(DataKey.of(String.class), fixture, generatorFactory);
@@ -39,7 +39,7 @@ public class ConditionalGeneratorProviderTest {
   @Test
   public void testAGeneratorIsNotProvidedWhenTheTypeIsNotString(){
 
-    ConditionalGeneratorFactory sut = new ConditionalGeneratorFactory(type -> type.isAssignableFrom(String.class), Suppliers.ofInstance("abcd"));
+    ConditionalGeneratorFactory sut = new ConditionalGeneratorFactory(type -> type.isSubtypeOf(String.class), Suppliers.ofInstance("abcd"));
 
     //exercise sut
     Optional<GenerationStrategy<String>> actual = sut.buildGeneratorOf((DataKey)DataKey.of(Integer.class), fixture, generatorFactory);

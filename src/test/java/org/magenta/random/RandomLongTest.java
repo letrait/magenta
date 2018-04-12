@@ -19,8 +19,6 @@ public class RandomLongTest {
 
     long value = rnd.resolution(2).any(Range.closed(-1000L,1000L));
 
-    System.out.println(value);
-
     assertThat(value).isBetween(-1000L, 1000L);
     }
   }

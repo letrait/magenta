@@ -24,13 +24,13 @@ public class PrimitiveDynamicGeneratorFactoryProvider {
   public static List<DynamicGeneratorFactory> get(){
     List<DynamicGeneratorFactory> factories = Lists.newArrayList();
     
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(String.class), () -> FluentRandom.strings().charabia(16)));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Integer.class) || mappedType(type).isAssignableFrom(Integer.class), () -> FluentRandom.integers().anyPositive()));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Long.class) || mappedType(type).isAssignableFrom(Long.class), () -> FluentRandom.longs().anyPositive()));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Short.class) || mappedType(type).isAssignableFrom(Short.class), () -> FluentRandom.shorts().anyPositive()));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Double.class) || mappedType(type).isAssignableFrom(Double.class), () -> FluentRandom.doubles().anyPositive()));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Float.class) || mappedType(type).isAssignableFrom(Float.class), () -> new Float(FluentRandom.doubles().anyPositive())));
-    factories.add(new ConditionalGeneratorFactory(type -> type.isAssignableFrom(Boolean.class) || mappedType(type).isAssignableFrom(Boolean.class), () -> FluentRandom.integers().anyPositive(1)==0));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(String.class), () -> FluentRandom.strings().charabia(16)));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Integer.class) || mappedType(type).isAssignableFrom(Integer.class), () -> FluentRandom.integers().anyPositive()));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Long.class) || mappedType(type).isAssignableFrom(Long.class), () -> FluentRandom.longs().anyPositive()));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Short.class) || mappedType(type).isAssignableFrom(Short.class), () -> FluentRandom.shorts().anyPositive()));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Double.class) || mappedType(type).isAssignableFrom(Double.class), () -> FluentRandom.doubles().anyPositive()));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Float.class) || mappedType(type).isAssignableFrom(Float.class), () -> new Float(FluentRandom.doubles().anyPositive())));
+    factories.add(new ConditionalGeneratorFactory(type -> type.isSubtypeOf(Boolean.class) || mappedType(type).isAssignableFrom(Boolean.class), () -> FluentRandom.integers().anyPositive(1)==0));
     
     return factories;
   }

@@ -45,11 +45,8 @@ public class DataSetImpl<D> implements DataSet<D> {
 
   /**
    * Construct a new dataset using the provided supplier as source.
-   *
-   * @param type
-   *          the type of data
-   * @param random
-   *          the java random to use for shuffling and by the "any()" method
+   * @param datasetSupplier The data supplier
+   * @param postEventEnabled if event must be posted when data are read.
    */
   public DataSetImpl(DataSupplier<D> datasetSupplier, boolean postEventEnabled) {
     this.supplier = datasetSupplier;
