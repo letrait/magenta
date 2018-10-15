@@ -9,6 +9,7 @@ import org.junit.Test;
 import org.magenta.DataKey;
 import org.magenta.DataSet;
 import org.magenta.FixtureFactory;
+import org.magenta.RestrictableDataSet;
 import org.mockito.Mockito;
 
 import com.google.common.base.Suppliers;
@@ -18,7 +19,7 @@ public class DatasetSupplierTest {
   @Test
   public void testGet(){
     //setup fixture
-    DataSet<String> expected = mock(DataSet.class);
+    RestrictableDataSet<String> expected = mock(RestrictableDataSet.class);
     FixtureFactory fixture = mock(FixtureFactory.class);
 
     when(fixture.dataset(Mockito.any(DataKey.class))).thenReturn(expected);

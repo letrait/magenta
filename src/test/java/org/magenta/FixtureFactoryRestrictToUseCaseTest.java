@@ -39,13 +39,25 @@ public class FixtureFactoryRestrictToUseCaseTest {
   }
 
   @Test
+  public void testRestrictToOneObjectOnTheDataSet(){
+
+    //setup fixtures
+
+    //exercise sut
+    List<Employee> engineers = fixtures.dataset(Employee.class).restrictTo(Occupation.ENGINEER).list(3);
+
+    //verify outcome
+    assertThat(engineers).extracting("occupation").containsOnly(Occupation.ENGINEER);
+  }
+
+  @Test
   public void testRestrictToTwoObjects(){
 
     //setup fixtures
     Address expectedAddress = new Address();
 
     //exercise sut
-    List<Employee> engineers = fixtures.restrictTo(Occupation.ENGINEER, expectedAddress).dataset(Employee.class).list(3);
+    List<Employee> engineers = fixtures.dataset(Employee.class).restrictTo(Occupation.ENGINEER, expectedAddress).list(3);
 
     //verify outcome
     assertThat(engineers).extracting("occupation").containsOnly(Occupation.ENGINEER);

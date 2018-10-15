@@ -147,7 +147,6 @@ public class CoordinatedSequence2Test {
   }
 
 
-
   private <D> DataSetImpl<D> createDataSetFrom(D...staticData) {
     D proto = staticData[0];
     TypeToken<D> expectedType = TypeToken.of((Class)proto.getClass());

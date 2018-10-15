@@ -12,7 +12,7 @@ public class FixtureFactorySimpleUseCaseTest {
     FixtureFactory fixture = createRootFixtureFactory();
 
     // exercise sut
-    fixture.dataset(Integer.class);
+    fixture.dataset(Integer.class).any();
 
   }
 

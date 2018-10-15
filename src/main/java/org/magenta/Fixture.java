@@ -20,9 +20,9 @@ public interface Fixture {
 
   <D> List<D> list(Class<D> type, Object firstRestriction, Object...rest) ;
 
-  public <D> DataSet<D> dataset(DataKey<D> key);
+  public <D> RestrictableDataSet<D> dataset(DataKey<D> key);
 
-  public <D> DataSet<D> dataset(Class<D> type);
+  public <D> RestrictableDataSet<D> dataset(Class<D> type);
 
   public Set<DataKey<?>> keys();
 

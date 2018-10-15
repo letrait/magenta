@@ -10,6 +10,7 @@ import org.magenta.core.DataSetImpl;
 import org.magenta.core.FixtureContext;
 import org.magenta.core.GenerationStrategy;
 import org.magenta.core.GenerationStrategyFactory;
+import org.magenta.core.RestrictableDataSetImpl;
 import org.magenta.core.RestrictionHelper;
 import org.magenta.core.automagic.generation.DynamicGeneratorFactory;
 import org.magenta.core.data.supplier.GeneratorDataSupplier;
@@ -54,7 +55,7 @@ public class FixtureFactory implements Fixture {
   }
 
   @Override
-  public <D> DataSet<D> dataset(Class<D> type) {
+  public <D> RestrictableDataSet<D> dataset(Class<D> type) {
     return dataset(DataKey.of(type));
   }
 
@@ -94,8 +95,8 @@ public class FixtureFactory implements Fixture {
   }
 
   @Override
-  public <D> DataSet<D> dataset(DataKey<D> key) {
-    return doGetDatasetFunction(key).apply(this);
+  public <D> RestrictableDataSet<D> dataset(DataKey<D> key) {
+    return new RestrictableDataSetImpl<>(key, this);
   }
 
   @Override
@@ -133,7 +134,7 @@ public class FixtureFactory implements Fixture {
     return this;
   }
 
-  private <D> Function<Fixture, DataSet<D>> doGetDatasetFunction(DataKey<D> key) {
+  public <D> Function<Fixture, DataSet<D>> doGetDatasetFunction(DataKey<D> key) {
     Function<Fixture, DataSet<D>> datasetFunction = registry.get(key);
     if (datasetFunction != null) {
       Magenta.eventBus().post(DataSetFound.from(key, this));
